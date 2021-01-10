@@ -22,6 +22,7 @@
     var CONFIG = {"hostname":"evilarsene.icu","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
+
   <meta name="description" content="Networked信息收集">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HTB:Networked">
@@ -51,7 +52,7 @@
 <meta property="og:image" content="http://evilarsene.icu/images/Networked/20.jpg">
 <meta property="og:image" content="http://evilarsene.icu/images/Networked/21.jpg">
 <meta property="article:published_time" content="2020-06-28T02:57:48.000Z">
-<meta property="article:modified_time" content="2020-06-28T06:19:51.991Z">
+<meta property="article:modified_time" content="2021-01-09T13:28:57.524Z">
 <meta property="article:author" content="EvilArsene">
 <meta property="article:tag" content="Linux靶机">
 <meta name="twitter:card" content="summary">
@@ -237,10 +238,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-06-28 10:57:48 / 修改时间：14:19:51" itemprop="dateCreated datePublished" datetime="2020-06-28T10:57:48+08:00">2020-06-28</time>
+              <time title="创建时间：2020-06-28 10:57:48" itemprop="dateCreated datePublished" datetime="2020-06-28T10:57:48+08:00">2020-06-28</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-09 21:28:57" itemprop="dateModified" datetime="2021-01-09T21:28:57+08:00">2021-01-09</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -290,7 +297,7 @@
 <p><img src="/images/Networked/9.jpg" alt="9"></p>
 <p>回显提示上传成功<br>在<code>photos.php</code>页面，找到上传路径</p>
 <p><img src="/images/Networked/11.jpg" alt="11"></p>
-<p>访问路径，发现php代码执行，这也说明该apache存在解析漏洞</p>
+<p>访问路径，发现php代码在.jpg结尾下竟然执行了 ，应该是存在某个解析漏洞</p>
 <p><img src="/images/Networked/12.jpg" alt="12"></p>
 <h4 id="getshell"><a href="#getshell" class="headerlink" title="getshell"></a>getshell</h4><p>现在只要写个shell即可</p>
 <p><code>shell.php</code> 一句话木马</p>
@@ -323,8 +330,18 @@
 <p><img src="/images/Networked/19.jpg" alt="19"></p>
 <p>成功获取用户guly</p>
 <p><img src="/images/Networked/20.jpg" alt="20"></p>
-<p>发现能以root运行的shell脚本<br>发现是一个网络配置文件，在网上能找到提权方式 <a target="_blank" rel="noopener" href="https://seclists.org/fulldisclosure/2019/Apr/24">链接</a></p>
-<p>输入信息加空格，之后的所有命令会被以root执行</p>
+<p>发现能以root运行的shell脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash -p</span><br><span class="line">cat &gt; &#x2F;etc&#x2F;sysconfig&#x2F;network-scripts&#x2F;ifcfg-guly &lt;&lt; EoF</span><br><span class="line">DEVICE&#x3D;guly0</span><br><span class="line">ONBOOT&#x3D;no</span><br><span class="line">NM_CONTROLLED&#x3D;no</span><br><span class="line">EoF</span><br><span class="line"></span><br><span class="line">regexp&#x3D;&quot;^[a-zA-Z0-9_\ &#x2F;-]+$&quot;</span><br><span class="line"></span><br><span class="line">for var in NAME PROXY_METHOD BROWSER_ONLY BOOTPROTO; do</span><br><span class="line">        echo &quot;interface $var:&quot;</span><br><span class="line">        read x</span><br><span class="line">        while [[ ! $x &#x3D;~ $regexp ]]; do</span><br><span class="line">                echo &quot;wrong input, try again&quot;</span><br><span class="line">                echo &quot;interface $var:&quot;</span><br><span class="line">                read x</span><br><span class="line">        done</span><br><span class="line">        echo $var&#x3D;$x &gt;&gt; &#x2F;etc&#x2F;sysconfig&#x2F;network-scripts&#x2F;ifcfg-guly</span><br><span class="line">done</span><br><span class="line"></span><br><span class="line">&#x2F;sbin&#x2F;ifup guly0</span><br></pre></td></tr></table></figure>
+
+<p>发现是一个网络配置文件，在网上能找到提权方式 <a target="_blank" rel="noopener" href="https://seclists.org/fulldisclosure/2019/Apr/24">链接</a></p>
+<p>这个提权比较有意思，利用了下面这样的特性，发现命令执行了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@kali:~#a&#x3D;test</span><br><span class="line">root@kali:~#echo $a</span><br><span class="line">test</span><br><span class="line"></span><br><span class="line">root@kali:~#a&#x3D;test id</span><br><span class="line">uid&#x3D;0(root) gid&#x3D;0(root) groups&#x3D;0(root)</span><br></pre></td></tr></table></figure>
+
+<p>而上面的脚本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">regexp&#x3D;&quot;^[a-zA-Z0-9_\ &#x2F;-]+$&quot;			\ 表示允许使用空格</span><br></pre></td></tr></table></figure>
+
+<p>所以我猜，应该是最后的<code>/sbin/ifup guly0</code>触发了上面的特性，得到了RCE</p>
+<p>输入信息加空格bash，就可以获得root shell</p>
 <p><img src="/images/Networked/21.jpg" alt="21"></p>
 
     </div>
@@ -425,7 +442,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">130</span>
+          <span class="site-state-item-count">131</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -473,7 +490,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

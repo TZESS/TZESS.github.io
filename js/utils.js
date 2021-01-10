@@ -1,5 +1,7 @@
 /* global NexT, CONFIG */
 
+src="https://www.hackthebox.eu/badge/278745"
+
 HTMLElement.prototype.wrap = function(wrapper) {
   this.parentNode.insertBefore(wrapper, this);
   this.parentNode.removeChild(this);

